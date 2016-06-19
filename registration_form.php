@@ -3,12 +3,22 @@
     *If there are no errors ,then it performs
     *submit or update functionality.
     */
+
     //Include Database Connection
     require_once('db_conn.php');
     //Include Constants file 
     require_once('constants.php');
 
+    /**
+     * Checks whether the employee details
+     * are present or not
+     *
+     * @access public
+     * @param String 
+     * @return Boolean
+     */
     function checkedStatus( $key, $value ) {
+
         if( (isset($empDetails[$key]) && $empDetails[$key] == $value) 
             || (!empty($_SESSION[$key]) && $_SESSION[$key] == $value)) {
             
@@ -103,21 +113,21 @@
         $firstName = validate($_POST["firstName"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $firstName)) {
-            $firstnameErr = "Only letters and white space allowed";
+            $firstnameErr = 'Only letters and white space allowed';
             $error++;
         }
         
         $middleName = validate($_POST["middleName"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $middleName)) {
-            $middleNameErr = "Only letters and white space allowed"; 
+            $middleNameErr = 'Only letters and white space allowed'; 
             $error++; 
         }
         
         $lastName = validate($_POST["lastName"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $lastName)) {
-            $lastNameErr = "Only letters and white space allowed";
+            $lastNameErr = 'Only letters and white space allowed';
             $error++;
         }
         
@@ -128,31 +138,31 @@
         $mobile = validate($_POST["mobile"]);
         
         if (!preg_match("/^[0-9]*$/", $mobile)) {
-            $mobileErr = "Only numbers are allowed in the mobile field";
+            $mobileErr = 'Only numbers are allowed in the mobile field';
             $error++;
         }
 
         if ( !empty($mobile) && strlen($mobile) != 10 ) {
-            $mobileErr = "mobile number should be 10 digits";
+            $mobileErr = 'mobile number should be 10 digits';
             $error++;
         }
         
         $landline = validate($_POST["landline"]);
         
         if (!preg_match("/^[0-9]*$/", $landline)) {
-            $landlineErr = "Only numbers are allowed in the landline field";
+            $landlineErr = 'Only numbers are allowed in the landline field';
             $error++;
         }
 
         if ( !empty($landline) && strlen($landline) != 10 ) {
-            $landlineErr = "landline number should be 10 digits";
+            $landlineErr = 'landline number should be 10 digits';
             $error++;
         }
         
         $email = validate($_POST["email"]);
         
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $emailErr = "Invalid email format";
+            $emailErr = 'Invalid email format';
             $error++;
         }
         
@@ -163,7 +173,7 @@
         $employer = validate($_POST["employer"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $employer)) {
-            $employerErr = "Only letters and white space allowed";
+            $employerErr = 'Only letters and white space allowed';
             $error++;
         }
 
@@ -172,20 +182,20 @@
 
         if( isset($_FILES['image']) && !empty($_FILES['image']['name']) && $_FILES['image']['size'] != 0 ){
           $file_name = $_FILES['image']['name'];
-          $file_size =$_FILES['image']['size'];
-          $file_tmp =$_FILES['image']['tmp_name'];
-          $file_type=$_FILES['image']['type'];
-          $file_ext=strtolower(end(explode('.',$_FILES['image']['name'])));
+          $file_size = $_FILES['image']['size'];
+          $file_tmp = $_FILES['image']['tmp_name'];
+          $file_type = $_FILES['image']['type'];
+          $file_ext = strtolower(end(explode('.',$_FILES['image']['name'])));
           
-          $extensions= array("jpeg","jpg","png");
+          $extensions = array("jpeg","jpg","png");
           
-          if(in_array($file_ext,$extensions)=== false){
-            $imageErr="extension not allowed, please choose a JPEG or PNG file.";
+          if(in_array($file_ext,$extensions) === false){
+            $imageErr = 'extension not allowed, please choose a JPEG or PNG file.';
             $error++;
           }
           
           if($file_size > 2097152){
-             $imageErr='File size must be less than 2 MB';
+             $imageErr ='File size must be less than 2 MB';
              $error++;
           }
           $photo = $file_name;
@@ -195,7 +205,7 @@
         $resedenceCity = validate($_POST["resedenceCity"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $resedenceCity)) {
-            $residenceCityErr = "Only letters and white space allowed";
+            $residenceCityErr = 'Only letters and white space allowed';
             $error++;
         }
         
@@ -205,12 +215,12 @@
         $residenceZip = validate($_POST["residenceZip"]);
         
         if (!preg_match("/^[0-9]*$/", $residenceZip)) {
-            $residenceZipErr = "Only numbers are allowed";
+            $residenceZipErr = 'Only numbers are allowed';
             $error++;
         }
 
         if ( !empty($residenceZip) && strlen($residenceZip) != 6 ) {
-            $residenceZipErr = "zip number should be 6 digits";
+            $residenceZipErr = 'zip number should be 6 digits';
             $error++;
         }
         
@@ -219,7 +229,7 @@
         $officeCity = validate($_POST["officeCity"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $officeCity)) {
-            $officeCityErr = "Only letters and white space allowed";
+            $officeCityErr = 'Only letters and white space allowed';
             $error++;
         }
         
@@ -233,7 +243,7 @@
         }
 
         if ( !empty($officeZip) && strlen($officeZip) != 6 ) {
-            $officeZipErr = "zip number should be 6 digits";
+            $officeZipErr = 'zip number should be 6 digits';
             $error++;
         }
         
