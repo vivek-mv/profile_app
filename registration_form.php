@@ -29,9 +29,14 @@
         return false;
     }
 
+    //Start session to store the form fields
+    session_start();
+
     //Check for any error messages from details page
-    if (!empty($_REQUEST['Message'])) {
-        echo "Sorry , something bad happened .Please try after some time." . $_REQUEST['Message'];
+    if ( (isset($_SESSION['dbErr'] ) && $_SESSION['dbErr'] == 1) || (isset($_GET["dbErr"]) && $_GET["dbErr"] == 1 ) ) {
+        echo "Sorry , something bad happened .Please try after some time." ;
+        session_unset();
+        session_destroy();
     }
 
     //Check and set form action
@@ -81,16 +86,13 @@
         'West Bengal'
     );
 
-    //Start session to store the form fields
-    //session_start();
-
     //If a request is for update then set a flag in a session variable ,so that, update button
     //could be retained
     if (isset($_GET["userId"]) && isset($_GET["userAction"]) ) {
         $_SESSION["retainUpdateBtn"] = 1;
     } 
 
-    //Validate the input fields only if the request method is POST
+    //getCorrectData the input fields only if the request method is POST
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         //Initialize error to check for any errors that occur during validation
         $error = 0;
@@ -102,41 +104,41 @@
          * @param String $data
          * @return String
          */
-        function validate($data) {
+        function getCorrectData($data) {
             $data = trim($data);
             $data = stripslashes($data);
             $data = htmlspecialchars($data);
             return $data;
         }
         
-        $prefix = validate($_POST["prefix"]);
+        $prefix = getCorrectData($_POST["prefix"]);
         $_SESSION["prefix"] = $prefix;
-        $firstName = validate($_POST["firstName"]);
+        $firstName = getCorrectData($_POST["firstName"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $firstName)) {
             $firstnameErr = 'Only letters and white space allowed';
             $error++;
         }
         
-        $middleName = validate($_POST["middleName"]);
+        $middleName = getCorrectData($_POST["middleName"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $middleName)) {
             $middleNameErr = 'Only letters and white space allowed'; 
             $error++; 
         }
         
-        $lastName = validate($_POST["lastName"]);
+        $lastName = getCorrectData($_POST["lastName"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $lastName)) {
             $lastNameErr = 'Only letters and white space allowed';
             $error++;
         }
         
-        $gender = validate($_POST["gender"]);
+        $gender = getCorrectData($_POST["gender"]);
         $_SESSION["gender"] = $gender;
-        $dob = validate($_POST["dob"]);
+        $dob = getCorrectData($_POST["dob"]);
         $_SESSION["dob"] = $dob;
-        $mobile = validate($_POST["mobile"]);
+        $mobile = getCorrectData($_POST["mobile"]);
         
         if (!preg_match("/^[0-9]*$/", $mobile)) {
             $mobileErr = 'Only numbers are allowed in the mobile field';
@@ -148,7 +150,7 @@
             $error++;
         }
         
-        $landline = validate($_POST["landline"]);
+        $landline = getCorrectData($_POST["landline"]);
         
         if (!preg_match("/^[0-9]*$/", $landline)) {
             $landlineErr = 'Only numbers are allowed in the landline field';
@@ -160,18 +162,18 @@
             $error++;
         }
         
-        $email = validate($_POST["email"]);
+        $email = getCorrectData($_POST["email"]);
         
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $emailErr = 'Invalid email format';
             $error++;
         }
         
-        $maritalStatus = validate($_POST["maritalStatus"]);
+        $maritalStatus = getCorrectData($_POST["maritalStatus"]);
         $_SESSION["maritalStatus"] = $maritalStatus;
-        $employment = validate($_POST["employment"]);
+        $employment = getCorrectData($_POST["employment"]);
         $_SESSION["employment"] = $employment;
-        $employer = validate($_POST["employer"]);
+        $employer = getCorrectData($_POST["employer"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $employer)) {
             $employerErr = 'Only letters and white space allowed';
@@ -195,25 +197,25 @@
             $error++;
           }
           
-          if($file_size > 2097152){
-             $imageErr ='File size must be less than 2 MB';
+          if($file_size > IMAGE_SIZE){
+             $imageErr ='File size must be less than'.IMAGE_SIZE_MB;
              $error++;
           }
           $photo = $file_name;
         }
         
-        $residenceStreet = validate($_POST["residenceStreet"]);
-        $resedenceCity = validate($_POST["resedenceCity"]);
+        $residenceStreet = getCorrectData($_POST["residenceStreet"]);
+        $resedenceCity = getCorrectData($_POST["resedenceCity"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $resedenceCity)) {
             $residenceCityErr = 'Only letters and white space allowed';
             $error++;
         }
         
-        $resedenceState = validate($_POST["residenceState"]);
+        $resedenceState = getCorrectData($_POST["residenceState"]);
         $_SESSION["residenceState"] = $resedenceState;
 
-        $residenceZip = validate($_POST["residenceZip"]);
+        $residenceZip = getCorrectData($_POST["residenceZip"]);
         
         if (!preg_match("/^[0-9]*$/", $residenceZip)) {
             $residenceZipErr = 'Only numbers are allowed';
@@ -225,18 +227,18 @@
             $error++;
         }
         
-        $residenceFax = validate($_POST["residenceFax"]);
-        $officeStreet = validate($_POST["officeStreet"]);
-        $officeCity = validate($_POST["officeCity"]);
+        $residenceFax = getCorrectData($_POST["residenceFax"]);
+        $officeStreet = getCorrectData($_POST["officeStreet"]);
+        $officeCity = getCorrectData($_POST["officeCity"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $officeCity)) {
             $officeCityErr = 'Only letters and white space allowed';
             $error++;
         }
         
-        $officeState = validate($_POST["officeState"]);
+        $officeState = getCorrectData($_POST["officeState"]);
         $_SESSION["officeState"] = $officeState;
-        $officeZip = validate($_POST["officeZip"]);
+        $officeZip = getCorrectData($_POST["officeZip"]);
         
         if (!preg_match("/^[0-9]*$/", $officeZip)) {
             $officeZipErr = "Only numbers are allowed";
@@ -248,8 +250,8 @@
             $error++;
         }
         
-        $officeFax = validate($_POST["officeFax"]);
-        $note = validate($_POST["note"]);
+        $officeFax = getCorrectData($_POST["officeFax"]);
+        $note = getCorrectData($_POST["note"]);
 
         //Check for Communication Medium,if its empty then assign an empty array
         if( isset($_POST["commMed"]) ) {
@@ -275,8 +277,8 @@
 
                 $empID = $conn->insert_id;
             } else {
-                header("Location:registration_form.php?Message="
-                 . " " . $conn->connect_error);
+                $_SESSION['dbErr'] = 1;
+                header("Location:registration_form.php");
                 exit();
             }
             // insert residence and office address
@@ -285,8 +287,8 @@
                     '$residenceFax') , ('$empID','2','$officeStreet','$officeCity','$officeState','$officeZip','$officeFax')";
 
             if (!$conn->query($insertAdd)) {
-                header("Location:registration_form.php?Message="
-                 . " " . $conn->connect_error);
+                $_SESSION['dbErr'] = 1;
+                header("Location:registration_form.php");
                 exit();
             }
             
@@ -299,8 +301,8 @@
                 VALUES ('$empID','$msg','$comEmail','$call','$any')";
             
             if (!$conn->query($insertCommMedium)) {
-                header("Location:registration_form.php?Message="
-                 . " " . $conn->connect_error);
+                $_SESSION['dbErr'] = 1;
+                header("Location:registration_form.php");
                 exit();
             }
 
@@ -320,12 +322,12 @@
                 $image ="SELECT employee.photo FROM employee WHERE eid=" . $_GET["userId"] . ";";
 
                 $result = mysqli_query($conn, $image) or 
-                header("Location:details.php?Message= delete failed:(");
+                header("Location:details.php?Message=1");
 
                 $row = $result->fetch_assoc();
 
                 if ( !unlink(APP_PATH."/profile_pic/".$row["photo"]) ) {
-                  header("Location:details.php?Message= Unable to delete image");
+                  header("Location:details.php?Message=1");
                 }
             }
 
@@ -333,13 +335,13 @@
             $updateResidenceAdd = "UPDATE address SET street = '" . $residenceStreet . "', city ='" . $resedenceCity . "',
             state = '" . $resedenceState . "' , zip = '" . $residenceZip . "', fax = '" .$residenceFax .
             "' where eid = " . $_GET["userId"] . " && type = 1";
-            $conn->query($updateResidenceAdd) or header("Location:registration_form.php?Message=database error" . $conn->connect_error);
+            $conn->query($updateResidenceAdd) or header("Location:registration_form.php?dbErr=1");
             
             //Update office address
             $updateOfficeAdd = "UPDATE address SET street = '" . $officeStreet . "', city ='" . $officeCity . "',
                             state = '" . $officeState . "' , zip = '" . $officeZip . "', fax = '" . $officeFax .
                             "' where eid = " . $_GET["userId"] . " && type = 2";
-            $conn->query($updateOfficeAdd) or header("Location:registration_form.php?Message=" . " " . $conn->connect_error);
+            $conn->query($updateOfficeAdd) or header("Location:registration_form.php?dbErr=1");
             
             // Update communication medium
             $msg = in_array("msg", $commMedium) ? 1 : 0;
@@ -349,7 +351,7 @@
             
             $updateCommMedium = "UPDATE commMedium SET msg ='" . $msg . "' , email ='" . $comEmail . "',
                 `call` ='" . $call . "' , any ='" . $any . "' where empId =" . $_GET["userId"];
-            $conn->query($updateCommMedium) or header("Location:registration_form.php?Message=" . " " . $conn->connect_error);
+            $conn->query($updateCommMedium) or header("Location:registration_form.php?dbErr=1");
             
             //If photo is empty then dont update photo
             if( empty($photo) ) {
@@ -365,7 +367,7 @@
                 employer='" . $employer ."'".$insertImage . ",note= '" . $note . "' where eid = " 
                 . $_GET["userId"];
                 
-            $conn->query($updateEmpDetails) or header("Location:registration_form.php?Message=" . " " . $conn->connect_error);
+            $conn->query($updateEmpDetails) or header("Location:registration_form.php?dbErr=1");
             
             //Destroy the session 
             session_unset();
@@ -392,15 +394,15 @@
             WHERE address.eid =" . $_GET["userId"] . " AND address.type = 2";
 
         $result1 = mysqli_query($conn, $selectEmpDetails) or 
-            header("Location:registration_form.php?Message= :(");
+            header("Location:registration_form.php?dbErr=1");
         $empDetails = $result1->fetch_assoc();
         
         $result2 = mysqli_query($conn, $residenceAddress) or 
-            header("Location:registration_form.php?Message= :(");
+            header("Location:registration_form.php?dbErr=1");
         $empResidence = $result2->fetch_assoc();
 
         $result3 = mysqli_query($conn, $officeAddress) or 
-            header("Location:registration_form.php?Message= :(");
+            header("Location:registration_form.php?dbErr=1");
         $empOffice = $result3->fetch_assoc();        
     }
 ?>

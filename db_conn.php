@@ -11,7 +11,7 @@
     
     // Check connection and redirect to registration page if there's error in conn.
     if ($conn->connect_error) {
-        header("Location:registration_form.php?Message=" . " " . $conn->connect_error);
+        header("Location:registration_form.php?dbErr=1");
         exit();
     }
 ?>

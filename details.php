@@ -11,7 +11,7 @@
     require_once('constants.php');
     
     //Display error message if delete fails in the same page
-    if ( isset($_GET["Message"]) && !empty($_GET["Message"]) ) {
+    if ( isset($_GET["Message"]) && $_GET["Message"] == 1 ) {
 
         echo "Sorry delete failed !, please try after some time ";
     }
@@ -27,23 +27,23 @@
         //Select the employee image from the employee table and remove it from profile_pic dir.
         $image ="SELECT employee.photo FROM employee WHERE eid=" . $_GET["userId"] . ";";
         $delImage = mysqli_query($conn, $image) or 
-                    header("Location:details.php?Message= delete failed:(");
+                    header("Location:details.php?Message=1");
         $getImg = $delImage->fetch_assoc();
         
         if ( !empty($getImg["photo"])  && !unlink(APP_PATH . "/profile_pic/".$getImg["photo"]) ) {
 
-            header("Location:details.php?Message= Unable to delete image");
+            header("Location:details.php?Message=1");
         }
 
         //Delete employee address
         mysqli_query($conn, $deleteAddress) or 
-            header("Location:details.php?Message= delete failed:(");
+            header("Location:details.php?Message=1");
         //Delete employee communication medium
         mysqli_query($conn, $deleteCommMode) or 
-            header("Location:details.php?Message= delete failed:(");
+            header("Location:details.php?Message=1");
         //Delete employee details
         mysqli_query($conn, $deleteEmployee) or 
-            header("Location:details.php?Message= delete failed:(");
+            header("Location:details.php?Message=1");
 
         //If delete is successfull then redirect to the same page
         header("Location:details.php");
@@ -97,7 +97,7 @@
                             employee.eid = commMedium.empId JOIN address ON  employee.eid = address.eid";
                         
                         $employeeDetails = mysqli_query($conn, $selectEmpDetails) or 
-                                   header("Location:registration_form.php?Message= :(");
+                                   header("Location:registration_form.php?dbErr=1");
 
                         //When no data is present in the table,display message
                         if ( $employeeDetails->num_rows == 0 ) {
