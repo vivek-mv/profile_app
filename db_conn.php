@@ -1,4 +1,6 @@
 <?php
+    //Enable error reporting
+    ini_set('error_reporting', E_ALL);
     
     // DATABASE CONNECTION
     $servername = "localhost";

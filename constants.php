@@ -1,4 +1,7 @@
 <?php
+	//Enable error reporting
+    ini_set('error_reporting', E_ALL);
+    
 	//Get the current working directly and assign to APP_PATH constant
 	define("APP_PATH", getcwd());
 

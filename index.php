@@ -1,10 +1,15 @@
 <?php 
+    //Enable error reporting
+    ini_set('error_reporting', E_ALL);
     
     if ( isset($_GET['message']) && $_GET['message'] == 'update' ) {
+
         $message = 'You have successfully updated your details';
     }else if ( isset($_GET['message']) && $_GET['message'] == 'register' ) {
+
         $message = 'Successfully Registered';
     }else {
+
         $message = 'Welcome to employee registration portal';
     }
 ?>

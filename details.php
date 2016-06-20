@@ -4,7 +4,9 @@
     *which deletes the respective employee record
     *from the database.
     */
-
+    //Enable error reporting
+    ini_set('error_reporting', E_ALL);
+    
     //include db connection
     require_once('db_conn.php');
     //include the constants file
@@ -84,7 +86,7 @@
                 </div>
             </nav>
             <div class="row">
-                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-1">
+                <div class="col-xs-11 col-sm-11 col-md-11 col-lg-11 ">
                     <h2>Registered Employees</h2>
               		<?php
                         //Get the records of all the employees

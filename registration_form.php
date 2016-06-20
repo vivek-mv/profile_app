@@ -4,6 +4,9 @@
     *submit or update functionality.
     */
 
+    //Enable error reporting
+    ini_set('error_reporting', E_ALL);
+
     //Include Database Connection
     require_once('db_conn.php');
     //Include Constants file 
@@ -32,6 +35,14 @@
     //Start session to store the form fields
     session_start();
 
+    //Destroy the session variable if registration form is opened for the first time
+    if ( empty($_POST) && empty($_GET) ) {
+       
+        //Destroy the session 
+        session_unset();
+        session_destroy();
+    }
+
     //Check for any error messages from details page
     if ( (isset($_SESSION['dbErr'] ) && $_SESSION['dbErr'] == 1) || (isset($_GET["dbErr"]) && $_GET["dbErr"] == 1 ) ) {
         echo "Sorry , something bad happened .Please try after some time." ;
@@ -40,7 +51,7 @@
     }
 
     //Check and set form action
-    if( (isset($_GET['userAction']) && $_GET['userAction']=='update') 
+    if( (isset($_GET['userAction']) && $_GET['userAction'] == 'update') 
         || ( isset($_GET["userId"]) && $_GET["userId"] > 0) ) {
         $form_action = 'registration_form.php?userId='.$_GET["userId"]; 
     } else {
@@ -85,15 +96,9 @@
         'Uttar Pradesh',
         'West Bengal'
     );
-
-    //If a request is for update then set a flag in a session variable ,so that, update button
-    //could be retained
-    if (isset($_GET["userId"]) && isset($_GET["userAction"]) ) {
-        $_SESSION["retainUpdateBtn"] = 1;
-    } 
-
-    //getCorrectData the input fields only if the request method is POST
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  
+    //Validate the input fields only if the request method is POST
+    if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
         //Initialize error to check for any errors that occur during validation
         $error = 0;
         
@@ -105,6 +110,7 @@
          * @return String
          */
         function getCorrectData($data) {
+
             $data = trim($data);
             $data = stripslashes($data);
             $data = htmlspecialchars($data);
@@ -115,21 +121,26 @@
         $_SESSION["prefix"] = $prefix;
         $firstName = getCorrectData($_POST["firstName"]);
         
-        if (!preg_match("/^[a-zA-Z ]*$/", $firstName)) {
+        if ( !preg_match("/^[a-zA-Z ]*$/", $firstName) ) {
             $firstnameErr = 'Only letters and white space allowed';
+            $error++;
+        }
+
+        if ( strlen($firstName) > 20 ) {
+            $firstnameErr = 'Only 20 characters allowed';
             $error++;
         }
         
         $middleName = getCorrectData($_POST["middleName"]);
         
-        if (!preg_match("/^[a-zA-Z ]*$/", $middleName)) {
+        if ( !preg_match("/^[a-zA-Z ]*$/", $middleName) ) {
             $middleNameErr = 'Only letters and white space allowed'; 
             $error++; 
         }
         
         $lastName = getCorrectData($_POST["lastName"]);
         
-        if (!preg_match("/^[a-zA-Z ]*$/", $lastName)) {
+        if ( !preg_match("/^[a-zA-Z ]*$/", $lastName) ) {
             $lastNameErr = 'Only letters and white space allowed';
             $error++;
         }
@@ -152,7 +163,7 @@
         
         $landline = getCorrectData($_POST["landline"]);
         
-        if (!preg_match("/^[0-9]*$/", $landline)) {
+        if ( !preg_match("/^[0-9]*$/", $landline) ) {
             $landlineErr = 'Only numbers are allowed in the landline field';
             $error++;
         }
@@ -164,7 +175,7 @@
         
         $email = getCorrectData($_POST["email"]);
         
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if ( !filter_var($email, FILTER_VALIDATE_EMAIL) ) {
             $emailErr = 'Invalid email format';
             $error++;
         }
@@ -175,7 +186,7 @@
         $_SESSION["employment"] = $employment;
         $employer = getCorrectData($_POST["employer"]);
         
-        if (!preg_match("/^[a-zA-Z ]*$/", $employer)) {
+        if ( !preg_match("/^[a-zA-Z ]*$/", $employer) ) {
             $employerErr = 'Only letters and white space allowed';
             $error++;
         }
@@ -192,12 +203,12 @@
           
           $extensions = array("jpeg","jpg","png");
           
-          if(in_array($file_ext,$extensions) === false){
+          if( in_array($file_ext,$extensions) === false ) {
             $imageErr = 'extension not allowed, please choose a JPEG or PNG file.';
             $error++;
           }
           
-          if($file_size > IMAGE_SIZE){
+          if ( $file_size > IMAGE_SIZE ) { 
              $imageErr ='File size must be less than'.IMAGE_SIZE_MB;
              $error++;
           }
@@ -228,6 +239,12 @@
         }
         
         $residenceFax = getCorrectData($_POST["residenceFax"]);
+
+        if (!preg_match("/^[0-9]*$/", $residenceFax)) {
+            $residenceFaxErr = 'Only numbers are allowed';
+            $error++;
+        }
+
         $officeStreet = getCorrectData($_POST["officeStreet"]);
         $officeCity = getCorrectData($_POST["officeCity"]);
         
@@ -251,6 +268,11 @@
         }
         
         $officeFax = getCorrectData($_POST["officeFax"]);
+
+        if (!preg_match("/^[0-9]*$/", $officeFax)) {
+            $officeFaxErr = "Only numbers are allowed";
+            $error++;
+        }
         $note = getCorrectData($_POST["note"]);
 
         //Check for Communication Medium,if its empty then assign an empty array
@@ -262,7 +284,7 @@
         }
         
         //Insert the user data in the database if there are no errors.
-        if( $error == 0 && $_POST["submit"]=="SUBMIT" ) {
+        if( $error == 0 && $_POST["submit"] == "SUBMIT" ) {
 
             //Move the image to a specific folder
             move_uploaded_file($_FILES['image']['tmp_name'],APP_PATH."/profile_pic/".$_FILES['image']['name']);
@@ -273,7 +295,7 @@
                 '$email', '$maritalStatus' ,'$employment', '$employer', '$photo', '$note')";
             
             //Get the last insert id as empId to insert address and comm. medium
-            if ($conn->query($insertEmp) === TRUE) {
+            if ( $conn->query($insertEmp ) === TRUE ) {
 
                 $empID = $conn->insert_id;
             } else {
@@ -286,7 +308,7 @@
                     VALUES ('$empID','1','$residenceStreet','$resedenceCity','$resedenceState','$residenceZip',
                     '$residenceFax') , ('$empID','2','$officeStreet','$officeCity','$officeState','$officeZip','$officeFax')";
 
-            if (!$conn->query($insertAdd)) {
+            if ( !$conn->query($insertAdd) ) {
                 $_SESSION['dbErr'] = 1;
                 header("Location:registration_form.php");
                 exit();
@@ -300,7 +322,7 @@
             $insertCommMedium = "INSERT INTO commMedium (`empId`,`msg`,`email`,`call`,`any`)
                 VALUES ('$empID','$msg','$comEmail','$call','$any')";
             
-            if (!$conn->query($insertCommMedium)) {
+            if ( !$conn->query($insertCommMedium) ) {
                 $_SESSION['dbErr'] = 1;
                 header("Location:registration_form.php");
                 exit();
@@ -309,6 +331,7 @@
             //Destroy the session 
             session_unset();
             session_destroy();
+
             //If successfully inserted ,then redirect to index page
             header("Location:index.php?message=register");
         }
@@ -372,13 +395,14 @@
             //Destroy the session 
             session_unset();
             session_destroy();
+
             //If update is successfull then redirect to index page
             header("Location:index.php?message=update");
         }
     }
 
     //When user clicks the update button in the details page,then this code is executed
-    if (isset($_GET["userId"]) && isset($_GET["userAction"]) ) {
+    if ( isset($_GET["userId"]) && isset($_GET["userAction"]) ) {
         $selectEmpDetails = "SELECT employee.eid, employee.prefix, employee.firstName, employee.middleName, 
             employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline, employee.email,
             employee.maritalStatus, employee.employment, employee.employer, employee.note, employee.photo,
@@ -403,7 +427,10 @@
 
         $result3 = mysqli_query($conn, $officeAddress) or 
             header("Location:registration_form.php?dbErr=1");
-        $empOffice = $result3->fetch_assoc();        
+        $empOffice = $result3->fetch_assoc();
+
+        //set the image name into a session variable,so that image keeps showing if the update fails due to error
+        $_SESSION['photo'] = $empDetails['photo'];      
     }
 ?>
 <!DOCTYPE html>
@@ -504,7 +531,7 @@
                                         }
 
                                         if( isset($firstName) ) {
-                                            echo 'value='.$firstName;
+                                            echo 'value="'.$firstName.'"';
                                         }
                                     ?> 
                                     required >
@@ -667,7 +694,7 @@
                                             echo 'value="'.$empDetails["email"].'"';
                                         } 
                                         if( isset($email) ) {
-                                            echo 'value='.$email;
+                                            echo 'value="'.$email.'"';
                                         }
                                     ?>
                                     required >
@@ -749,16 +776,14 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="image" class="input-file" type="file" 
-                                    <?php 
-                                        if( isset($empDetails["photo"]) && !empty($empDetails["photo"]) ) {
-                                            echo 'filename='.$empDetails["photo"];
-                                        }
-                                    ?>
-                                    >
+                                    <input  name="image" class="input-file" type="file" >
                                     <?php 
                                         if( isset($empDetails["photo"]) && !empty($empDetails["photo"]) ) { 
                                             echo '<img src="profile_pic/'.$empDetails["photo"].'"  alt="profile pic" 
+                                                height="200" width="200" />';
+
+                                        } else if ( isset($_SESSION['photo']) ) {
+                                            echo '<img src="profile_pic/'.$_SESSION['photo'].'"  alt="profile pic" 
                                                 height="200" width="200" />';
                                         } 
                                     ?>
@@ -857,6 +882,13 @@
                             <div class="form-group">
                                 <label class="col-md-3 control-label" >Fax</label>  
                                 <div class="col-md-7">
+                                    <span class="error"> 
+                                    <?php
+                                        if( !empty($residenceFaxErr) ) {
+                                            echo "*".$residenceFaxErr;
+                                        }
+                                    ?>
+                                    </span>
                                     <input name="residenceFax" type="text" placeholder="Fax" class="form-control input-md"
                                     <?php
                                         if( isset($empResidence["fax"]) ) {
@@ -959,6 +991,13 @@
                             <div class="form-group">
                                 <label class="col-md-3 control-label" >Fax</label>  
                                 <div class="col-md-7">
+                                    <span class="error"> 
+                                    <?php
+                                        if( !empty($officeFaxErr) ) {
+                                            echo "*".$officeFaxErr;
+                                        }
+                                    ?>
+                                    </span>
                                     <input name="officeFax" type="text" placeholder="Fax" class="form-control input-md"
                                     <?php
                                         if( isset($empOffice["fax"]) ) {
