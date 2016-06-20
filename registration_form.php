@@ -18,6 +18,7 @@
      * @return Boolean
      */
     function checkedStatus( $key, $value ) {
+        global $empDetails;
 
         if( (isset($empDetails[$key]) && $empDetails[$key] == $value) 
             || (!empty($_SESSION[$key]) && $_SESSION[$key] == $value)) {
@@ -81,7 +82,7 @@
     );
 
     //Start session to store the form fields
-    session_start();
+    //session_start();
 
     //If a request is for update then set a flag in a session variable ,so that, update button
     //could be retained
@@ -463,8 +464,7 @@
                                     <select id="selectbasic1" name="prefix" class="form-control" >
                                         <option value="mr" 
                                         <?php 
-                                            if ( (isset($empDetails["prefix"]) && $empDetails["prefix"] == "mr") 
-                                                || (!empty($_SESSION["prefix"]) && $_SESSION["prefix"] == "mr" ) ) {
+                                            if (  checkedStatus("prefix", "mr") ) {
 
                                                 echo 'selected="selected"';
                                             } 
@@ -565,7 +565,7 @@
                                     <label class="radio-inline">
                                     <input type="radio" name="gender" value="f" 
                                     <?php 
-                                        if( checkedStatus("gender", "f") ) {
+                                        if( checkedStatus("gender","f")) {
 
                                             echo 'checked="checked"';
                                         } 
@@ -1061,8 +1061,8 @@
                 <div class="row text-center">
                     <input type="submit" name="submit" value=
                     <?php 
-                        if( (isset($_GET['userAction']) && $_GET['userAction'] == 'update') || ( isset($_SESSION["retainUpdateBtn"]) 
-                            && $_SESSION["retainUpdateBtn"] == 1)  ) {
+                        if( (isset($_GET['userAction']) && $_GET['userAction']=='update') 
+                            || ( isset($_GET["userId"]) && $_GET["userId"] > 0) ) {
 
                             echo 'UPDATE'; 
                         } else {
@@ -1072,8 +1072,8 @@
                         class="btn btn-primary"> &nbsp;  &nbsp;  &nbsp;
                     <input type= 
                     <?php 
-                        if( (isset($_GET['userAction']) && $_GET['userAction'] == 'update') || 
-                            ( isset($_SESSION["retainUpdateBtn"]) && $_SESSION["retainUpdateBtn"] == 1) ) {
+                       if( (isset($_GET['userAction']) && $_GET['userAction']=='update') 
+                            || ( isset($_GET["userId"]) && $_GET["userId"] > 0) ) {
                             
                             echo 'hidden'; } else {echo 'reset';
                         }
