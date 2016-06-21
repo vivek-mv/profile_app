@@ -444,6 +444,7 @@
             
             $updateCommMedium = "UPDATE commMedium SET msg ='" . $msg . "' , email ='" . $comEmail . "',
                 `call` ='" . $call . "' , any ='" . $any . "' where empId =" . $_GET["userId"];
+                
             $conn->query($updateCommMedium) or header("Location:registration_form.php?dbErr=1");
             
             //If photo is empty then dont update photo

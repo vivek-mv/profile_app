@@ -4,6 +4,7 @@
     *which deletes the respective employee record
     *from the database.
     */
+
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
     
@@ -11,6 +12,8 @@
     require_once('db_conn.php');
     //include the constants file
     require_once('constants.php');
+
+    require_once('dbOperations.php');
     
     //Display error message if delete fails in the same page
     if ( isset($_GET["Message"]) && $_GET["Message"] == 1 ) {
@@ -20,36 +23,19 @@
     
     //When user clicks the delete button in the details listing page
     if (isset($_GET["userAction"]) && $_GET["userAction"] == "delete") {
-
-        //Query to delete a row from the registration database with the respective employee id
-        $deleteAddress = "DELETE FROM address WHERE eid=" . $_GET["userId"] . ";";
-        $deleteCommMode = "DELETE FROM commMedium WHERE empId=" . $_GET["userId"] . ";";
-        $deleteEmployee = "DELETE FROM employee WHERE eid=" . $_GET["userId"] . ";";
-
-        //Select the employee image from the employee table and remove it from profile_pic dir.
-        $image ="SELECT employee.photo FROM employee WHERE eid=" . $_GET["userId"] . ";";
-        $delImage = mysqli_query($conn, $image) or 
-                    header("Location:details.php?Message=1");
-        $getImg = $delImage->fetch_assoc();
         
-        if ( !empty($getImg["photo"])  && !unlink(APP_PATH . "/profile_pic/".$getImg["photo"]) ) {
-
-            header("Location:details.php?Message=1");
-        }
-
-        //Delete employee address
-        mysqli_query($conn, $deleteAddress) or 
-            header("Location:details.php?Message=1");
-        //Delete employee communication medium
-        mysqli_query($conn, $deleteCommMode) or 
-            header("Location:details.php?Message=1");
-        //Delete employee details
-        mysqli_query($conn, $deleteEmployee) or 
-            header("Location:details.php?Message=1");
-
+        $dbOperations = new DbOperations();
+        $deleteSuccess = $dbOperations->delete($_GET['userId']);
+        
+        if ( $deleteSuccess ) {
         //If delete is successfull then redirect to the same page
         header("Location:details.php");
         exit();
+        } else {
+            header("Location:details.php?Message=1");
+            exit();
+        }
+        
     }
   
 ?>
