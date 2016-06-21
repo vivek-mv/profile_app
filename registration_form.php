@@ -137,11 +137,21 @@
             $middleNameErr = 'Only letters and white space allowed'; 
             $error++; 
         }
+
+        if ( strlen($middleName) > 20 ) {
+            $middleNameErr = 'Only 20 characters allowed';
+            $error++;
+        }
         
         $lastName = getCorrectData($_POST["lastName"]);
         
         if ( !preg_match("/^[a-zA-Z ]*$/", $lastName) ) {
             $lastNameErr = 'Only letters and white space allowed';
+            $error++;
+        }
+
+        if ( strlen($lastName) > 20 ) {
+            $lastNameErr = 'Only 20 characters allowed';
             $error++;
         }
         
@@ -179,15 +189,29 @@
             $emailErr = 'Invalid email format';
             $error++;
         }
+
+        if ( strlen($email) > 50 ) {
+            $emailErr = 'Only 50 characters allowed';
+            $error++;
+        }
         
         $maritalStatus = getCorrectData($_POST["maritalStatus"]);
+
         $_SESSION["maritalStatus"] = $maritalStatus;
+
         $employment = getCorrectData($_POST["employment"]);
+
         $_SESSION["employment"] = $employment;
+
         $employer = getCorrectData($_POST["employer"]);
         
         if ( !preg_match("/^[a-zA-Z ]*$/", $employer) ) {
             $employerErr = 'Only letters and white space allowed';
+            $error++;
+        }
+
+        if ( strlen($employer) > 25 ) {
+            $employerErr = 'Only 25 characters allowed';
             $error++;
         }
 
@@ -216,10 +240,20 @@
         }
         
         $residenceStreet = getCorrectData($_POST["residenceStreet"]);
+
+        if ( strlen($residenceStreet) > 50 ) {
+            $residenceStreetErr = 'Only 50 characters allowed';
+            $error++;
+        }
         $resedenceCity = getCorrectData($_POST["resedenceCity"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $resedenceCity)) {
             $residenceCityErr = 'Only letters and white space allowed';
+            $error++;
+        }
+
+        if ( strlen($resedenceCity) > 50 ) {
+            $residenceCityErr = 'Only 50 characters allowed';
             $error++;
         }
         
@@ -245,11 +279,26 @@
             $error++;
         }
 
+        if ( !empty($residenceFax) && strlen($residenceFax) > 15 ) {
+            $residenceFaxErr = 'Fax should be less than 15 digits';
+            $error++;
+        }
+
         $officeStreet = getCorrectData($_POST["officeStreet"]);
+
+        if ( strlen($officeStreet) > 50 ) {
+            $officeStreetErr = 'Only 50 characters allowed';
+            $error++;
+        }
         $officeCity = getCorrectData($_POST["officeCity"]);
         
         if (!preg_match("/^[a-zA-Z ]*$/", $officeCity)) {
             $officeCityErr = 'Only letters and white space allowed';
+            $error++;
+        }
+
+        if ( strlen($officeCity) > 50 ) {
+            $officeCityErr = 'Only 50 characters allowed';
             $error++;
         }
         
@@ -273,7 +322,17 @@
             $officeFaxErr = "Only numbers are allowed";
             $error++;
         }
+
+        if ( !empty($officeFax) && strlen($officeFax) > 15 ) {
+            $officeFaxErr = 'Fax should be less than 15 digits';
+            $error++;
+        }
         $note = getCorrectData($_POST["note"]);
+
+        if ( strlen($note) > 150 ) {
+            $noteErr = 'Only 150 characters allowed';
+            $error++;
+        }
 
         //Check for Communication Medium,if its empty then assign an empty array
         if( isset($_POST["commMed"]) ) {
@@ -801,6 +860,13 @@
                             <div class="form-group">
                                 <label class="col-md-3 control-label" >Street</label>  
                                 <div class="col-md-7">
+                                    <span class="error">
+                                    <?php
+                                        if( !empty($residenceStreetErr) ) {
+                                            echo "*".$residenceStreetErr;
+                                        }
+                                    ?>
+                                    </span>
                                     <input  name="residenceStreet" type="text" placeholder="Street" class="form-control input-md"
                                     <?php
                                         if( isset($empResidence["street"]) ) {
@@ -910,6 +976,12 @@
                             <div class="form-group">
                                 <label class="col-md-3 control-label" >Street</label>  
                                 <div class="col-md-7">
+                                    <span class="error"> 
+                                    <?php
+                                        if( !empty($officeStreetErr) ) {
+                                            echo "*".$officeStreetErr;
+                                        }
+                                    ?>
                                     <input  name="officeStreet" type="text" placeholder="Street" class="form-control input-md"
                                     <?php 
                                         if( isset($empOffice["street"]) ) {
@@ -1024,7 +1096,14 @@
                                     <!-- Input field for note -->
                                     <div class="form-group">
                                         <label class="col-md-3 control-label" for="textarea">Note</label>
-                                        <div class="col-md-7">                     
+                                        <div class="col-md-7">
+                                            <span class="error"> 
+                                            <?php
+                                                if( !empty($noteErr) ) {
+                                                    echo "*".$noteErr;
+                                                }
+                                            ?>
+                                            </span>                     
                                             <textarea class="form-control" id="note" name="note" rows="3">
                                             <?php
                                                 if( isset($empDetails["note"]) ) {
