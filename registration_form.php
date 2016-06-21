@@ -99,6 +99,7 @@
   
     //Validate the input fields only if the request method is POST
     if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
+
         //Initialize error to check for any errors that occur during validation
         $error = 0;
         
@@ -218,12 +219,20 @@
         //Set photo to empty string in case no image is provided by the user
         $photo="";
 
+        //If the user upload any file greater than 8 MB then redirect to index.php
+        if ( $_FILES['image']['error'] == 1) { 
+            $imageErr = 1;
+            header("Location:index.php?message=".$imageErr);
+            exit();
+        }
+
         if( isset($_FILES['image']) && !empty($_FILES['image']['name']) && $_FILES['image']['size'] != 0 ){
           $file_name = $_FILES['image']['name'];
           $file_size = $_FILES['image']['size'];
           $file_tmp = $_FILES['image']['tmp_name'];
           $file_type = $_FILES['image']['type'];
-          $file_ext = strtolower(end(explode('.',$_FILES['image']['name'])));
+          $path_parts = pathinfo($_FILES['image']['name']);
+          $file_ext = strtolower( $path_parts['extension'] );
           
           $extensions = array("jpeg","jpg","png");
           
@@ -236,6 +245,7 @@
              $imageErr ='File size must be less than'.IMAGE_SIZE_MB;
              $error++;
           }
+
           $photo = $file_name;
         }
         
@@ -342,6 +352,7 @@
             $commMedium=array();
         }
         
+
         //Insert the user data in the database if there are no errors.
         if( $error == 0 && $_POST["submit"] == "SUBMIT" ) {
 
@@ -841,7 +852,7 @@
                                             echo '<img src="profile_pic/'.$empDetails["photo"].'"  alt="profile pic" 
                                                 height="200" width="200" />';
 
-                                        } else if ( isset($_SESSION['photo']) ) {
+                                        } else if ( isset($_SESSION['photo']) && $_SESSION['photo'] != "" ) {
                                             echo '<img src="profile_pic/'.$_SESSION['photo'].'"  alt="profile pic" 
                                                 height="200" width="200" />';
                                         } 

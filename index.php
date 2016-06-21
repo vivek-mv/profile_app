@@ -8,6 +8,9 @@
     }else if ( isset($_GET['message']) && $_GET['message'] == 'register' ) {
 
         $message = 'Successfully Registered';
+    }else if ( isset($_GET['message']) && $_GET['message'] == 1 ) {
+
+        $message = 'Your image size exceeds the limit, please upload an image which is less than 2 MB';
     }else {
 
         $message = 'Welcome to employee registration portal';
