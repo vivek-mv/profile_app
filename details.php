@@ -7,9 +7,7 @@
 
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
-    
-    //include db connection
-    require_once('db_conn.php');
+
     //include the constants file
     require_once('constants.php');
 
@@ -21,10 +19,12 @@
         echo "Sorry delete failed !, please try after some time ";
     }
     
+    //Create DbOperations object which handles all the database operations
+    $dbOperations = new DbOperations();
+    
     //When user clicks the delete button in the details listing page
     if (isset($_GET["userAction"]) && $_GET["userAction"] == "delete") {
         
-        $dbOperations = new DbOperations();
         $deleteSuccess = $dbOperations->delete($_GET['userId']);
         
         if ( $deleteSuccess ) {
@@ -32,6 +32,7 @@
         header("Location:details.php");
         exit();
         } else {
+            //If delete fails 
             header("Location:details.php?Message=1");
             exit();
         }
@@ -75,18 +76,12 @@
                 <div class="col-xs-11 col-sm-11 col-md-11 col-lg-11 ">
                     <h2>Registered Employees</h2>
               		<?php
-                        //Get the records of all the employees
-                        $selectEmpDetails = "SELECT employee.eid, employee.firstName, employee.middleName,
-                            employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline,
-                            employee.email, employee.maritalStatus, employee.employment, employee.employer,
-                            employee.photo, commMedium.empId, commMedium.msg, commMedium.email AS comm_email, 
-                            commMedium.call, commMedium.any, address.eid, address.type, address.street, address.city ,
-                            address.state, address.zip, address.fax FROM employee JOIN commMedium ON 
-                            employee.eid = commMedium.empId JOIN address ON  employee.eid = address.eid";
-                        
-                        $employeeDetails = mysqli_query($conn, $selectEmpDetails) or 
-                                   header("Location:registration_form.php?dbErr=1");
+                        $employeeDetails = $dbOperations->selectAllEmployees();
 
+                        if ( $employeeDetails === false ) {
+                            echo '<h1> Sorry your request could not be processed, please try after some time :( </h1>';
+                            exit();
+                        }
                         //When no data is present in the table,display message
                         if ( $employeeDetails->num_rows == 0 ) {
 

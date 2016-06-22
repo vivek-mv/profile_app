@@ -11,6 +11,11 @@
     require_once('db_conn.php');
     //Include Constants file 
     require_once('constants.php');
+    //Include dbOperations file
+    require_once('dbOperations.php');
+
+    //dbOperations object 
+    $dbOperations = new DbOperations();
 
     /**
      * Checks whether the employee details
@@ -35,17 +40,17 @@
     //Start session to store the form fields
     session_start();
 
-    //Destroy the session variable if registration form is opened for the first time
-    if ( empty($_POST) && empty($_GET) ) {
-       
-        //Destroy the session 
+    //Check for any error messages from details page
+    if ( (isset($_SESSION['dbErr'] ) && $_SESSION['dbErr'] == 1) || (isset($_GET["dbErr"]) && $_GET["dbErr"] == 1 ) ) {
+        echo "Sorry , something bad happened .Please try after some time." ;
         session_unset();
         session_destroy();
     }
 
-    //Check for any error messages from details page
-    if ( (isset($_SESSION['dbErr'] ) && $_SESSION['dbErr'] == 1) || (isset($_GET["dbErr"]) && $_GET["dbErr"] == 1 ) ) {
-        echo "Sorry , something bad happened .Please try after some time." ;
+    //Destroy the session variable if registration form is opened for the first time
+    if ( empty($_POST) && empty($_GET) && !empty($_SESSION) ) {
+       
+        //Destroy the session 
         session_unset();
         session_destroy();
     }
@@ -358,27 +363,30 @@
 
             //Move the image to a specific folder
             move_uploaded_file($_FILES['image']['tmp_name'],APP_PATH."/profile_pic/".$_FILES['image']['name']);
-            //insert the employee details
-            $insertEmp = "INSERT INTO employee (`prefix`, `firstName`, `middleName`, `lastName`, `gender`, `dob`, `mobile`,
-                `landline`, `email`, `maritalStatus`, `employment`, `employer`, `photo`, `note`)
-                VALUES ('$prefix', '$firstName', '$middleName', '$lastName', '$gender', '$dob', '$mobile', '$landline',
-                '$email', '$maritalStatus' ,'$employment', '$employer', '$photo', '$note')";
-            
-            //Get the last insert id as empId to insert address and comm. medium
-            if ( $conn->query($insertEmp ) === TRUE ) {
 
-                $empID = $conn->insert_id;
-            } else {
+            //Array to store employee details
+            $empData = array( 'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
+                'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile, 'landline' => $landline,
+                'email' => $email, 'maritalStatus' => $maritalStatus, 'employment' => $employment, 'employer' => $employer,
+                'photo' => $photo, 'note' => $note);
+            //Insert the employee details and get the last insert id.
+            $empID = $dbOperations->insert('employee', $empData);
+            
+            if ( $empID === false ) {
                 $_SESSION['dbErr'] = 1;
                 header("Location:registration_form.php");
-                exit();
+                exit();    
             }
-            // insert residence and office address
-            $insertAdd = "INSERT INTO address (`eid`,`type`,`street`,`city`,`state`,`zip`,`fax`)
-                    VALUES ('$empID','1','$residenceStreet','$resedenceCity','$resedenceState','$residenceZip',
-                    '$residenceFax') , ('$empID','2','$officeStreet','$officeCity','$officeState','$officeZip','$officeFax')";
 
-            if ( !$conn->query($insertAdd) ) {
+            //Array to store employye address
+            $empAddressData = array( 'employeeId' => $empID, 'residenceStreet' => $residenceStreet, 'resedenceCity' => $resedenceCity,
+                'resedenceState' => $resedenceState, 'residenceZip' => $residenceZip, 'residenceFax' => $residenceFax,
+                'officeStreet' => $officeStreet, 'officeCity' => $officeCity, 'officeState' => $officeState, 'officeZip' => $officeZip,
+                'officeFax' => $officeFax ); 
+            //Insert the address
+            $address = $dbOperations->insert('address', $empAddressData, $empID);
+
+            if ( !$address ) {
                 $_SESSION['dbErr'] = 1;
                 header("Location:registration_form.php");
                 exit();
@@ -389,10 +397,13 @@
             $comEmail = in_array("mail", $commMedium) ? 1 : 0;
             $call = in_array("phone", $commMedium) ? 1 : 0;
             $any = in_array("any", $commMedium) ? 1 : 0;
-            $insertCommMedium = "INSERT INTO commMedium (`empId`,`msg`,`email`,`call`,`any`)
-                VALUES ('$empID','$msg','$comEmail','$call','$any')";
+
+            //Array to store employee communication medium
+            $commMediumData = array( 'employeeId' => $empID, 'message' => $msg, 'comEmail' => $comEmail,
+                'call' => $call, 'any' => $any );
             
-            if ( !$conn->query($insertCommMedium) ) {
+            $commMedium = $dbOperations->insert('commMedium', $commMediumData, $empID);
+            if ( !$commMedium ) {
                 $_SESSION['dbErr'] = 1;
                 header("Location:registration_form.php");
                 exit();
@@ -474,31 +485,27 @@
 
     //When user clicks the update button in the details page,then this code is executed
     if ( isset($_GET["userId"]) && isset($_GET["userAction"]) ) {
-        $selectEmpDetails = "SELECT employee.eid, employee.prefix, employee.firstName, employee.middleName, 
-            employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline, employee.email,
-            employee.maritalStatus, employee.employment, employee.employer, employee.note, employee.photo,
-            commMedium.empId, commMedium.msg, commMedium.email AS comm_email, commMedium.call , commMedium.any 
-            FROM employee JOIN commMedium ON employee.eid = commMedium.empId WHERE eid =" . $_GET["userId"];
 
-        $residenceAddress = "SELECT address.eid , address.type , address.street , address.city ,
-            address.state , address.zip , address.fax FROM address
-            WHERE address.eid =" . $_GET["userId"] . " AND address.type = 1";
-
-        $officeAddress = "SELECT address.eid , address.type , address.street , address.city ,
-            address.state , address.zip , address.fax FROM address
-            WHERE address.eid =" . $_GET["userId"] . " AND address.type = 2";
-
-        $result1 = mysqli_query($conn, $selectEmpDetails) or 
+        $details = $dbOperations->selectEmployee($_GET["userId"]);
+        if ( $details === false ) {
             header("Location:registration_form.php?dbErr=1");
-        $empDetails = $result1->fetch_assoc();
+            exit();
+        }
+        $empDetails = $details->fetch_assoc();
         
-        $result2 = mysqli_query($conn, $residenceAddress) or 
+        $residence = $dbOperations->selectEmployee($_GET["userId"], 1);
+        if ( $residence === false ) {
             header("Location:registration_form.php?dbErr=1");
-        $empResidence = $result2->fetch_assoc();
+            exit();
+        }
+        $empResidence = $residence->fetch_assoc();
 
-        $result3 = mysqli_query($conn, $officeAddress) or 
+        $office = $dbOperations->selectEmployee($_GET["userId"], 2);
+        if ( $office === false ) {
             header("Location:registration_form.php?dbErr=1");
-        $empOffice = $result3->fetch_assoc();
+            exit();
+        }
+        $empOffice = $office->fetch_assoc();
 
         //set the image name into a session variable,so that image keeps showing if the update fails due to error
         $_SESSION['photo'] = $empDetails['photo'];      

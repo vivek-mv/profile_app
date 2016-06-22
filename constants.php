@@ -10,4 +10,16 @@
 
 	//Define image size in MB
 	define("IMAGE_SIZE_MB", "2MB");
+
+	//Database host name
+	define("HOST", "localhost");
+
+	//Database user name
+	define("USER", "root");
+
+	//Database password
+	define("PASSWORD", "mindfire");
+
+	//Database name
+	define("DBNAME", "registration");
 ?>

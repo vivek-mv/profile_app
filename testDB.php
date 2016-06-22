@@ -1,4 +1,7 @@
 <?php
+//include constants.php
+require_once('constants.php');
+
 /**
 * Mysql database class - only one connection alowed
 * @access public
@@ -6,17 +9,17 @@
 class Database {
 	private $connection;
 	private static $instance; 
-	private $host = "localhost";
-	private $username = "root";
-	private $password = "mindfire";
-	private $database = "registration";
+	private $host = HOST;
+	private $username = USER;
+	private $password = PASSWORD;
+	private $database = DBNAME;
 	
 	/**
      * Get an instance of the Database
      *
      * @access public
      * @param no parameter 
-     * @return Database
+     * @return instance of this class
      */
 	public static function getInstance() {
 		if(!self::$instance) {

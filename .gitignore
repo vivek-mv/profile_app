@@ -1,1 +1,3 @@
 profile_pic/*
+.sonar/
+sonar-project.properties
