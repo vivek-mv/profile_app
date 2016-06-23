@@ -1,5 +1,5 @@
 <?php
-require_once('testDB.php');
+require_once('db_conn.php');
 /**
 * Class that handles Insert, Update, Delete and Display Operations.
 * @access public
@@ -7,12 +7,28 @@ require_once('testDB.php');
 class DbOperations {
 	private $conn = null;
 	
-	// Constructor
+	/**
+     *Constructor
+     *
+     * @access public
+     * @param void 
+     * @return void
+     */
 	public function __construct() {
 		$db = Database::getInstance();
 		$this->conn = $db->getConnection();
 	}
 
+    /**
+     *Takes a query string and executes the query
+     *
+     * @access public
+     * @param String 
+     * @return boolean/object
+     */
+    public function executeSql($query) {
+        return mysqli_query($this->conn, $query);
+    }
 
 	/**
      *Deletes the employee record 
@@ -30,7 +46,7 @@ class DbOperations {
         //Select the employee image from the employee table and remove it from profile_pic dir.
         $image ="SELECT employee.photo FROM employee WHERE eid=" . $employeeId . ";";
 
-        $delImage = mysqli_query($this->conn, $image);
+        $delImage = $this->executeSql($image);
 
         if ( !$delImage ) {
         	return false;
@@ -44,17 +60,17 @@ class DbOperations {
         }
 
         //Delete employee address
-        if ( !mysqli_query($this->conn, $deleteAddress) ) {
+        if ( !$this->executeSql($deleteAddress) ) {
 
         	return false;
         }
         //Delete employee communication medium
-        if ( !mysqli_query($this->conn, $deleteCommMode) ) {
+        if ( !$this->executeSql($deleteCommMode) ) {
 
         	return false;
         }
         //Delete employee details
-        if ( !mysqli_query($this->conn, $deleteEmployee) ) {
+        if ( !$this->executeSql($deleteEmployee) ) {
 
         	return false;
         }
@@ -68,7 +84,7 @@ class DbOperations {
      *
      * @access public
      * @param void 
-     * @return mysqli result object if success or bool(false) if fails
+     * @return object/boolean
      */
 	public function selectAllEmployees() {
 		
@@ -81,7 +97,7 @@ class DbOperations {
             address.state, address.zip, address.fax FROM employee JOIN commMedium ON 
             employee.eid = commMedium.empId JOIN address ON  employee.eid = address.eid";
         
-        $employeeDetails = mysqli_query($this->conn, $selectEmpDetails);
+        $employeeDetails = $this->executeSql($selectEmpDetails);
         return $employeeDetails;
 	}
 
@@ -89,8 +105,9 @@ class DbOperations {
      *Selects employee details a particular employee using employee id.(and address type when its provided)
      *
      * @access public
-     * @param String, Integer 
-     * @return mysqli result object if success or bool(false) if fails
+     * @param String
+     * @param Integer 
+     * @return object/boolean
      */
     public function selectEmployee($employeeId, $addressType = 0) {
 
@@ -100,7 +117,7 @@ class DbOperations {
             employee.maritalStatus, employee.employment, employee.employer, employee.note, employee.photo,
             commMedium.empId, commMedium.msg, commMedium.email AS comm_email, commMedium.call , commMedium.any 
             FROM employee JOIN commMedium ON employee.eid = commMedium.empId WHERE eid =" . $employeeId;
-            $details = mysqli_query($this->conn, $selectEmpDetails);
+            $details = $this->executeSql($selectEmpDetails);
 
             return $details;
         }
@@ -108,7 +125,7 @@ class DbOperations {
         $addressQuery = "SELECT address.eid , address.type , address.street , address.city ,
             address.state , address.zip , address.fax FROM address
             WHERE address.eid =" . $employeeId . " AND address.type = " . $addressType;
-        $address = mysqli_query($this->conn, $addressQuery); 
+        $address = $this->executeSql($addressQuery); 
 
         return $address;
     }
@@ -117,20 +134,21 @@ class DbOperations {
      *Inserts the employee data into the database
      *
      * @access public
-     * @param String, Array, Integer 
-     * @return mysqli result object if success or bool(false) if fails
+     * @param String
+     * @param Array
+     * @param Integer 
+     * @return object/boolean
      */
     public function insert($tableName, $data, $employeeId = 0) {
 
         if ( $tableName == 'employee' && $employeeId === 0 ) {
-            $insertEmp = "INSERT INTO employee (`prefix`, `firstName`, `middleName`, `lastName`, `gender`, `dob`, `mobile`,
-                `landline`, `email`, `maritalStatus`, `employment`, `employer`, `photo`, `note`)
-                VALUES ('".$data['prefix']."', '".$data['firstName']."', '".$data['middleName']."', '".$data['lastName']."',
-                 '".$data['gender']."', '".$data['dob']."', '".$data['mobile']."', '".$data['landline']."',
-                '".$data['email']."', '".$data['maritalStatus']."' ,'".$data['employment']."', '".$data['employer']."',
-                 '".$data['photo']."', '".$data['note']."')";
+            $insertEmp = "INSERT INTO employee (`prefix`, `firstName`, `middleName`, `lastName`, `gender`, `dob`, `mobile`,`landline`, `email`, `maritalStatus`, `employment`, `employer`, `photo`, `note`)
+                VALUES ('".$data['prefix']."', '".$data['firstName']."', '".$data['middleName']."',
+                '".$data['lastName']."', '".$data['gender']."', '".$data['dob']."', '".$data['mobile']."',
+                '".$data['landline']."','".$data['email']."', '".$data['maritalStatus']."' ,
+                '".$data['employment']."', '".$data['employer']."','".$data['photo']."', '".$data['note']."')";
             
-            $insertEmployee = $this->conn->query($insertEmp);
+            $insertEmployee = $this->executeSql($insertEmp);
             if ( $insertEmployee === TRUE ) {
                 //if success then return the last insert id
                 return $this->conn->insert_id;
@@ -146,7 +164,7 @@ class DbOperations {
                     '".$data['resedenceState']."','".$data['residenceZip']."','".$data['residenceFax']."') ,
                      ('".$data['employeeId']."','2','".$data['officeStreet']."','".$data['officeCity']."',
                     '".$data['officeState']."','".$data['officeZip']."','".$data['officeFax']."')";
-            $address = $this->conn->query($insertAdd);
+            $address = $this->executeSql($insertAdd);
 
             if ( $address == true ) {
                 return true;
@@ -161,7 +179,7 @@ class DbOperations {
                 VALUES ('".$data['employeeId']."','".$data['message']."','".$data['comEmail']."',
                     '".$data['call']."','".$data['any']."')";
 
-            $commMedium = $this->conn->query($insertCommMedium);
+            $commMedium = $this->executeSql($insertCommMedium);
 
             if ( $commMedium == true ) {
                 return true;
@@ -171,6 +189,59 @@ class DbOperations {
         }
     }
 
+    /**
+     *Updates the employee data into the database
+     *
+     * @access public
+     * @param String
+     * @param Array
+     * @param Integer 
+     * @param Integer
+     * @return object/boolean
+     */
+    public function update($tableName, $data, $employeeId, $addressType = 0) {
+        
+        if ( $tableName == 'address' && $addressType == 1) {
+
+            //Update residence address
+            $updateResidenceAdd = "UPDATE address SET street = '" . $data['rstreet'] . "', city ='" . $data['rcity'] ."',state = '" . $data['rstate'] . "' , zip = '" . $data['rzip'] . "', fax = '" . $data['rfax'] .
+                "' where eid = " . $employeeId . " && type = ".$addressType;
+            
+            $updateAdd = $this->executeSql($updateResidenceAdd);
+            return $updateAdd;
+        }
+
+        if ( $tableName == 'address' && $addressType == 2 ) {
+            //Update office address
+            $updateOfficeAdd = "UPDATE address SET street = '" . $data['ostreet'] . "', city ='" . $data['ocity'] . "',state = '" . $data['ostate'] . "' , zip = '" . $data['ozip'] . "', fax = '" . $data['ofax'] .
+                "' where eid = " . $employeeId . " && type = ".$addressType;
+
+            $updateAdd = $this->executeSql($updateOfficeAdd);
+            return $updateAdd;
+        }
+
+        if ( $tableName == 'commMedium' ) {
+            $updateCommMedium = "UPDATE commMedium SET msg ='" . $data['msg'] . "' , email ='" . $data['email'] . "',
+                `call` ='" . $data['call'] . "' , any ='" . $data['any'] . "' where empId =" . $employeeId;
+
+            $updateComm = $this->executeSql($updateCommMedium);
+            return $updateComm;
+        }
+
+        if ( $tableName == 'employee' ) {
+            //update employee details
+            $updateEmpDetails = "UPDATE employee SET prefix = '" . $data['prefix'] . "' , firstName = '" . 
+                $data['firstName'] . "' , middleName = '" . $data['middleName'] . "' , lastName = '" .
+                $data['lastName'] . "' ,  gender = '" . $data['gender'] ."' , dob = '" . $data['dob'] . "' ,
+                mobile = '" . $data['mobile'] . "' , landline='" . $data['landline'] . "', email ='" 
+                . $data['email'] . "', maritalStatus= '" . $data['maritalStatus'] . "' ,employment = '" .
+                $data['employment'] . "' ,employer='" . $data['employer'] ."'".$data['insertImage'] . ",
+                note= '" . $data['note'] . "' where eid = " . $employeeId;
+
+            $updateEmployee = $this->executeSql($updateEmpDetails);
+            return $updateEmployee;
+        }
+    }
 }
 
 ?>

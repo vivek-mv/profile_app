@@ -1,19 +1,39 @@
 <?php
-    //Enable error reporting
-    ini_set('error_reporting', E_ALL);
-    
-    // DATABASE CONNECTION
-    $servername = "localhost";
-    $username   = "root";
-    $password   = "mindfire";
-    $database   = "registration";
-    
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $database);
-    
-    // Check connection and redirect to registration page if there's error in conn.
-    if ($conn->connect_error) {
-        header("Location:registration_form.php?dbErr=1");
-        exit();
-    }
+//include constants.php
+require_once('constants.php');
+
+/**
+* Mysql database class - only one connection alowed
+* @access public
+*/
+Class Database {
+	private $connection;
+	private static $instance; 
+	
+	/**
+     * Get an instance of the Database
+     *
+     * @access public
+     * @param no parameter 
+     * @return instance of this class
+     */
+	public static function getInstance() {
+		if(!self::$instance) {
+		// If no instance then make one
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+	// Constructor
+	private function __construct() {
+		$this->connection = new mysqli(HOST, USER, 
+			PASSWORD, DBNAME);
+	}
+
+	// Get mysqli connection
+	public function getConnection() {
+		return $this->connection;
+	}
+}
+
 ?>

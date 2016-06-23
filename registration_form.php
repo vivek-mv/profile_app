@@ -7,8 +7,6 @@
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
 
-    //Include Database Connection
-    require_once('db_conn.php');
     //Include Constants file 
     require_once('constants.php');
     //Include dbOperations file
@@ -425,7 +423,7 @@
 
                 $image ="SELECT employee.photo FROM employee WHERE eid=" . $_GET["userId"] . ";";
 
-                $result = mysqli_query($conn, $image) or 
+                $result = $dbOperations->executeSql($image) or 
                 header("Location:details.php?Message=1");
 
                 $row = $result->fetch_assoc();
@@ -435,17 +433,19 @@
                 }
             }
 
-            //Update residence address
-            $updateResidenceAdd = "UPDATE address SET street = '" . $residenceStreet . "', city ='" . $resedenceCity . "',
-            state = '" . $resedenceState . "' , zip = '" . $residenceZip . "', fax = '" .$residenceFax .
-            "' where eid = " . $_GET["userId"] . " && type = 1";
-            $conn->query($updateResidenceAdd) or header("Location:registration_form.php?dbErr=1");
+            $updateResidenceData = array( 'rstreet' => $residenceStreet, 'rcity' => $resedenceCity,
+                'rstate' => $resedenceState, 'rzip' => $residenceZip, 'rfax' => $residenceFax);
+
+            if ( !$dbOperations->update('address', $updateResidenceData, $_GET["userId"], 1) ) {
+                header("Location:registration_form.php?dbErr=1");
+            } 
             
-            //Update office address
-            $updateOfficeAdd = "UPDATE address SET street = '" . $officeStreet . "', city ='" . $officeCity . "',
-                            state = '" . $officeState . "' , zip = '" . $officeZip . "', fax = '" . $officeFax .
-                            "' where eid = " . $_GET["userId"] . " && type = 2";
-            $conn->query($updateOfficeAdd) or header("Location:registration_form.php?dbErr=1");
+            $updateOfficeData = array( 'ostreet' => $officeStreet, 'ocity' => $officeCity,
+                'ostate' => $officeState, 'ozip' => $officeZip, 'ofax' => $officeFax);
+            
+            if ( !$dbOperations->update('address', $updateOfficeData, $_GET["userId"], 2) ) {
+                header("Location:registration_form.php?dbErr=1");
+            }
             
             // Update communication medium
             $msg = in_array("msg", $commMedium) ? 1 : 0;
@@ -453,10 +453,12 @@
             $call = in_array("phone", $commMedium) ? 1 : 0;
             $any = in_array("any", $commMedium) ? 1 : 0;
             
-            $updateCommMedium = "UPDATE commMedium SET msg ='" . $msg . "' , email ='" . $comEmail . "',
-                `call` ='" . $call . "' , any ='" . $any . "' where empId =" . $_GET["userId"];
+            $updateCommMedium = array( 'msg' => $msg, 'email' => $comEmail, 'call' => $call,
+                'any' => $any );
                 
-            $conn->query($updateCommMedium) or header("Location:registration_form.php?dbErr=1");
+            if ( !$dbOperations->update('commMedium', $updateCommMedium, $_GET["userId"] ) ) {
+                header("Location:registration_form.php?dbErr=1");
+            }
             
             //If photo is empty then dont update photo
             if( empty($photo) ) {
@@ -464,15 +466,15 @@
             }else {
                 $insertImage = ", photo = '".$photo."'";
             }
-            //update employee details
-            $updateEmpDetails = "UPDATE employee SET prefix = '" . $prefix . "' , firstName = '" . $firstName . "' , 
-                middleName = '" . $middleName . "' , lastName = '" . $lastName . "' ,  gender = '" . $gender .
-                "' , dob = '" . $dob . "' , mobile = '" . $mobile . "' , landline='" . $landline . "', email ='" 
-                . $email . "', maritalStatus= '" . $maritalStatus . "' ,employment = '" . $employment . "' ,
-                employer='" . $employer ."'".$insertImage . ",note= '" . $note . "' where eid = " 
-                . $_GET["userId"];
+
+            $updateEmpDetails = array( 'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
+                'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile,
+                'landline' => $landline, 'email' => $email, 'maritalStatus' => $maritalStatus,
+                'employment' => $employment, 'employer' => $employer, 'insertImage' => $insertImage, 'note' => $note );
                 
-            $conn->query($updateEmpDetails) or header("Location:registration_form.php?dbErr=1");
+            if ( !$dbOperations->update('employee', $updateEmpDetails, $_GET["userId"] ) ) {
+                header("Location:registration_form.php?dbErr=1");
+            }
             
             //Destroy the session 
             session_unset();
