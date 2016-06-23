@@ -19,15 +19,15 @@ Class Database {
      */
 	public static function getInstance() {
 		if(!self::$instance) {
-		// If no instance then make one
+			// If no instance then make one
 			self::$instance = new self();
 		}
+
 		return self::$instance;
 	}
 	// Constructor
 	private function __construct() {
-		$this->connection = new mysqli(HOST, USER, 
-			PASSWORD, DBNAME);
+		$this->connection = new mysqli(HOST, USER, PASSWORD, DBNAME);
 	}
 
 	// Get mysqli connection

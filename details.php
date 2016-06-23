@@ -7,6 +7,13 @@
 
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
+    session_start();
+    //Check for user's session
+    if ( !isset($_SESSION['employeeId']) ) {
+        echo '<h3>You are not authoried to access this page ! Please 
+            <a href="login.php">login </a></h3>';
+        exit();
+    }
 
     //include the constants file
     require_once('constants.php');
@@ -51,25 +58,23 @@
     <body>
         <div class="container">
             <nav class="navbar navbar-default">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" 
-                    aria-expanded="false" aria-controls="navbar">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" 
+                            aria-expanded="false" aria-controls="navbar">
                         <span class="sr-only">Toggle navigation</span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="index.php">VIVEK</a>
-                </div>
-                <div id="navbar" class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a href="registration_form.php">SIGN UP</a>
-                        </li>
-                        <li><a href="#">LOG IN</a>
-                        </li>
-                        <li><a href="details.php">DETAILS</a>
-                        </li>
-                    </ul>
+                        </button>
+                        <a class="navbar-brand" href="index.php">HOME</a>
+                    </div>
+                    <div id="navbar" class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="details.php">DETAILS</a></li>
+                            <li><a href="logout.php">LOG OUT</a></li>
+                        </ul>
+                    </div>
                 </div>
             </nav>
             <div class="row">
@@ -179,16 +184,25 @@
                                             height="150" width="150" >';
                                     }
 
-                                    echo '</td>';
-                                    echo "<td><a href='registration_form.php?userId=" . $row["eid"] . "&userAction=update' target='_self' >
-                                        <span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></a></td>";
+                                    echo '</td><td>';
 
-                                    echo "<td><a href='details.php?userId=" . $row["eid"] . "&userAction=delete' target='_self' > 
-                                        <span class='glyphicon glyphicon-remove' aria-hidden='true'></span></a></td>";
+                                    //Display edit and delete option to the loged in user only
+                                    if ( $row['eid'] == $_SESSION['employeeId'] ) {
+                                        echo "<a href='registration_form.php?userId=" . $row["eid"] . "&userAction=update' target='_self' >
+                                        <span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></a>";
+                                    }
+                                    echo "</td>";
+
+                                    if ( $row['eid'] == $_SESSION['employeeId'] ) {
+                                        echo "<td><a href='details.php?userId=" . $row["eid"] . "&userAction=delete' target='_self' > 
+                                            <span class='glyphicon glyphicon-remove' aria-hidden='true'></span></a>";
+                                    }
+                                    
+                                    echo "</td>";
 
                                 }
 
-                                if ( $employeeId == $row["eid"] ) {
+                                if ( $employeeId == $row["empId"] ) {
                                     echo "</tr>";
                                 }
 

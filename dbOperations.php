@@ -113,10 +113,8 @@ class DbOperations {
 
         if ( $addressType === 0 ) {
 
-            $selectEmpDetails = "SELECT employee.eid, employee.prefix, employee.firstName, employee.middleName, employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline, employee.email,
-            employee.maritalStatus, employee.employment, employee.employer, employee.note, employee.photo,
-            commMedium.empId, commMedium.msg, commMedium.email AS comm_email, commMedium.call , commMedium.any 
-            FROM employee JOIN commMedium ON employee.eid = commMedium.empId WHERE eid =" . $employeeId;
+            $selectEmpDetails = "SELECT employee.eid, employee.prefix, employee.firstName, employee.middleName, employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline, employee.email, employee.password, employee.maritalStatus, employee.employment, employee.employer, employee.note,employee.photo,commMedium.empId, commMedium.msg, commMedium.email AS comm_email, commMedium.call , commMedium.any FROM employee JOIN commMedium ON employee.eid = commMedium.empId WHERE eid =" . 
+                $employeeId;
             $details = $this->executeSql($selectEmpDetails);
 
             return $details;
@@ -142,10 +140,10 @@ class DbOperations {
     public function insert($tableName, $data, $employeeId = 0) {
 
         if ( $tableName == 'employee' && $employeeId === 0 ) {
-            $insertEmp = "INSERT INTO employee (`prefix`, `firstName`, `middleName`, `lastName`, `gender`, `dob`, `mobile`,`landline`, `email`, `maritalStatus`, `employment`, `employer`, `photo`, `note`)
+            $insertEmp = "INSERT INTO employee (`prefix`, `firstName`, `middleName`, `lastName`, `gender`, `dob`, `mobile`,`landline`, `email`, `password`, `maritalStatus`, `employment`, `employer`, `photo`, `note`)
                 VALUES ('".$data['prefix']."', '".$data['firstName']."', '".$data['middleName']."',
                 '".$data['lastName']."', '".$data['gender']."', '".$data['dob']."', '".$data['mobile']."',
-                '".$data['landline']."','".$data['email']."', '".$data['maritalStatus']."' ,
+                '".$data['landline']."','".$data['email']."','".$data['password']."', '".$data['maritalStatus']."' ,
                 '".$data['employment']."', '".$data['employer']."','".$data['photo']."', '".$data['note']."')";
             
             $insertEmployee = $this->executeSql($insertEmp);
@@ -234,9 +232,10 @@ class DbOperations {
                 $data['firstName'] . "' , middleName = '" . $data['middleName'] . "' , lastName = '" .
                 $data['lastName'] . "' ,  gender = '" . $data['gender'] ."' , dob = '" . $data['dob'] . "' ,
                 mobile = '" . $data['mobile'] . "' , landline='" . $data['landline'] . "', email ='" 
-                . $data['email'] . "', maritalStatus= '" . $data['maritalStatus'] . "' ,employment = '" .
-                $data['employment'] . "' ,employer='" . $data['employer'] ."'".$data['insertImage'] . ",
-                note= '" . $data['note'] . "' where eid = " . $employeeId;
+                . $data['email'] . "', password = '" . $data['password'] . "' , maritalStatus= '" . 
+                $data['maritalStatus'] . "' ,employment = '" .$data['employment'] . "' ,employer='" .
+                $data['employer'] ."'".$data['insertImage'] . ",note= '" . $data['note'] . "' where eid = " .
+                $employeeId;
 
             $updateEmployee = $this->executeSql($updateEmpDetails);
             return $updateEmployee;

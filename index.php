@@ -2,10 +2,7 @@
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
     
-    if ( isset($_GET['message']) && $_GET['message'] == 'update' ) {
-
-        $message = 'You have successfully updated your details';
-    }else if ( isset($_GET['message']) && $_GET['message'] == 'register' ) {
+    if ( isset($_GET['message']) && $_GET['message'] == 'register' ) {
 
         $message = 'Successfully Registered';
     }else if ( isset($_GET['message']) && $_GET['message'] == 1 ) {
@@ -14,6 +11,44 @@
     }else {
 
         $message = 'Welcome to employee registration portal';
+    }
+
+    //Setup Navigation links
+    $navLink1 = 'registration_form.php';
+    $navLink1Name = 'SIGN UP';
+
+    $navLink2 = 'login.php';
+    $navLink2Name = 'LOG IN';
+
+    //Start the session
+    session_start();
+    if ( isset($_SESSION['employeeId']) ) {
+
+        //Create a greeting message with respect to time of the day
+        $time = date("H");
+        if( $time < 12 ) {
+
+            $wish = 'Good morning';
+        } else if ( $time >= 12 && $time < 16) {
+
+            $wish = 'Good afternoon';
+        } else if ( $time >= 16 ) {
+
+            $wish = 'Good evening';
+        }
+
+        if ( isset($_GET['message']) && $_GET['message'] == 'update' ) {
+            $wish = 'You have successfully updated your details';
+        }
+        
+        $message = 'Welcome ' . $_SESSION['employeeFirstName'] . ' , ' . $wish;
+
+        //Change Navigation links
+        $navLink1 = 'details.php';
+        $navLink1Name = 'DETAILS';
+
+        $navLink2 = 'logout.php';
+        $navLink2Name = 'LOG OUT';
     }
 ?>
 <!DOCTYPE html>
@@ -36,13 +71,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="index.php">VIVEK</a>
+                    <a class="navbar-brand" href="index.php">HOME</a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li><a href="registration_form.php">SIGN UP</a></li>
-                        <li><a href="#">LOG IN</a></li>
-                        <li><a href="details.php">DETAILS</a></li>
+                        <li><a href="<?php echo "$navLink1";?> "><?php echo "$navLink1Name";?></a></li>
+                        <li><a href="<?php echo "$navLink2";?>"><?php echo "$navLink2Name";?></a></li>
                     </ul>
                 </div>
             </div>

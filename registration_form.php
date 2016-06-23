@@ -38,6 +38,23 @@
     //Start session to store the form fields
     session_start();
 
+    //Setup Navigation links
+    $navLink1 = 'registration_form.php';
+    $navLink1Name = 'SIGN UP';
+
+    $navLink2 = 'login.php';
+    $navLink2Name = 'LOG IN';
+
+    if ( isset($_SESSION['employeeId']) ) {
+
+        //Change Navigation links
+        $navLink1 = 'details.php';
+        $navLink1Name = 'DETAILS';
+
+        $navLink2 = 'logout.php';
+        $navLink2Name = 'LOG OUT';
+    }
+
     //Check for any error messages from details page
     if ( (isset($_SESSION['dbErr'] ) && $_SESSION['dbErr'] == 1) || (isset($_GET["dbErr"]) && $_GET["dbErr"] == 1 ) ) {
         echo "Sorry , something bad happened .Please try after some time." ;
@@ -196,6 +213,18 @@
 
         if ( strlen($email) > 50 ) {
             $emailErr = 'Only 50 characters allowed';
+            $error++;
+        }
+
+        $password = getCorrectData($_POST["password"]);
+        
+        if ( !preg_match("/^[a-zA-Z0-9]*$/", $password) ) {
+            $passwordErr = 'Only letters and numbers allowed';
+            $error++;
+        }
+
+        if ( strlen($password) > 11 ) {
+            $passwordErr = 'Only 11 characters allowed';
             $error++;
         }
         
@@ -365,7 +394,7 @@
             //Array to store employee details
             $empData = array( 'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
                 'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile, 'landline' => $landline,
-                'email' => $email, 'maritalStatus' => $maritalStatus, 'employment' => $employment, 'employer' => $employer,
+                'email' => $email, 'password' => $password, 'maritalStatus' => $maritalStatus, 'employment' => $employment, 'employer' => $employer,
                 'photo' => $photo, 'note' => $note);
             //Insert the employee details and get the last insert id.
             $empID = $dbOperations->insert('employee', $empData);
@@ -469,17 +498,13 @@
 
             $updateEmpDetails = array( 'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
                 'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile,
-                'landline' => $landline, 'email' => $email, 'maritalStatus' => $maritalStatus,
+                'landline' => $landline, 'email' => $email, 'password' => $password, 'maritalStatus' => $maritalStatus,
                 'employment' => $employment, 'employer' => $employer, 'insertImage' => $insertImage, 'note' => $note );
                 
             if ( !$dbOperations->update('employee', $updateEmpDetails, $_GET["userId"] ) ) {
                 header("Location:registration_form.php?dbErr=1");
             }
             
-            //Destroy the session 
-            session_unset();
-            session_destroy();
-
             //If update is successfull then redirect to index page
             header("Location:index.php?message=update");
         }
@@ -487,6 +512,13 @@
 
     //When user clicks the update button in the details page,then this code is executed
     if ( isset($_GET["userId"]) && isset($_GET["userAction"]) ) {
+
+        //Check for user's session
+        if ( !isset($_SESSION['employeeId']) ) {
+            echo '<h3>You are not authoried to access this page ! Please 
+                <a href="login.php">login </a></h3>';
+            exit();
+        }
 
         $details = $dbOperations->selectEmployee($_GET["userId"]);
         if ( $details === false ) {
@@ -538,13 +570,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="index.php">VIVEK</a>
+                    <a class="navbar-brand" href="index.php">HOME</a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li><a href="registration_form.php">SIGN UP</a></li>
-                        <li><a href="#">LOG IN</a></li>
-                        <li><a href="details.php">DETAILS</a></li>
+                        <li><a href="<?php echo "$navLink1";?> "><?php echo "$navLink1Name";?></a></li>
+                        <li><a href="<?php echo "$navLink2";?>"><?php echo "$navLink2Name";?></a></li>
                     </ul>
                 </div>
             </div>
@@ -777,6 +808,31 @@
                                             echo 'value="'.$email.'"';
                                         }
                                     ?>
+                                    required >
+                                </div>
+                            </div>
+                            <!-- Input field for password -->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" for="password">Password</label>  
+                                <div class="col-md-7">
+                                    <span class="error"> 
+                                    <?php 
+                                        if( !empty($passwordErr) ) {
+                                            echo "*".$passwordErr;
+                                        }
+                                    ?>
+                                    </span>
+                                    <input  name="password" type="password" placeholder="Password" class="form-control input-md" 
+                                    <?php
+
+                                        if( isset($empDetails["password"]) ) {
+                                            echo 'value="'.$empDetails["password"].'"';
+                                        }
+
+                                        if( isset($password) ) {
+                                            echo 'value="'.$password.'"';
+                                        }
+                                    ?> 
                                     required >
                                 </div>
                             </div>
