@@ -786,7 +786,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="landline" type="text" placeholder="9999-9999999" class="form-control input-md"
+                                    <input  name="landline" type="text" placeholder="9999-99999999" class="form-control input-md"
                                     <?php
                                         if( isset($empDetails["landline"]) ) {
                                             echo 'value="'.$empDetails["landline"].'"';
