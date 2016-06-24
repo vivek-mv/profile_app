@@ -17,8 +17,9 @@
 
     /**
      * Checks whether the employee details
-     * are present or not
-     *
+     * are present or not,which is used for
+     * retaining the form field values in
+     * case of any errors
      * @access public
      * @param String 
      * @return Boolean
@@ -129,139 +130,139 @@
     //Validate the input fields only if the request method is POST
     if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 
+        //Include the validation file
+        require_once('validation.php');
+
         //Initialize error to check for any errors that occur during validation
         $error = 0;
         
-         /**
-         * Performs validation for the form input fields
-         *
-         * @access public
-         * @param String $data
-         * @return String
-         */
-        function getCorrectData($data) {
-
-            $data = trim($data);
-            $data = stripslashes($data);
-            $data = htmlspecialchars($data);
-            return $data;
-        }
-        
-        $prefix = getCorrectData($_POST["prefix"]);
+        $prefix = Validation::getCorrectData($_POST["prefix"]);
         $_SESSION["prefix"] = $prefix;
-        $firstName = getCorrectData($_POST["firstName"]);
+        $firstName = Validation::getCorrectData($_POST["firstName"]);
         
-        if ( !preg_match("/^[a-zA-Z ]*$/", $firstName) ) {
+        if ( !Validation::validateText($firstName) ) {
             $firstnameErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($firstName) > 20 ) {
+        if ( Validation::validateLength($firstName, 20) ) {
             $firstnameErr = 'Only 20 characters allowed';
             $error++;
         }
         
-        $middleName = getCorrectData($_POST["middleName"]);
+        $middleName = Validation::getCorrectData($_POST["middleName"]);
         
-        if ( !preg_match("/^[a-zA-Z ]*$/", $middleName) ) {
+        if ( !Validation::validateText($middleName) ) {
             $middleNameErr = 'Only letters and white space allowed'; 
             $error++; 
         }
 
-        if ( strlen($middleName) > 20 ) {
+        if ( Validation::validateLength($middleName, 20) ) {
             $middleNameErr = 'Only 20 characters allowed';
             $error++;
         }
         
-        $lastName = getCorrectData($_POST["lastName"]);
+        $lastName = Validation::getCorrectData($_POST["lastName"]);
         
-        if ( !preg_match("/^[a-zA-Z ]*$/", $lastName) ) {
+        if ( !Validation::validateText($lastName) ) {
             $lastNameErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($lastName) > 20 ) {
+        if ( Validation::validateLength($lastName, 20) ) {
             $lastNameErr = 'Only 20 characters allowed';
             $error++;
         }
         
-        $gender = getCorrectData($_POST["gender"]);
+        $gender = Validation::getCorrectData($_POST["gender"]);
         $_SESSION["gender"] = $gender;
-        $dob = getCorrectData($_POST["dob"]);
+        $dob = Validation::getCorrectData($_POST["dob"]);
         $_SESSION["dob"] = $dob;
-        $mobile = getCorrectData($_POST["mobile"]);
+        $mobile = Validation::getCorrectData($_POST["mobile"]);
         
-        if (!preg_match("/^[0-9]*$/", $mobile)) {
+        if ( Validation::validateNumber($mobile) ) {
             $mobileErr = 'Only numbers are allowed in the mobile field';
             $error++;
         }
 
-        if ( !empty($mobile) && strlen($mobile) != 10 ) {
+        if ( Validation::validatePhone($mobile) ) {
             $mobileErr = 'mobile number should be 10 digits';
             $error++;
         }
         
-        $landline = getCorrectData($_POST["landline"]);
+        $landline = Validation::getCorrectData($_POST["landline"]);
         
-        if ( !preg_match("/^[0-9]*$/", $landline) ) {
+        if ( Validation::validateNumber($landline) ) {
             $landlineErr = 'Only numbers are allowed in the landline field';
             $error++;
         }
 
-        if ( !empty($landline) && strlen($landline) != 10 ) {
+        if ( Validation::validatePhone($landline) ) {
             $landlineErr = 'landline number should be 10 digits';
             $error++;
         }
         
-        $email = getCorrectData($_POST["email"]);
+        $email = Validation::getCorrectData($_POST["email"]);
         
-        if ( !filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+        if ( Validation::validateEmail($email) ) {
             $emailErr = 'Invalid email format';
             $error++;
-        }
+        }   
 
-        if ( strlen($email) > 50 ) {
+        if ( Validation::validateLength($email, 50) ) {
             $emailErr = 'Only 50 characters allowed';
             $error++;
         }
 
-        $password = getCorrectData($_POST["password"]);
+        //Check if email id is already present or not
+        $checkEmail = "SELECT * FROM employee WHERE employee.email =  '" . $email . "'";
+        $checkEmailPresent = $dbOperations->executeSql($checkEmail);
         
-        if ( !preg_match("/^[a-zA-Z0-9]*$/", $password) ) {
+        if ( (!isset($_SESSION['employeeId'])) && (!$checkEmailPresent->num_rows == 0) ) {
+            $emailErr = "Email already present";
+            $error++;
+        }
+
+        $password = Validation::getCorrectData($_POST["password"]);
+        
+        if ( Validation::validatePassword($password) ) {
             $passwordErr = 'Only letters and numbers allowed';
             $error++;
         }
 
-        if ( strlen($password) > 11 ) {
+        if ( Validation::validateLength($password, 11) ) {
             $passwordErr = 'Only 11 characters allowed';
             $error++;
         }
         
-        $maritalStatus = getCorrectData($_POST["maritalStatus"]);
+        $maritalStatus = Validation::getCorrectData($_POST["maritalStatus"]);
 
         $_SESSION["maritalStatus"] = $maritalStatus;
 
-        $employment = getCorrectData($_POST["employment"]);
+        $employment = Validation::getCorrectData($_POST["employment"]);
 
         $_SESSION["employment"] = $employment;
 
-        $employer = getCorrectData($_POST["employer"]);
+        $employer = Validation::getCorrectData($_POST["employer"]);
         
-        if ( !preg_match("/^[a-zA-Z ]*$/", $employer) ) {
+        if ( !Validation::validateText($employer) ) {
             $employerErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($employer) > 25 ) {
+        if ( Validation::validateLength($employer, 25) ) {
             $employerErr = 'Only 25 characters allowed';
             $error++;
         }
 
         //Set photo to empty string in case no image is provided by the user
         $photo="";
+        
+        //Get the size of post if its too lagre(large than the max. post size),than redirect to home page
+        $postSize = $_SERVER['CONTENT_LENGTH'];
 
         //If the user upload any file greater than 8 MB then redirect to index.php
-        if ( $_FILES['image']['error'] == 1) { 
+        if ( ($postSize > 15097152) || ($_FILES['image']['error'] == 1) ) { 
             $imageErr = 1;
             header("Location:index.php?message=".$imageErr);
             exit();
@@ -290,97 +291,97 @@
           $photo = $file_name;
         }
         
-        $residenceStreet = getCorrectData($_POST["residenceStreet"]);
+        $residenceStreet = Validation::getCorrectData($_POST["residenceStreet"]);
 
-        if ( strlen($residenceStreet) > 50 ) {
+        if ( Validation::validateLength($residenceStreet, 50) ) {
             $residenceStreetErr = 'Only 50 characters allowed';
             $error++;
         }
-        $resedenceCity = getCorrectData($_POST["resedenceCity"]);
+        $resedenceCity = Validation::getCorrectData($_POST["resedenceCity"]);
         
-        if (!preg_match("/^[a-zA-Z ]*$/", $resedenceCity)) {
+        if ( !Validation::validateText($resedenceCity) ) {
             $residenceCityErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($resedenceCity) > 50 ) {
+        if ( Validation::validateLength($resedenceCity, 50) ) {
             $residenceCityErr = 'Only 50 characters allowed';
             $error++;
         }
         
-        $resedenceState = getCorrectData($_POST["residenceState"]);
+        $resedenceState = Validation::getCorrectData($_POST["residenceState"]);
         $_SESSION["residenceState"] = $resedenceState;
 
-        $residenceZip = getCorrectData($_POST["residenceZip"]);
+        $residenceZip = Validation::getCorrectData($_POST["residenceZip"]);
         
-        if (!preg_match("/^[0-9]*$/", $residenceZip)) {
+        if ( Validation::validateNumber($residenceZip) ) {
             $residenceZipErr = 'Only numbers are allowed';
             $error++;
         }
 
-        if ( !empty($residenceZip) && strlen($residenceZip) != 6 ) {
+        if ( Validation::validateZip($residenceZip) ) {
             $residenceZipErr = 'zip number should be 6 digits';
             $error++;
         }
         
-        $residenceFax = getCorrectData($_POST["residenceFax"]);
+        $residenceFax = Validation::getCorrectData($_POST["residenceFax"]);
 
-        if (!preg_match("/^[0-9]*$/", $residenceFax)) {
+        if ( Validation::validateNumber($residenceFax) ) {
             $residenceFaxErr = 'Only numbers are allowed';
             $error++;
         }
 
-        if ( !empty($residenceFax) && strlen($residenceFax) > 15 ) {
+        if ( Validation::validateFax($residenceFax) ) {
             $residenceFaxErr = 'Fax should be less than 15 digits';
             $error++;
         }
 
-        $officeStreet = getCorrectData($_POST["officeStreet"]);
+        $officeStreet = Validation::getCorrectData($_POST["officeStreet"]);
 
-        if ( strlen($officeStreet) > 50 ) {
+        if ( Validation::validateLength($officeStreet, 50) ) {
             $officeStreetErr = 'Only 50 characters allowed';
             $error++;
         }
-        $officeCity = getCorrectData($_POST["officeCity"]);
+        $officeCity = Validation::getCorrectData($_POST["officeCity"]);
         
-        if (!preg_match("/^[a-zA-Z ]*$/", $officeCity)) {
+        if ( !Validation::validateText($officeCity) ) {
             $officeCityErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($officeCity) > 50 ) {
+        if ( Validation::validateLength($officeCity, 50) ) {
             $officeCityErr = 'Only 50 characters allowed';
             $error++;
         }
         
-        $officeState = getCorrectData($_POST["officeState"]);
+        $officeState = Validation::getCorrectData($_POST["officeState"]);
         $_SESSION["officeState"] = $officeState;
-        $officeZip = getCorrectData($_POST["officeZip"]);
+        $officeZip = Validation::getCorrectData($_POST["officeZip"]);
         
-        if (!preg_match("/^[0-9]*$/", $officeZip)) {
+        if ( Validation::validateNumber($officeZip) ) {
             $officeZipErr = "Only numbers are allowed";
             $error++;
         }
 
-        if ( !empty($officeZip) && strlen($officeZip) != 6 ) {
+        if ( Validation::validateZip($officeZip) ) {
             $officeZipErr = 'zip number should be 6 digits';
             $error++;
         }
         
-        $officeFax = getCorrectData($_POST["officeFax"]);
+        $officeFax = Validation::getCorrectData($_POST["officeFax"]);
 
-        if (!preg_match("/^[0-9]*$/", $officeFax)) {
+        if ( Validation::validateNumber($officeFax) ) {
             $officeFaxErr = "Only numbers are allowed";
             $error++;
         }
 
-        if ( !empty($officeFax) && strlen($officeFax) > 15 ) {
+        if ( Validation::validateFax($officeFax) ) {
             $officeFaxErr = 'Fax should be less than 15 digits';
             $error++;
         }
-        $note = getCorrectData($_POST["note"]);
+        $note = Validation::getCorrectData($_POST["note"]);
 
-        if ( strlen($note) > 150 ) {
+        if ( Validation::validateLength($note, 150) ) {
             $noteErr = 'Only 150 characters allowed';
             $error++;
         }
@@ -396,7 +397,6 @@
 
         //Insert the user data in the database if there are no errors.
         if( $error == 0 && $_POST["submit"] == "SUBMIT" ) {
-
             //Move the image to a specific folder
             move_uploaded_file($_FILES['image']['tmp_name'],APP_PATH."/profile_pic/".$_FILES['image']['name']);
 

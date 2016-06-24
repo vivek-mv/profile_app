@@ -40,6 +40,9 @@
         if ( isset($_GET['message']) && $_GET['message'] == 'update' ) {
             $wish = 'You have successfully updated your details';
         }
+        if ( isset($_GET['message']) && $_GET['message'] == '1' ) {
+            $wish = 'Your image size exceeds the limit, please upload an image which is less than 2 MB';
+        }
         
         $message = 'Welcome ' . $_SESSION['employeeFirstName'] . ' , ' . $wish;
 

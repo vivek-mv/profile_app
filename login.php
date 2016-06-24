@@ -1,4 +1,7 @@
 <?php 
+    
+    require_once('validation.php');
+
     if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
         $error = 0;
         if ( empty($_POST['email']) ) {
@@ -11,41 +14,26 @@
             $error++;
         }
 
-        /**
-         * Performs validation for the form input fields
-         *
-         * @access public
-         * @param String $data
-         * @return String
-         */
-        function getCorrectData($data) {
-
-            $data = trim($data);
-            $data = stripslashes($data);
-            $data = htmlspecialchars($data);
-            return $data;
-        }
-
-        $email = getCorrectData($_POST["email"]);
+        $email = Validation::getCorrectData($_POST["email"]);
         
-        if ( !preg_match("/^[a-zA-Z0-9@.]*$/", $email) ) {
+        if ( Validation::validateEmail($email) ) {
             $emailErr = 'Invalid email format';
             $error++;
         }
 
-        if ( strlen($email) > 50 ) {
+        if ( Validation::validateLength($email, 50) ) {
             $emailErr = 'Only 50 characters allowed';
             $error++;
         }
 
-        $password = getCorrectData($_POST["password"]);
+        $password = Validation::getCorrectData($_POST["password"]);
         
-        if ( !preg_match("/^[a-zA-Z0-9]*$/", $password) ) {
+        if ( Validation::validatePassword($password) ) {
             $passwordErr = 'Only letters and numbers allowed';
             $error++;
         }
         
-        if ( strlen($password) > 11 ) {
+        if ( Validation::validateLength($password, 11) ) {
             $passwordErr = 'Only 11 characters allowed';
             $error++;
         }
