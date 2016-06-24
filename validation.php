@@ -77,7 +77,11 @@
          */
         public static function validateEmail($data) {
             if ( !preg_match("/^[a-zA-Z0-9@.]*$/", $data) ) {
-            return true;
+                
+                return true;
+            }
+            if ( !filter_var($data, FILTER_VALIDATE_EMAIL) ) {
+                return true; 
             }
             return false;
         }

@@ -7,7 +7,8 @@
         $message = 'Successfully Registered';
     }else if ( isset($_GET['message']) && $_GET['message'] == 1 ) {
 
-        $message = 'Your image size exceeds the limit, please upload an image which is less than 2 MB';
+        $message = 'It seems that you are trying to break my code by uploading a very big file,<br>please 
+            dont do this to me :( . Please upload an image within 2 MB ';
     }else {
 
         $message = 'Welcome to employee registration portal';
@@ -41,7 +42,7 @@
             $wish = 'You have successfully updated your details';
         }
         if ( isset($_GET['message']) && $_GET['message'] == '1' ) {
-            $wish = 'Your image size exceeds the limit, please upload an image which is less than 2 MB';
+            $wish = 'It seems that you are trying to break my code by uploading a very big file';
         }
         
         $message = 'Welcome ' . $_SESSION['employeeFirstName'] . ' , ' . $wish;
