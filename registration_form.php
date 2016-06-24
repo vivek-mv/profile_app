@@ -65,7 +65,16 @@
     //Destroy the session variable if registration form is opened for the first time
     if ( empty($_POST) && empty($_GET) && !empty($_SESSION) ) {
        
-        //Destroy the session 
+        //if loged in user is trying to access a fresh registration page
+        if ( isset($_SESSION['employeeId']) ) {
+            echo "<h3>Oops.. Looks like you lost your way.<br>
+                Let us take you to the right place.
+                <a href='index.php'>Click Here</a>
+                </h3>";
+            exit();
+        }
+
+        //Destroy any session that is present 
         session_unset();
         session_destroy();
     }

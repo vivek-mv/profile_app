@@ -78,7 +78,7 @@
                 </div>
             </nav>
             <div class="row">
-                <div class="col-xs-11 col-sm-11 col-md-11 col-lg-11 ">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
                     <h2>Registered Employees</h2>
               		<?php
                         $employeeDetails = $dbOperations->selectAllEmployees();
