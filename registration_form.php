@@ -418,7 +418,8 @@
             $empAddressData = array( 'employeeId' => $empID, 'residenceStreet' => $residenceStreet, 'resedenceCity' => $resedenceCity,
                 'resedenceState' => $resedenceState, 'residenceZip' => $residenceZip, 'residenceFax' => $residenceFax,
                 'officeStreet' => $officeStreet, 'officeCity' => $officeCity, 'officeState' => $officeState, 'officeZip' => $officeZip,
-                'officeFax' => $officeFax ); 
+                'officeFax' => $officeFax );
+             
             //Insert the address
             $address = $dbOperations->insert('address', $empAddressData, $empID);
 
@@ -1190,16 +1191,14 @@
                                                 }
                                             ?>
                                             </span>                     
-                                            <textarea class="form-control" id="note" name="note" rows="3">
-                                            <?php
-                                                if( isset($empDetails["note"]) ) {
+                                            <textarea class="form-control" id="note" name="note" 
+                                                rows="3"><?php if( isset($empDetails["note"]) ) {
                                                     echo $empDetails["note"];
                                                 } 
                                                 if( isset($note) ) {
                                                     echo $note;
                                                 }
-                                            ?>
-                                            </textarea>
+                                            ?></textarea>
                                         </div>
                                     </div>
                                 </div>

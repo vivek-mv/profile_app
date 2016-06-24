@@ -138,7 +138,7 @@
                                     echo "<td>" . $row["email"] . "</td>";
                                     echo "<td>" . ucfirst( $row["maritalStatus"] ) . "</td>";
 
-                                    if ( $row["employment"] == 'employed' ) {
+                                    if ( $row["employment"] == 'employed' && !empty($row["employer"]) ) {
                                         echo "<td>" . ucfirst( $row["employment"] ) . " in " . ucfirst( $row["employer"] ) . "</td>";
 
                                     } else {

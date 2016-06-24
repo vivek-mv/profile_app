@@ -162,6 +162,7 @@ class DbOperations {
                     '".$data['resedenceState']."','".$data['residenceZip']."','".$data['residenceFax']."') ,
                      ('".$data['employeeId']."','2','".$data['officeStreet']."','".$data['officeCity']."',
                     '".$data['officeState']."','".$data['officeZip']."','".$data['officeFax']."')";
+            
             $address = $this->executeSql($insertAdd);
 
             if ( $address == true ) {
