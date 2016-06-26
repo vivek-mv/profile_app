@@ -42,7 +42,7 @@
             require_once('dbOperations.php');
             $dbOperations = new DbOperations();
             $query = "SELECT * FROM employee WHERE employee.email = '" . $email . "' AND 
-                employee.password = '" . $password . "'";
+                employee.password = '" . md5($password) . "'";
             $employeeData = $dbOperations->executeSql($query);
 
             if ( $employeeData->num_rows == 0 ) {
@@ -102,7 +102,7 @@
                             <span class="error">
                                         <?php 
                                             if( !empty($loginErr) ) {
-                                                echo "*".$loginErr;
+                                                echo $loginErr;
                                             }
                                         ?>
                                         </span>

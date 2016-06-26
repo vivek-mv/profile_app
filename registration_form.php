@@ -186,7 +186,7 @@
         }
 
         if ( Validation::validatePhone($mobile) ) {
-            $mobileErr = 'mobile number should be 10 digits';
+            $mobileErr = 'Mobile number should be 10 digits';
             $error++;
         }
         
@@ -198,7 +198,7 @@
         }
 
         if ( Validation::validatePhone($landline) ) {
-            $landlineErr = 'landline number should be 10 digits';
+            $landlineErr = 'Landline number should be 10 digits';
             $error++;
         }
         
@@ -279,7 +279,7 @@
           $extensions = array("jpeg","jpg","png");
           
           if( in_array($file_ext,$extensions) === false ) {
-            $imageErr = 'extension not allowed, please choose a JPEG or PNG file.';
+            $imageErr = 'Extension not allowed, please choose a JPEG or PNG file.';
             $error++;
           }
           
@@ -320,7 +320,7 @@
         }
 
         if ( Validation::validateZip($residenceZip) ) {
-            $residenceZipErr = 'zip number should be 6 digits';
+            $residenceZipErr = 'Zip number should be 6 digits';
             $error++;
         }
         
@@ -364,7 +364,7 @@
         }
 
         if ( Validation::validateZip($officeZip) ) {
-            $officeZipErr = 'zip number should be 6 digits';
+            $officeZipErr = 'Zip number should be 6 digits';
             $error++;
         }
         
@@ -403,7 +403,7 @@
             //Array to store employee details
             $empData = array( 'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
                 'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile, 'landline' => $landline,
-                'email' => $email, 'password' => $password, 'maritalStatus' => $maritalStatus, 'employment' => $employment, 'employer' => $employer,
+                'email' => $email, 'password' => md5($password), 'maritalStatus' => $maritalStatus, 'employment' => $employment, 'employer' => $employer,
                 'photo' => $photo, 'note' => $note);
             //Insert the employee details and get the last insert id.
             $empID = $dbOperations->insert('employee', $empData);
@@ -508,7 +508,7 @@
 
             $updateEmpDetails = array( 'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
                 'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile,
-                'landline' => $landline, 'email' => $email, 'password' => $password, 'maritalStatus' => $maritalStatus,
+                'landline' => $landline, 'email' => $email, 'password' => md5($password), 'maritalStatus' => $maritalStatus,
                 'employment' => $employment, 'employer' => $employer, 'insertImage' => $insertImage, 'note' => $note );
                 
             if ( !$dbOperations->update('employee', $updateEmpDetails, $_GET["userId"] ) ) {
@@ -832,18 +832,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="password" type="password" placeholder="Password" class="form-control input-md" 
-                                    <?php
-
-                                        if( isset($empDetails["password"]) ) {
-                                            echo 'value="'.$empDetails["password"].'"';
-                                        }
-
-                                        if( isset($password) ) {
-                                            echo 'value="'.$password.'"';
-                                        }
-                                    ?> 
-                                    required >
+                                    <input  name="password" type="password" placeholder="Password" class="form-control input-md" required >
                                 </div>
                             </div>
                             <!-- Radio button for marital status -->

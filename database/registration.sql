@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 24, 2016 at 05:36 PM
+-- Generation Time: Jun 26, 2016 at 01:03 PM
 -- Server version: 5.5.49-0ubuntu0.14.04.1
 -- PHP Version: 5.5.9-1ubuntu4.17
 
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `address` (
   `fax` varchar(20) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `eid` (`eid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15 ;
 
 -- --------------------------------------------------------
 
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `commMedium` (
   `any` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `empId` (`empId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
 
 -- --------------------------------------------------------
 
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `employee` (
   `mobile` varchar(11) NOT NULL,
   `landline` varchar(11) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `password` varchar(11) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `maritalStatus` varchar(10) NOT NULL,
   `employment` varchar(11) NOT NULL,
   `employer` varchar(25) NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS `employee` (
   `note` text NOT NULL,
   PRIMARY KEY (`eid`),
   KEY `eid` (`eid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
 
 --
 -- Constraints for dumped tables

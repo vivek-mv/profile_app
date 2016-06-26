@@ -9,7 +9,7 @@
 	define("IMAGE_SIZE", 2097152);
 
 	//Define image size in MB
-	define("IMAGE_SIZE_MB", "2MB");
+	define("IMAGE_SIZE_MB", " 2 MB");
 
 	//Database host name
 	define("HOST", "localhost");

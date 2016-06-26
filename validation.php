@@ -76,7 +76,7 @@
          * @return Boolean
          */
         public static function validateEmail($data) {
-            if ( !preg_match("/^[a-zA-Z0-9@.]*$/", $data) ) {
+            if ( !preg_match("/^[a-zA-Z0-9@._]*$/", $data) ) {
                 
                 return true;
             }
