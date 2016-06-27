@@ -7,6 +7,7 @@
 
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
+
     session_start();
     //Check for user's session
     if ( !isset($_SESSION['employeeId']) ) {
@@ -23,7 +24,7 @@
     //Display error message if delete fails in the same page
     if ( isset($_GET["Message"]) && $_GET["Message"] == 1 ) {
 
-        echo "Sorry delete failed !, please try after some time ";
+        echo 'Sorry delete failed !, please try after some time';
     }
     
     //Create DbOperations object which handles all the database operations

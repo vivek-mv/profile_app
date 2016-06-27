@@ -1,9 +1,15 @@
 <?php
 require_once('db_conn.php');
+
 /**
-* Class that handles Insert, Update, Delete and Display Operations.
-* @access public
-*/
+ * Class that handles Insert, Update, Delete and Display Operations.
+ * @access public
+ * @package void
+ * @subpackage void
+ * @category void
+ * @author vivek
+ * @link void
+ */
 class DbOperations {
 	private $conn = null;
 	
@@ -15,6 +21,7 @@ class DbOperations {
      * @return void
      */
 	public function __construct() {
+
 		$db = Database::getInstance();
 		$this->conn = $db->getConnection();
 	}
@@ -27,6 +34,7 @@ class DbOperations {
      * @return boolean/object
      */
     public function executeSql($query) {
+
         return mysqli_query($this->conn, $query);
     }
 
@@ -38,6 +46,7 @@ class DbOperations {
      * @return boolean
      */
 	public function delete($employeeId) {
+        
 		//Query to delete a row from the registration database with the respective employee id
         $deleteAddress = "DELETE FROM address WHERE eid=" . $employeeId . ";";
         $deleteCommMode = "DELETE FROM commMedium WHERE empId=" . $employeeId . ";";

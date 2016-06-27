@@ -5,12 +5,12 @@
     if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
         $error = 0;
         if ( empty($_POST['email']) ) {
-            $emailErr = "Email cannot be empty";
+            $emailErr = 'Email cannot be empty';
             $error++;
         }
 
         if ( empty($_POST['password']) ) {
-            $passwordErr = "Password cannot be empty";
+            $passwordErr = 'Password cannot be empty';
             $error++;
         }
 

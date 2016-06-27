@@ -1,10 +1,14 @@
 <?php 
 
-	/**
-	* Performs validation for the form input fields
-	*
-	* 
-	*/
+    /**
+     * Performs validation for the form input fields.
+     * @access public
+     * @package void
+     * @subpackage void
+     * @category void
+     * @author vivek
+     * @link void
+     */
 	Class Validation {
 
 		/**
@@ -76,6 +80,7 @@
          * @return Boolean
          */
         public static function validateEmail($data) {
+
             if ( !preg_match("/^[a-zA-Z0-9@._]*$/", $data) ) {
                 
                 return true;
@@ -94,6 +99,7 @@
          * @return Boolean
          */
         public static function validatePhone($data) {
+
             if ( !empty($data) && strlen($data) != 10 ) {
             return true;
             }
@@ -108,6 +114,7 @@
          * @return Boolean
          */
         public static function validateZip($data) {
+
             if ( !empty($data) && strlen($data) != 6 ) {
             return true;
             }
@@ -122,6 +129,7 @@
          * @return Boolean
          */
         public static function validateFax($data) {
+
             if ( !empty($data) && strlen($data) > 15 ) {
             return true;
             }
@@ -136,6 +144,7 @@
          * @return Boolean
          */
         public static function validatePassword($data) {
+            
             if ( !preg_match("/^[a-zA-Z0-9]*$/", $data) ) {
             return true;
             }

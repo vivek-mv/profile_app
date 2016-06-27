@@ -3,9 +3,14 @@
 require_once('constants.php');
 
 /**
-* Mysql database class - only one connection alowed
-* @access public
-*/
+ * Mysql database class - only one connection alowed
+ * @access public
+ * @package void
+ * @subpackage void
+ * @category void
+ * @author vivek
+ * @link void
+ */
 Class Database {
 	private $connection;
 	private static $instance; 

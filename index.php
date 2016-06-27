@@ -7,8 +7,8 @@
         $message = 'Successfully Registered';
     }else if ( isset($_GET['message']) && $_GET['message'] == 1 ) {
 
-        $message = 'It seems that you are trying to break my code by uploading a very big file,<br>please 
-            dont do this to me :( . Please upload an image within 2 MB ';
+        $message = 'It seems that you are trying to upload a very large file,<br>
+            . Please upload an image of size less than 2 MB ';
     }else {
 
         $message = 'Welcome to employee registration portal';
