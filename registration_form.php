@@ -609,7 +609,7 @@
             ?>
         </h1>
         <form action=<?php echo $form_action; ?> method="post" role="form" class="form-horizontal" 
-            enctype="multipart/form-data">
+            enctype="multipart/form-data" onsubmit="return validateForm()">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                     <fieldset>
@@ -652,7 +652,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="firstName" type="text" placeholder="First Name" class="form-control input-md" 
+                                    <input  name="firstName" type="text" placeholder="First Name" class="form-control input-md text_input" 
                                     <?php
 
                                         if( isset($empDetails["firstName"]) ) {
@@ -663,7 +663,7 @@
                                             echo 'value="'.$firstName.'"';
                                         }
                                     ?> 
-                                    required >
+                                    >
                                 </div>
                             </div>
                             <!-- Input field for middle name -->
@@ -677,7 +677,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="middleName" type="text" placeholder="Middle Name" class="form-control input-md"
+                                    <input  name="middleName" type="text" placeholder="Middle Name" class="form-control input-md text_input"
                                     <?php
                                         if( isset($empDetails["middleName"]) ) {
                                             echo 'value="'.$empDetails["middleName"].'"';
@@ -700,7 +700,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="lastName" type="text" placeholder="Last Name" class="form-control input-md" 
+                                    <input  name="lastName" type="text" placeholder="Last Name" class="form-control input-md text_input" 
                                     <?php
                                         if( isset($empDetails["lastName"]) ) {
                                             echo 'value="'.$empDetails["lastName"].'"';
@@ -826,7 +826,7 @@
                                             echo 'value="'.$email.'"';
                                         }
                                     ?>
-                                    required >
+                                    >
                                 </div>
                             </div>
                             <!-- Input field for password -->
@@ -840,14 +840,14 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="password" type="password" placeholder="Password" class="form-control input-md" required >
+                                    <input  name="password" type="password" placeholder="Password" class="form-control input-md">
                                 </div>
                             </div>
                             <!-- Input field for confirm password -->
                             <div class="form-group">
                                 <label class="col-md-3 control-label" for="password">Confirm Password</label>  
                                 <div class="col-md-7">
-                                    <input  name="confirmPassword" type="password" placeholder="Password" class="form-control input-md" required >
+                                    <input  name="confirmPassword" type="password" placeholder="Password" class="form-control input-md">
                                 </div>
                             </div>
                             <!-- Radio button for marital status -->
@@ -903,7 +903,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="employer" type="text" placeholder="Employer" class="form-control input-md"
+                                    <input  name="employer" type="text" placeholder="Employer" class="form-control input-md text_input"
                                     <?php
                                         if( isset($empDetails["employer"]) ) {
                                             echo 'value="'.$empDetails["employer"].'"';
@@ -981,7 +981,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="resedenceCity" type="text" placeholder="City" class="form-control input-md"
+                                    <input  name="resedenceCity" type="text" placeholder="City" class="form-control input-md text_input"
                                     <?php
                                         if( isset($empResidence["city"]) ) {
                                             echo 'value="'.$empResidence["city"].'"';
@@ -1096,7 +1096,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="officeCity" type="text" placeholder="City" class="form-control input-md"
+                                    <input  name="officeCity" type="text" placeholder="City" class="form-control input-md text_input"
                                     <?php 
                                         if( isset($empOffice["city"]) ) {
                                             echo 'value="'.$empOffice["city"].'"';
@@ -1291,5 +1291,6 @@
                 </div>
         </form>
         </div>
+        <script type="text/javascript" src="js/validate.js"></script>
     </body>
     <html>

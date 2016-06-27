@@ -145,7 +145,7 @@
          */
         public static function validatePassword($data) {
             
-            if ( !preg_match("/^[a-zA-Z0-9]*$/", $data) ) {
+            if ( (!preg_match("/^[a-zA-Z0-9]*$/", $data)) || ($data === '') ) {
             return true;
             }
             return false;
