@@ -221,6 +221,12 @@
         }
 
         $password = Validation::getCorrectData($_POST["password"]);
+        $confirmPassword = Validation::getCorrectData($_POST["confirmPassword"]);
+
+        if ( $password !== $confirmPassword ) {
+            $passwordErr = 'Please type same password twice';
+            $error++;
+        }
         
         if ( Validation::validatePassword($password) ) {
             $passwordErr = 'Only letters and numbers allowed';
@@ -259,13 +265,13 @@
         $postSize = $_SERVER['CONTENT_LENGTH'];
 
         //If the user upload any file greater than 8 MB then redirect to index.php
-        if ( ($postSize > 15097152) || ($_FILES['image']['error'] == 1) ) { 
+        if ( ($postSize > POST_SIZE) || ($_FILES['image']['error'] == 1) ) { 
             $imageErr = 1;
             header("Location:index.php?message=".$imageErr);
             exit();
         }
 
-        if( isset($_FILES['image']) && !empty($_FILES['image']['name']) && $_FILES['image']['size'] != 0 ){
+        if ( isset($_FILES['image']) && !empty($_FILES['image']['name']) && $_FILES['image']['size'] != 0 ) {
           $file_name = $_FILES['image']['name'];
           $file_size = $_FILES['image']['size'];
           $file_tmp = $_FILES['image']['tmp_name'];
@@ -275,7 +281,7 @@
           
           $extensions = array("jpeg","jpg","png");
           
-          if( in_array($file_ext,$extensions) === false ) {
+          if ( in_array($file_ext,$extensions) === false ) {
             $imageErr = 'Extension not allowed, please choose a JPEG or PNG file.';
             $error++;
           }
@@ -835,6 +841,13 @@
                                     ?>
                                     </span>
                                     <input  name="password" type="password" placeholder="Password" class="form-control input-md" required >
+                                </div>
+                            </div>
+                            <!-- Input field for confirm password -->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" for="password">Confirm Password</label>  
+                                <div class="col-md-7">
+                                    <input  name="confirmPassword" type="password" placeholder="Password" class="form-control input-md" required >
                                 </div>
                             </div>
                             <!-- Radio button for marital status -->
