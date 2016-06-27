@@ -5,11 +5,14 @@
     if ( isset($_GET['message']) && $_GET['message'] == 'register' ) {
 
         $message = 'Successfully Registered';
-    }else if ( isset($_GET['message']) && $_GET['message'] == 1 ) {
+    } else if ( isset($_GET['message']) && $_GET['message'] == 1 ) {
 
         $message = 'It seems that you are trying to upload a very large file,<br>
             . Please upload an image of size less than 2 MB ';
-    }else {
+    } else if ( isset($_GET['message']) && $_GET['message'] == 2 ) {
+
+        $message = 'Please login to access your account';
+    } else {
 
         $message = 'Welcome to employee registration portal';
     }
@@ -42,9 +45,14 @@
             $wish = 'You have successfully updated your details';
         }
         if ( isset($_GET['message']) && $_GET['message'] == '1' ) {
-            $wish = 'It seems that you are trying to break my code by uploading a very big file';
+            $wish = 'It seems that you are to upload a very large file <br>
+                Please upload an image of size less than 2 MB';
         }
         
+        if ( isset($_GET['message']) && $_GET['message'] == '2' ) {
+            $wish = 'You can only access your account';
+        }
+
         $message = 'Welcome ' . $_SESSION['employeeFirstName'] . ' , ' . $wish;
 
         //Change Navigation links

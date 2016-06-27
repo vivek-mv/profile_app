@@ -68,10 +68,7 @@
        
         //if loged in user is trying to access a fresh registration page
         if ( isset($_SESSION['employeeId']) ) {
-            echo "<h3>Oops.. Looks like you lost your way.<br>
-                Let us take you to the right place.
-                <a href='index.php'>Click Here</a>
-                </h3>";
+            header('Location:index.php');
             exit();
         }
 
@@ -525,8 +522,13 @@
 
         //Check for user's session
         if ( !isset($_SESSION['employeeId']) ) {
-            echo '<h3>You are not authoried to access this page ! Please 
-                <a href="login.php">login </a></h3>';
+            header('Location:index.php?message=2');
+            exit();
+        }
+
+        //Check if the user is trying to access other accounts
+        if ( !($_SESSION['employeeId'] == $_GET["userId"]) ) {
+            header('Location:index.php?message=2');
             exit();
         }
 

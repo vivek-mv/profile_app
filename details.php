@@ -11,8 +11,7 @@
     session_start();
     //Check for user's session
     if ( !isset($_SESSION['employeeId']) ) {
-        echo '<h3>You are not authoried to access this page ! Please 
-            <a href="login.php">login </a></h3>';
+        header('Location:index.php?message=2');
         exit();
     }
 
