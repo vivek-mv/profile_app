@@ -81,7 +81,7 @@
          */
         public static function validateEmail($data) {
 
-            if ( !preg_match("/^[a-zA-Z0-9@._]*$/", $data) ) {
+            if ( !preg_match("/^[a-zA-Z0-9@._-]*$/", $data) ) {
                 
                 return true;
             }
@@ -130,7 +130,7 @@
          */
         public static function validateFax($data) {
 
-            if ( !empty($data) && strlen($data) > 15 ) {
+            if ( !empty($data) && strlen($data) > 10 ) {
             return true;
             }
             return false;

@@ -118,7 +118,7 @@
                                             }
                                         ?>
                                         </span>
-                                        <input  name="email" type="email" placeholder="example@mail.com" class="form-control input-md" 
+                                        <input  id="email" name="email" type="email" placeholder="example@mail.com" class="form-control input-md" 
                                         <?php
                                             if( isset($email) ) {
                                                 echo 'value='.$email;
@@ -138,7 +138,7 @@
                                             }
                                         ?>
                                         </span>
-                                        <input  name="password" type="password" placeholder="Password" class="form-control input-md" 
+                                        <input  name="password" type="password" placeholder="Password" class="form-control input-md password" 
                                         <?php
                                             if( isset($password) ) {
                                                 echo 'value='.$password;
@@ -156,5 +156,7 @@
                 </div>
             </div>
         </div>
+    <script type="text/javascript" src="js/constants.js"></script>
+    <script type="text/javascript" src="js/validate.js"></script>
     </body>
 </html>

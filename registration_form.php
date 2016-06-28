@@ -840,14 +840,14 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="password" type="password" placeholder="Password" class="form-control input-md">
+                                    <input  name="password" type="password" placeholder="Password" class="form-control input-md password">
                                 </div>
                             </div>
                             <!-- Input field for confirm password -->
                             <div class="form-group">
                                 <label class="col-md-3 control-label" for="password">Confirm Password</label>  
                                 <div class="col-md-7">
-                                    <input  name="confirmPassword" type="password" placeholder="Password" class="form-control input-md">
+                                    <input  name="confirmPassword" type="password" placeholder="Password" class="form-control input-md password">
                                 </div>
                             </div>
                             <!-- Radio button for marital status -->
@@ -958,7 +958,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="residenceStreet" type="text" placeholder="Street" class="form-control input-md"
+                                    <input  name="residenceStreet" type="text" placeholder="Street" class="form-control input-md street"
                                     <?php
                                         if( isset($empResidence["street"]) ) {
                                             echo 'value="'.$empResidence["street"].'"';
@@ -1073,7 +1073,8 @@
                                             echo "*".$officeStreetErr;
                                         }
                                     ?>
-                                    <input  name="officeStreet" type="text" placeholder="Street" class="form-control input-md"
+                                    </span>
+                                    <input  name="officeStreet" type="text" placeholder="Street" class="form-control input-md street"
                                     <?php 
                                         if( isset($empOffice["street"]) ) {
                                             echo 'value="'.$empOffice["street"].'"';
@@ -1213,7 +1214,7 @@
                                         </div>
                                         <div class="col-xs-9 col-sm-8 col-md-8 col-lg-8 col-md-offset-2 col-lg-offset-2">
                                             <div class="checkbox-inline">
-                                                <input type="checkbox" id="mail" name="commMed[]" value="mail"
+                                                <input type="checkbox" id="mail" name="commMed[]" value="mail" class="checkbox"
                                                 <?php
                                                     if( (isset($empDetails["comm_email"]) && $empDetails["comm_email"]=="1") 
                                                         || ( isset($_SESSION["commMedium"]) && in_array("mail", $_SESSION["commMedium"]) ? TRUE : FALSE) ) {
@@ -1225,7 +1226,7 @@
                                                 <label for="mail">Mail</label>
                                             </div>
                                             <div class="checkbox-inline">
-                                                <input type="checkbox" id="message" name="commMed[]" value="msg"
+                                                <input type="checkbox" id="message" name="commMed[]" value="msg" class="checkbox"
                                                 <?php
                                                     if( (isset($empDetails["msg"]) && $empDetails["msg"] == "1") 
                                                         || ( isset($_SESSION["commMedium"]) && in_array("msg", $_SESSION["commMedium"]) ? TRUE : FALSE) ) {
@@ -1237,7 +1238,7 @@
                                                 <label for="message">Message</label>
                                             </div>
                                             <div class="checkbox-inline">
-                                                <input type="checkbox" id="phone" name="commMed[]" value="phone"
+                                                <input type="checkbox" id="phone" name="commMed[]" value="phone" class="checkbox"
                                                 <?php
                                                     if( (isset($empDetails["call"]) && $empDetails["call"] == "1") 
                                                         || ( isset($_SESSION["commMedium"]) && in_array("phone", $_SESSION["commMedium"]) ? TRUE : FALSE) ){
@@ -1249,7 +1250,7 @@
                                                 <label for="phone">Phone</label>
                                             </div>
                                             <div class="checkbox-inline">
-                                                <input type="checkbox" id="any" name="commMed[]" value="any" 
+                                                <input type="checkbox" id="any" name="commMed[]" value="any" class="checkbox"
                                                 <?php 
                                                     if( (isset($empDetails["any"]) && $empDetails["any"] == "1") 
                                                         || ( isset($_SESSION["commMedium"]) && in_array("any", $_SESSION["commMedium"]) ? TRUE : FALSE) ) {
@@ -1291,6 +1292,10 @@
                 </div>
         </form>
         </div>
+        <script src="https://code.jquery.com/jquery-3.0.0.min.js"   
+            integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=" 
+            crossorigin="anonymous">
+        </script>
         <script type="text/javascript" src="js/constants.js"></script>
         <script type="text/javascript" src="js/validate.js"></script>
     </body>
