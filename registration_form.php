@@ -771,7 +771,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="mobile" type="text" placeholder="9999-9999-9999" class="form-control input-md"
+                                    <input  name="mobile" type="text" placeholder="9999-9999-9999" class="form-control input-md number"
                                     <?php 
                                         if( isset($empDetails["mobile"]) ) {
                                             echo 'value="'.$empDetails["mobile"].'"';
@@ -794,7 +794,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="landline" type="text" placeholder="9999-99999999" class="form-control input-md"
+                                    <input  name="landline" type="text" placeholder="9999-99999999" class="form-control input-md number"
                                     <?php
                                         if( isset($empDetails["landline"]) ) {
                                             echo 'value="'.$empDetails["landline"].'"';
@@ -817,7 +817,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="email" type="email" placeholder="example@mail.com" class="form-control input-md"
+                                    <input  id="email" name="email" type="email" placeholder="example@mail.com" class="form-control input-md"
                                     <?php 
                                         if( isset($empDetails["email"]) ) {
                                             echo 'value="'.$empDetails["email"].'"';
@@ -1023,7 +1023,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input name="residenceZip" type="text" placeholder="Zip" class="form-control input-md"
+                                    <input name="residenceZip" type="text" placeholder="Zip" class="form-control input-md number"
                                     <?php 
                                         if( isset($empResidence["zip"]) ) {
                                             echo 'value="'.$empResidence["zip"].'"';
@@ -1046,7 +1046,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input name="residenceFax" type="text" placeholder="Fax" class="form-control input-md"
+                                    <input name="residenceFax" type="text" placeholder="Fax" class="form-control input-md number"
                                     <?php
                                         if( isset($empResidence["fax"]) ) {
                                             echo 'value="'.$empResidence["fax"].'"';
@@ -1138,7 +1138,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input name="officeZip" type="text" placeholder="Zip" class="form-control input-md"
+                                    <input name="officeZip" type="text" placeholder="Zip" class="form-control input-md number"
                                     <?php
                                         if( isset($empOffice["zip"]) ) {
                                             echo 'value="'.$empOffice["zip"].'"';
@@ -1161,7 +1161,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input name="officeFax" type="text" placeholder="Fax" class="form-control input-md"
+                                    <input name="officeFax" type="text" placeholder="Fax" class="form-control input-md number"
                                     <?php
                                         if( isset($empOffice["fax"]) ) {
                                             echo 'value="'.$empOffice["fax"].'"';
@@ -1291,6 +1291,8 @@
                 </div>
         </form>
         </div>
+        <script type="text/javascript" src="js/constants.js"></script>
         <script type="text/javascript" src="js/validate.js"></script>
     </body>
     <html>
+
