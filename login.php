@@ -96,16 +96,16 @@
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
-                    <form action="login.php" method="post" role="form" class="form-vertical">
+                    <form action="login.php" method="post" role="form" class="form-vertical" onsubmit="return validateEmailPassword()">
                         <fieldset>
                             <legend>Login In</legend>
                             <span class="error">
-                                        <?php 
-                                            if( !empty($loginErr) ) {
-                                                echo $loginErr;
-                                            }
-                                        ?>
-                                        </span>
+                                <?php 
+                                    if( !empty($loginErr) ) {
+                                        echo $loginErr;
+                                    }
+                                ?>
+                            </span>
                             <div class="well">
                                 <!-- Input field for email -->
                                 <div class="form-group">
@@ -124,7 +124,7 @@
                                                 echo 'value='.$email;
                                             }
                                         ?>
-                                        required >
+                                        >
                                     </div>
                                 </div>
                                 <!-- Input field for password -->
@@ -144,7 +144,7 @@
                                                 echo 'value='.$password;
                                             }
                                         ?>
-                                        required >
+                                        >
                                     </div>
                                 </div>
                                 <div class="text-center">

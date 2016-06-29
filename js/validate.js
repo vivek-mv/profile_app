@@ -11,7 +11,7 @@ function validateForm() {
 		
 		if ( elements[i].value.length > constants.textInputLength ) {
 			error++;
-			elements[i].parentElement.firstElementChild.innerHTML = "Only 20 characters  allowed";
+			elements[i].parentElement.firstElementChild.innerHTML = "Only "+constants.textInputLength+" characters  allowed";
 		}
 
 		if ( !(/^[a-zA-Z ]*$/.test(elements[i].value) ) ) {
@@ -36,7 +36,7 @@ function validateForm() {
 				if ( numbers[i].value != '' ) {
 				error++;
 				}
-				numbers[i].parentElement.firstElementChild.innerHTML = "You must enter 10 digits";
+				numbers[i].parentElement.firstElementChild.innerHTML = "You must enter "+constants.mobileLength+" digits";
 			}
 
 			//check for residence zip and office zip
@@ -45,7 +45,7 @@ function validateForm() {
 				if ( numbers[i].value != '' ) {
 				error++;
 				}
-				numbers[i].parentElement.firstElementChild.innerHTML = "You must enter 6 digits";
+				numbers[i].parentElement.firstElementChild.innerHTML = "You must enter "+constants.zipLength+" digits";
 			}
 
 			//check for residence fax and office fax
@@ -54,7 +54,7 @@ function validateForm() {
 				if ( numbers[i].value != '' ) {
 				error++;
 				}
-				numbers[i].parentElement.firstElementChild.innerHTML = "You must enter 10 digits";
+				numbers[i].parentElement.firstElementChild.innerHTML = "You must enter "+constants.faxLength+" digits";
 			}
 
 			//when user didnot entered anything then dont set any error messages
@@ -76,22 +76,26 @@ function validateForm() {
     password[0].parentElement.firstElementChild.innerHTML = '';
     
     error += validatePassword(password);
+
+    if ( password[0].value !== password[1].value ) {
+    	password[0].parentElement.firstElementChild.innerHTML = 'Passwords dont match';
+    }
 	//Validate Street 
 	var street = document.getElementsByClassName('street');
 	for ( i = 0; i<street.length; i++ ) {
 		street[i].parentElement.firstElementChild.innerHTML = '';
-		if ( street[i].value.length > 50 ) {
+		if ( street[i].value.length > constants.streetLength ) {
 			error++;
-			street[i].parentElement.firstElementChild.innerHTML = "Only 50 charaters allowed";
+			street[i].parentElement.firstElementChild.innerHTML = "Only "+constants.streetLength+" charaters allowed";
 		}
 	}
 
 	//validate note
 	var note = document.getElementById('note');
 	note.parentElement.firstElementChild.innerHTML = '';
-	if ( note.value.length > 150 ) {
+	if ( note.value.length > constants.noteLength ) {
 		error++;
-		note.parentElement.firstElementChild.innerHTML = "Only 150 charaters allowed";
+		note.parentElement.firstElementChild.innerHTML = "Only "+constants.noteLength+" charaters allowed";
 	}
 
 	//check for required fields
@@ -107,12 +111,7 @@ function validateForm() {
 		error++;
 		password[0].parentElement.firstElementChild.innerHTML = "This field is required";
 	}
-	
-	var checkboxes = document.getElementsByClassName('checkbox');
-	//change later
-	if ( ! (checkboxes[0].checked || checkboxes[1].checked || checkboxes[2].checked || checkboxes[3].checked) ) {
-		console.log('atleast one should be checked ');
-	}
+
 	//Check for error and return accordingly
 	if ( error > 0 ) {
 		return false;
@@ -129,6 +128,11 @@ function validateEmail(email) {
 		return 1;
     }
 
+    if ( email.value.length > constants.emailLength ) {
+		email.parentElement.firstElementChild.innerHTML = "Email should be less than " + constants.emailLength + " charaters";
+		return 1;
+    }
+
     var atpos = email.value.indexOf("@");
     var dotpos = email.value.lastIndexOf(".");
     if ( (atpos<1) || (dotpos<atpos+2) || (dotpos+2 >= email.value.length) ) {
@@ -139,10 +143,6 @@ function validateEmail(email) {
 }
 // function for validationg password
 function validatePassword(password) {
-	if ( password[0].value !== password[1].value ) {
-		password[0].parentElement.firstElementChild.innerHTML = "Passwords dont match";
-		return 1;
-	}
 
 	var checkPassword = /^[a-zA-Z0-9]*$/ ;
 	if ( !checkPassword.test(password[0].value) ) {
@@ -151,7 +151,7 @@ function validatePassword(password) {
 	}
 
 	if ( password[0].value.length > constants.passwordLength ) {
-		password[0].parentElement.firstElementChild.innerHTML = "Only 11 charaters allowed";
+		password[0].parentElement.firstElementChild.innerHTML = "Only " + constants.passwordLength + " charaters allowed";
 		return 1;
 	}
 	return 0;
@@ -160,9 +160,32 @@ function validatePassword(password) {
 
 //function for validating only email and password (to be accessed from login.php file)
 function validateEmailPassword() {
-	var email = document.getElementById('email');
-	validateEmail(email);
 
+	var error = 0;
+	var email = document.getElementById('email');
 	var password = document.getElementsByClassName('password');
-	validatePassword(password);
+
+	//set the error messages to empty string
+	email.parentElement.firstElementChild.innerHTML = '';
+	password[0].parentElement.firstElementChild.innerHTML = '';
+
+	error += validateEmail(email);
+	
+	error += validatePassword(password);
+
+	if ( email.value == '' ) {
+		error++;
+		email.parentElement.firstElementChild.innerHTML = "This field is required";
+	}
+
+	if ( password[0].value == '' ) {
+		error++;
+		password[0].parentElement.firstElementChild.innerHTML = "This field is required";
+	}
+	
+	if ( error > 0 ) {
+		return false;
+	} else {
+		return true;
+	}
 }

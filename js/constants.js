@@ -4,5 +4,8 @@ var constants = {
 	zipLength:6, 
 	faxLength:10,
 	textInputLength:20,
-	passwordLength:11
+	emailLength:50,
+	passwordLength:11,
+	streetLength:50,
+	noteLength:150
 };
