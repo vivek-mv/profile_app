@@ -7,15 +7,19 @@
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
 
-    //Include Database Connection
-    require_once('db_conn.php');
     //Include Constants file 
     require_once('constants.php');
+    //Include dbOperations file
+    require_once('dbOperations.php');
+
+    //dbOperations object 
+    $dbOperations = new DbOperations();
 
     /**
      * Checks whether the employee details
-     * are present or not
-     *
+     * are present or not,which is used for
+     * retaining the form field values in
+     * case of any errors
      * @access public
      * @param String 
      * @return Boolean
@@ -35,17 +39,40 @@
     //Start session to store the form fields
     session_start();
 
-    //Destroy the session variable if registration form is opened for the first time
-    if ( empty($_POST) && empty($_GET) ) {
-       
-        //Destroy the session 
-        session_unset();
-        session_destroy();
+    //Setup Navigation links
+    $navLink1 = 'registration_form.php';
+    $navLink1Name = 'SIGN UP';
+
+    $navLink2 = 'login.php';
+    $navLink2Name = 'LOG IN';
+
+    if ( isset($_SESSION['employeeId']) ) {
+
+        //Change Navigation links
+        $navLink1 = 'details.php';
+        $navLink1Name = 'DETAILS';
+
+        $navLink2 = 'logout.php';
+        $navLink2Name = 'LOG OUT';
     }
 
     //Check for any error messages from details page
     if ( (isset($_SESSION['dbErr'] ) && $_SESSION['dbErr'] == 1) || (isset($_GET["dbErr"]) && $_GET["dbErr"] == 1 ) ) {
         echo "Sorry , something bad happened .Please try after some time." ;
+        session_unset();
+        session_destroy();
+    }
+
+    //Destroy the session variable if registration form is opened for the first time
+    if ( empty($_POST) && empty($_GET) && !empty($_SESSION) ) {
+       
+        //if loged in user is trying to access a fresh registration page
+        if ( isset($_SESSION['employeeId']) ) {
+            header('Location:index.php');
+            exit();
+        }
+
+        //Destroy any session that is present 
         session_unset();
         session_destroy();
     }
@@ -100,133 +127,151 @@
     //Validate the input fields only if the request method is POST
     if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 
+        //Include the validation file
+        require_once('validation.php');
+
         //Initialize error to check for any errors that occur during validation
         $error = 0;
         
-         /**
-         * Performs validation for the form input fields
-         *
-         * @access public
-         * @param String $data
-         * @return String
-         */
-        function getCorrectData($data) {
-
-            $data = trim($data);
-            $data = stripslashes($data);
-            $data = htmlspecialchars($data);
-            return $data;
-        }
-        
-        $prefix = getCorrectData($_POST["prefix"]);
+        $prefix = Validation::getCorrectData($_POST["prefix"]);
         $_SESSION["prefix"] = $prefix;
-        $firstName = getCorrectData($_POST["firstName"]);
+        $firstName = Validation::getCorrectData($_POST["firstName"]);
         
-        if ( !preg_match("/^[a-zA-Z ]*$/", $firstName) ) {
+        if ( !Validation::validateText($firstName) ) {
             $firstnameErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($firstName) > 20 ) {
+        if ( Validation::validateLength($firstName, 20) ) {
             $firstnameErr = 'Only 20 characters allowed';
             $error++;
         }
         
-        $middleName = getCorrectData($_POST["middleName"]);
+        $middleName = Validation::getCorrectData($_POST["middleName"]);
         
-        if ( !preg_match("/^[a-zA-Z ]*$/", $middleName) ) {
+        if ( !Validation::validateText($middleName) ) {
             $middleNameErr = 'Only letters and white space allowed'; 
             $error++; 
         }
 
-        if ( strlen($middleName) > 20 ) {
+        if ( Validation::validateLength($middleName, 20) ) {
             $middleNameErr = 'Only 20 characters allowed';
             $error++;
         }
         
-        $lastName = getCorrectData($_POST["lastName"]);
+        $lastName = Validation::getCorrectData($_POST["lastName"]);
         
-        if ( !preg_match("/^[a-zA-Z ]*$/", $lastName) ) {
+        if ( !Validation::validateText($lastName) ) {
             $lastNameErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($lastName) > 20 ) {
+        if ( Validation::validateLength($lastName, 20) ) {
             $lastNameErr = 'Only 20 characters allowed';
             $error++;
         }
         
-        $gender = getCorrectData($_POST["gender"]);
+        $gender = Validation::getCorrectData($_POST["gender"]);
         $_SESSION["gender"] = $gender;
-        $dob = getCorrectData($_POST["dob"]);
+        $dob = Validation::getCorrectData($_POST["dob"]);
         $_SESSION["dob"] = $dob;
-        $mobile = getCorrectData($_POST["mobile"]);
+        $mobile = Validation::getCorrectData($_POST["mobile"]);
         
-        if (!preg_match("/^[0-9]*$/", $mobile)) {
+        if ( Validation::validateNumber($mobile) ) {
             $mobileErr = 'Only numbers are allowed in the mobile field';
             $error++;
         }
 
-        if ( !empty($mobile) && strlen($mobile) != 10 ) {
-            $mobileErr = 'mobile number should be 10 digits';
+        if ( Validation::validatePhone($mobile) ) {
+            $mobileErr = 'Mobile number should be 10 digits';
             $error++;
         }
         
-        $landline = getCorrectData($_POST["landline"]);
+        $landline = Validation::getCorrectData($_POST["landline"]);
         
-        if ( !preg_match("/^[0-9]*$/", $landline) ) {
+        if ( Validation::validateNumber($landline) ) {
             $landlineErr = 'Only numbers are allowed in the landline field';
             $error++;
         }
 
-        if ( !empty($landline) && strlen($landline) != 10 ) {
-            $landlineErr = 'landline number should be 10 digits';
+        if ( Validation::validatePhone($landline) ) {
+            $landlineErr = 'Landline number should be 10 digits';
             $error++;
         }
         
-        $email = getCorrectData($_POST["email"]);
+        $email = Validation::getCorrectData($_POST["email"]);
         
-        if ( !filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+        if ( Validation::validateEmail($email) ) {
             $emailErr = 'Invalid email format';
             $error++;
-        }
+        }   
 
-        if ( strlen($email) > 50 ) {
+        if ( Validation::validateLength($email, 50) ) {
             $emailErr = 'Only 50 characters allowed';
             $error++;
         }
+
+        //Check if email id is already present or not
+        $checkEmail = "SELECT * FROM employee WHERE employee.email =  '" . $email . "'";
+        $checkEmailPresent = $dbOperations->executeSql($checkEmail);
         
-        $maritalStatus = getCorrectData($_POST["maritalStatus"]);
+        if ( (!isset($_SESSION['employeeId'])) && (!$checkEmailPresent->num_rows == 0) ) {
+            $emailErr = "Email already present";
+            $error++;
+        }
+
+        $password = Validation::getCorrectData($_POST["password"]);
+        $confirmPassword = Validation::getCorrectData($_POST["confirmPassword"]);
+
+        if ( $password !== $confirmPassword ) {
+            $passwordErr = 'Please type same password twice';
+            $error++;
+        }
+        
+        if ( Validation::validatePassword($password) ) {
+            $passwordErr = 'Only letters and numbers allowed';
+            $error++;
+        }
+
+        if ( Validation::validateLength($password, 11) ) {
+            $passwordErr = 'Only 11 characters allowed';
+            $error++;
+        }
+        
+        $maritalStatus = Validation::getCorrectData($_POST["maritalStatus"]);
 
         $_SESSION["maritalStatus"] = $maritalStatus;
 
-        $employment = getCorrectData($_POST["employment"]);
+        $employment = Validation::getCorrectData($_POST["employment"]);
 
         $_SESSION["employment"] = $employment;
 
-        $employer = getCorrectData($_POST["employer"]);
+        $employer = Validation::getCorrectData($_POST["employer"]);
         
-        if ( !preg_match("/^[a-zA-Z ]*$/", $employer) ) {
+        if ( !Validation::validateText($employer) ) {
             $employerErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($employer) > 25 ) {
+        if ( Validation::validateLength($employer, 25) ) {
             $employerErr = 'Only 25 characters allowed';
             $error++;
         }
 
         //Set photo to empty string in case no image is provided by the user
         $photo="";
+        
+        //Get the size of post if its too lagre(large than the max. post size),than redirect to home page
+        $postSize = $_SERVER['CONTENT_LENGTH'];
 
         //If the user upload any file greater than 8 MB then redirect to index.php
-        if ( $_FILES['image']['error'] == 1) { 
+        if ( ($postSize > POST_SIZE) || ($_FILES['image']['error'] == 1) ) { 
             $imageErr = 1;
             header("Location:index.php?message=".$imageErr);
             exit();
         }
 
-        if( isset($_FILES['image']) && !empty($_FILES['image']['name']) && $_FILES['image']['size'] != 0 ){
+        if ( isset($_FILES['image']) && !empty($_FILES['image']['name']) && $_FILES['image']['size'] != 0 ) {
           $file_name = $_FILES['image']['name'];
           $file_size = $_FILES['image']['size'];
           $file_tmp = $_FILES['image']['tmp_name'];
@@ -236,8 +281,8 @@
           
           $extensions = array("jpeg","jpg","png");
           
-          if( in_array($file_ext,$extensions) === false ) {
-            $imageErr = 'extension not allowed, please choose a JPEG or PNG file.';
+          if ( in_array($file_ext,$extensions) === false ) {
+            $imageErr = 'Extension not allowed, please choose a JPEG or PNG file.';
             $error++;
           }
           
@@ -249,97 +294,97 @@
           $photo = $file_name;
         }
         
-        $residenceStreet = getCorrectData($_POST["residenceStreet"]);
+        $residenceStreet = Validation::getCorrectData($_POST["residenceStreet"]);
 
-        if ( strlen($residenceStreet) > 50 ) {
+        if ( Validation::validateLength($residenceStreet, 50) ) {
             $residenceStreetErr = 'Only 50 characters allowed';
             $error++;
         }
-        $resedenceCity = getCorrectData($_POST["resedenceCity"]);
+        $resedenceCity = Validation::getCorrectData($_POST["resedenceCity"]);
         
-        if (!preg_match("/^[a-zA-Z ]*$/", $resedenceCity)) {
+        if ( !Validation::validateText($resedenceCity) ) {
             $residenceCityErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($resedenceCity) > 50 ) {
+        if ( Validation::validateLength($resedenceCity, 50) ) {
             $residenceCityErr = 'Only 50 characters allowed';
             $error++;
         }
         
-        $resedenceState = getCorrectData($_POST["residenceState"]);
+        $resedenceState = Validation::getCorrectData($_POST["residenceState"]);
         $_SESSION["residenceState"] = $resedenceState;
 
-        $residenceZip = getCorrectData($_POST["residenceZip"]);
+        $residenceZip = Validation::getCorrectData($_POST["residenceZip"]);
         
-        if (!preg_match("/^[0-9]*$/", $residenceZip)) {
+        if ( Validation::validateNumber($residenceZip) ) {
             $residenceZipErr = 'Only numbers are allowed';
             $error++;
         }
 
-        if ( !empty($residenceZip) && strlen($residenceZip) != 6 ) {
-            $residenceZipErr = 'zip number should be 6 digits';
+        if ( Validation::validateZip($residenceZip) ) {
+            $residenceZipErr = 'Zip number should be 6 digits';
             $error++;
         }
         
-        $residenceFax = getCorrectData($_POST["residenceFax"]);
+        $residenceFax = Validation::getCorrectData($_POST["residenceFax"]);
 
-        if (!preg_match("/^[0-9]*$/", $residenceFax)) {
+        if ( Validation::validateNumber($residenceFax) ) {
             $residenceFaxErr = 'Only numbers are allowed';
             $error++;
         }
 
-        if ( !empty($residenceFax) && strlen($residenceFax) > 15 ) {
+        if ( Validation::validateFax($residenceFax) ) {
             $residenceFaxErr = 'Fax should be less than 15 digits';
             $error++;
         }
 
-        $officeStreet = getCorrectData($_POST["officeStreet"]);
+        $officeStreet = Validation::getCorrectData($_POST["officeStreet"]);
 
-        if ( strlen($officeStreet) > 50 ) {
+        if ( Validation::validateLength($officeStreet, 50) ) {
             $officeStreetErr = 'Only 50 characters allowed';
             $error++;
         }
-        $officeCity = getCorrectData($_POST["officeCity"]);
+        $officeCity = Validation::getCorrectData($_POST["officeCity"]);
         
-        if (!preg_match("/^[a-zA-Z ]*$/", $officeCity)) {
+        if ( !Validation::validateText($officeCity) ) {
             $officeCityErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($officeCity) > 50 ) {
+        if ( Validation::validateLength($officeCity, 50) ) {
             $officeCityErr = 'Only 50 characters allowed';
             $error++;
         }
         
-        $officeState = getCorrectData($_POST["officeState"]);
+        $officeState = Validation::getCorrectData($_POST["officeState"]);
         $_SESSION["officeState"] = $officeState;
-        $officeZip = getCorrectData($_POST["officeZip"]);
+        $officeZip = Validation::getCorrectData($_POST["officeZip"]);
         
-        if (!preg_match("/^[0-9]*$/", $officeZip)) {
+        if ( Validation::validateNumber($officeZip) ) {
             $officeZipErr = "Only numbers are allowed";
             $error++;
         }
 
-        if ( !empty($officeZip) && strlen($officeZip) != 6 ) {
-            $officeZipErr = 'zip number should be 6 digits';
+        if ( Validation::validateZip($officeZip) ) {
+            $officeZipErr = 'Zip number should be 6 digits';
             $error++;
         }
         
-        $officeFax = getCorrectData($_POST["officeFax"]);
+        $officeFax = Validation::getCorrectData($_POST["officeFax"]);
 
-        if (!preg_match("/^[0-9]*$/", $officeFax)) {
+        if ( Validation::validateNumber($officeFax) ) {
             $officeFaxErr = "Only numbers are allowed";
             $error++;
         }
 
-        if ( !empty($officeFax) && strlen($officeFax) > 15 ) {
+        if ( Validation::validateFax($officeFax) ) {
             $officeFaxErr = 'Fax should be less than 15 digits';
             $error++;
         }
-        $note = getCorrectData($_POST["note"]);
+        $note = Validation::getCorrectData($_POST["note"]);
 
-        if ( strlen($note) > 150 ) {
+        if ( Validation::validateLength($note, 150) ) {
             $noteErr = 'Only 150 characters allowed';
             $error++;
         }
@@ -355,30 +400,33 @@
 
         //Insert the user data in the database if there are no errors.
         if( $error == 0 && $_POST["submit"] == "SUBMIT" ) {
-
             //Move the image to a specific folder
             move_uploaded_file($_FILES['image']['tmp_name'],APP_PATH."/profile_pic/".$_FILES['image']['name']);
-            //insert the employee details
-            $insertEmp = "INSERT INTO employee (`prefix`, `firstName`, `middleName`, `lastName`, `gender`, `dob`, `mobile`,
-                `landline`, `email`, `maritalStatus`, `employment`, `employer`, `photo`, `note`)
-                VALUES ('$prefix', '$firstName', '$middleName', '$lastName', '$gender', '$dob', '$mobile', '$landline',
-                '$email', '$maritalStatus' ,'$employment', '$employer', '$photo', '$note')";
-            
-            //Get the last insert id as empId to insert address and comm. medium
-            if ( $conn->query($insertEmp ) === TRUE ) {
 
-                $empID = $conn->insert_id;
-            } else {
+            //Array to store employee details
+            $empData = array( 'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
+                'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile, 'landline' => $landline,
+                'email' => $email, 'password' => md5($password), 'maritalStatus' => $maritalStatus, 'employment' => $employment, 'employer' => $employer,
+                'photo' => $photo, 'note' => $note);
+            //Insert the employee details and get the last insert id.
+            $empID = $dbOperations->insert('employee', $empData);
+            
+            if ( $empID === false ) {
                 $_SESSION['dbErr'] = 1;
                 header("Location:registration_form.php");
-                exit();
+                exit();    
             }
-            // insert residence and office address
-            $insertAdd = "INSERT INTO address (`eid`,`type`,`street`,`city`,`state`,`zip`,`fax`)
-                    VALUES ('$empID','1','$residenceStreet','$resedenceCity','$resedenceState','$residenceZip',
-                    '$residenceFax') , ('$empID','2','$officeStreet','$officeCity','$officeState','$officeZip','$officeFax')";
 
-            if ( !$conn->query($insertAdd) ) {
+            //Array to store employye address
+            $empAddressData = array( 'employeeId' => $empID, 'residenceStreet' => $residenceStreet, 'resedenceCity' => $resedenceCity,
+                'resedenceState' => $resedenceState, 'residenceZip' => $residenceZip, 'residenceFax' => $residenceFax,
+                'officeStreet' => $officeStreet, 'officeCity' => $officeCity, 'officeState' => $officeState, 'officeZip' => $officeZip,
+                'officeFax' => $officeFax );
+             
+            //Insert the address
+            $address = $dbOperations->insert('address', $empAddressData, $empID);
+
+            if ( !$address ) {
                 $_SESSION['dbErr'] = 1;
                 header("Location:registration_form.php");
                 exit();
@@ -389,10 +437,13 @@
             $comEmail = in_array("mail", $commMedium) ? 1 : 0;
             $call = in_array("phone", $commMedium) ? 1 : 0;
             $any = in_array("any", $commMedium) ? 1 : 0;
-            $insertCommMedium = "INSERT INTO commMedium (`empId`,`msg`,`email`,`call`,`any`)
-                VALUES ('$empID','$msg','$comEmail','$call','$any')";
+
+            //Array to store employee communication medium
+            $commMediumData = array( 'employeeId' => $empID, 'message' => $msg, 'comEmail' => $comEmail,
+                'call' => $call, 'any' => $any );
             
-            if ( !$conn->query($insertCommMedium) ) {
+            $commMedium = $dbOperations->insert('commMedium', $commMediumData, $empID);
+            if ( !$commMedium ) {
                 $_SESSION['dbErr'] = 1;
                 header("Location:registration_form.php");
                 exit();
@@ -414,7 +465,7 @@
 
                 $image ="SELECT employee.photo FROM employee WHERE eid=" . $_GET["userId"] . ";";
 
-                $result = mysqli_query($conn, $image) or 
+                $result = $dbOperations->executeSql($image) or 
                 header("Location:details.php?Message=1");
 
                 $row = $result->fetch_assoc();
@@ -424,17 +475,19 @@
                 }
             }
 
-            //Update residence address
-            $updateResidenceAdd = "UPDATE address SET street = '" . $residenceStreet . "', city ='" . $resedenceCity . "',
-            state = '" . $resedenceState . "' , zip = '" . $residenceZip . "', fax = '" .$residenceFax .
-            "' where eid = " . $_GET["userId"] . " && type = 1";
-            $conn->query($updateResidenceAdd) or header("Location:registration_form.php?dbErr=1");
+            $updateResidenceData = array( 'rstreet' => $residenceStreet, 'rcity' => $resedenceCity,
+                'rstate' => $resedenceState, 'rzip' => $residenceZip, 'rfax' => $residenceFax);
+
+            if ( !$dbOperations->update('address', $updateResidenceData, $_GET["userId"], 1) ) {
+                header("Location:registration_form.php?dbErr=1");
+            } 
             
-            //Update office address
-            $updateOfficeAdd = "UPDATE address SET street = '" . $officeStreet . "', city ='" . $officeCity . "',
-                            state = '" . $officeState . "' , zip = '" . $officeZip . "', fax = '" . $officeFax .
-                            "' where eid = " . $_GET["userId"] . " && type = 2";
-            $conn->query($updateOfficeAdd) or header("Location:registration_form.php?dbErr=1");
+            $updateOfficeData = array( 'ostreet' => $officeStreet, 'ocity' => $officeCity,
+                'ostate' => $officeState, 'ozip' => $officeZip, 'ofax' => $officeFax);
+            
+            if ( !$dbOperations->update('address', $updateOfficeData, $_GET["userId"], 2) ) {
+                header("Location:registration_form.php?dbErr=1");
+            }
             
             // Update communication medium
             $msg = in_array("msg", $commMedium) ? 1 : 0;
@@ -442,9 +495,12 @@
             $call = in_array("phone", $commMedium) ? 1 : 0;
             $any = in_array("any", $commMedium) ? 1 : 0;
             
-            $updateCommMedium = "UPDATE commMedium SET msg ='" . $msg . "' , email ='" . $comEmail . "',
-                `call` ='" . $call . "' , any ='" . $any . "' where empId =" . $_GET["userId"];
-            $conn->query($updateCommMedium) or header("Location:registration_form.php?dbErr=1");
+            $updateCommMedium = array( 'msg' => $msg, 'email' => $comEmail, 'call' => $call,
+                'any' => $any );
+                
+            if ( !$dbOperations->update('commMedium', $updateCommMedium, $_GET["userId"] ) ) {
+                header("Location:registration_form.php?dbErr=1");
+            }
             
             //If photo is empty then dont update photo
             if( empty($photo) ) {
@@ -452,20 +508,16 @@
             }else {
                 $insertImage = ", photo = '".$photo."'";
             }
-            //update employee details
-            $updateEmpDetails = "UPDATE employee SET prefix = '" . $prefix . "' , firstName = '" . $firstName . "' , 
-                middleName = '" . $middleName . "' , lastName = '" . $lastName . "' ,  gender = '" . $gender .
-                "' , dob = '" . $dob . "' , mobile = '" . $mobile . "' , landline='" . $landline . "', email ='" 
-                . $email . "', maritalStatus= '" . $maritalStatus . "' ,employment = '" . $employment . "' ,
-                employer='" . $employer ."'".$insertImage . ",note= '" . $note . "' where eid = " 
-                . $_GET["userId"];
-                
-            $conn->query($updateEmpDetails) or header("Location:registration_form.php?dbErr=1");
-            
-            //Destroy the session 
-            session_unset();
-            session_destroy();
 
+            $updateEmpDetails = array( 'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
+                'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile,
+                'landline' => $landline, 'email' => $email, 'password' => md5($password), 'maritalStatus' => $maritalStatus,
+                'employment' => $employment, 'employer' => $employer, 'insertImage' => $insertImage, 'note' => $note );
+                
+            if ( !$dbOperations->update('employee', $updateEmpDetails, $_GET["userId"] ) ) {
+                header("Location:registration_form.php?dbErr=1");
+            }
+            
             //If update is successfull then redirect to index page
             header("Location:index.php?message=update");
         }
@@ -473,31 +525,39 @@
 
     //When user clicks the update button in the details page,then this code is executed
     if ( isset($_GET["userId"]) && isset($_GET["userAction"]) ) {
-        $selectEmpDetails = "SELECT employee.eid, employee.prefix, employee.firstName, employee.middleName, 
-            employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline, employee.email,
-            employee.maritalStatus, employee.employment, employee.employer, employee.note, employee.photo,
-            commMedium.empId, commMedium.msg, commMedium.email AS comm_email, commMedium.call , commMedium.any 
-            FROM employee JOIN commMedium ON employee.eid = commMedium.empId WHERE eid =" . $_GET["userId"];
 
-        $residenceAddress = "SELECT address.eid , address.type , address.street , address.city ,
-            address.state , address.zip , address.fax FROM address
-            WHERE address.eid =" . $_GET["userId"] . " AND address.type = 1";
+        //Check for user's session
+        if ( !isset($_SESSION['employeeId']) ) {
+            header('Location:index.php?message=2');
+            exit();
+        }
 
-        $officeAddress = "SELECT address.eid , address.type , address.street , address.city ,
-            address.state , address.zip , address.fax FROM address
-            WHERE address.eid =" . $_GET["userId"] . " AND address.type = 2";
+        //Check if the user is trying to access other accounts
+        if ( !($_SESSION['employeeId'] == $_GET["userId"]) ) {
+            header('Location:index.php?message=2');
+            exit();
+        }
 
-        $result1 = mysqli_query($conn, $selectEmpDetails) or 
+        $details = $dbOperations->selectEmployee($_GET["userId"]);
+        if ( $details === false ) {
             header("Location:registration_form.php?dbErr=1");
-        $empDetails = $result1->fetch_assoc();
+            exit();
+        }
+        $empDetails = $details->fetch_assoc();
         
-        $result2 = mysqli_query($conn, $residenceAddress) or 
+        $residence = $dbOperations->selectEmployee($_GET["userId"], 1);
+        if ( $residence === false ) {
             header("Location:registration_form.php?dbErr=1");
-        $empResidence = $result2->fetch_assoc();
+            exit();
+        }
+        $empResidence = $residence->fetch_assoc();
 
-        $result3 = mysqli_query($conn, $officeAddress) or 
+        $office = $dbOperations->selectEmployee($_GET["userId"], 2);
+        if ( $office === false ) {
             header("Location:registration_form.php?dbErr=1");
-        $empOffice = $result3->fetch_assoc();
+            exit();
+        }
+        $empOffice = $office->fetch_assoc();
 
         //set the image name into a session variable,so that image keeps showing if the update fails due to error
         $_SESSION['photo'] = $empDetails['photo'];      
@@ -528,13 +588,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="index.php">VIVEK</a>
+                    <a class="navbar-brand" href="index.php">HOME</a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li><a href="registration_form.php">SIGN UP</a></li>
-                        <li><a href="#">LOG IN</a></li>
-                        <li><a href="details.php">DETAILS</a></li>
+                        <li><a href="<?php echo "$navLink1";?> "><?php echo "$navLink1Name";?></a></li>
+                        <li><a href="<?php echo "$navLink2";?>"><?php echo "$navLink2Name";?></a></li>
                     </ul>
                 </div>
             </div>
@@ -735,7 +794,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="landline" type="text" placeholder="9999-9999999" class="form-control input-md"
+                                    <input  name="landline" type="text" placeholder="9999-99999999" class="form-control input-md"
                                     <?php
                                         if( isset($empDetails["landline"]) ) {
                                             echo 'value="'.$empDetails["landline"].'"';
@@ -768,6 +827,27 @@
                                         }
                                     ?>
                                     required >
+                                </div>
+                            </div>
+                            <!-- Input field for password -->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" for="password">Password</label>  
+                                <div class="col-md-7">
+                                    <span class="error"> 
+                                    <?php 
+                                        if( !empty($passwordErr) ) {
+                                            echo "*".$passwordErr;
+                                        }
+                                    ?>
+                                    </span>
+                                    <input  name="password" type="password" placeholder="Password" class="form-control input-md" required >
+                                </div>
+                            </div>
+                            <!-- Input field for confirm password -->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" for="password">Confirm Password</label>  
+                                <div class="col-md-7">
+                                    <input  name="confirmPassword" type="password" placeholder="Password" class="form-control input-md" required >
                                 </div>
                             </div>
                             <!-- Radio button for marital status -->
@@ -1115,16 +1195,14 @@
                                                 }
                                             ?>
                                             </span>                     
-                                            <textarea class="form-control" id="note" name="note" rows="3">
-                                            <?php
-                                                if( isset($empDetails["note"]) ) {
+                                            <textarea class="form-control" id="note" name="note" 
+                                                rows="3"><?php if( isset($empDetails["note"]) ) {
                                                     echo $empDetails["note"];
                                                 } 
                                                 if( isset($note) ) {
                                                     echo $note;
                                                 }
-                                            ?>
-                                            </textarea>
+                                            ?></textarea>
                                         </div>
                                     </div>
                                 </div>

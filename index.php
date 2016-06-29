@@ -2,18 +2,65 @@
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
     
-    if ( isset($_GET['message']) && $_GET['message'] == 'update' ) {
-
-        $message = 'You have successfully updated your details';
-    }else if ( isset($_GET['message']) && $_GET['message'] == 'register' ) {
+    if ( isset($_GET['message']) && $_GET['message'] == 'register' ) {
 
         $message = 'Successfully Registered';
-    }else if ( isset($_GET['message']) && $_GET['message'] == 1 ) {
+    } else if ( isset($_GET['message']) && $_GET['message'] == 1 ) {
 
-        $message = 'Your image size exceeds the limit, please upload an image which is less than 2 MB';
-    }else {
+        $message = 'It seems that you are trying to upload a very large file,<br>
+            . Please upload an image of size less than 2 MB ';
+    } else if ( isset($_GET['message']) && $_GET['message'] == 2 ) {
+
+        $message = 'Please login to access your account';
+    } else {
 
         $message = 'Welcome to employee registration portal';
+    }
+
+    //Setup Navigation links
+    $navLink1 = 'registration_form.php';
+    $navLink1Name = 'SIGN UP';
+
+    $navLink2 = 'login.php';
+    $navLink2Name = 'LOG IN';
+
+    //Start the session
+    session_start();
+    if ( isset($_SESSION['employeeId']) ) {
+
+        //Create a greeting message with respect to time of the day
+        $time = date("H");
+        if( $time < 12 ) {
+
+            $wish = 'Good morning';
+        } else if ( $time >= 12 && $time < 16) {
+
+            $wish = 'Good afternoon';
+        } else if ( $time >= 16 ) {
+
+            $wish = 'Good evening';
+        }
+
+        if ( isset($_GET['message']) && $_GET['message'] == 'update' ) {
+            $wish = 'You have successfully updated your details';
+        }
+        if ( isset($_GET['message']) && $_GET['message'] == '1' ) {
+            $wish = 'It seems that you are to upload a very large file <br>
+                Please upload an image of size less than 2 MB';
+        }
+        
+        if ( isset($_GET['message']) && $_GET['message'] == '2' ) {
+            $wish = 'You can only access your account';
+        }
+
+        $message = 'Welcome ' . $_SESSION['employeeFirstName'] . ' , ' . $wish;
+
+        //Change Navigation links
+        $navLink1 = 'details.php';
+        $navLink1Name = 'DETAILS';
+
+        $navLink2 = 'logout.php';
+        $navLink2Name = 'LOG OUT';
     }
 ?>
 <!DOCTYPE html>
@@ -36,20 +83,19 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="index.php">VIVEK</a>
+                    <a class="navbar-brand" href="index.php">HOME</a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li><a href="registration_form.php">SIGN UP</a></li>
-                        <li><a href="#">LOG IN</a></li>
-                        <li><a href="details.php">DETAILS</a></li>
+                        <li><a href="<?php echo "$navLink1";?> "><?php echo "$navLink1Name";?></a></li>
+                        <li><a href="<?php echo "$navLink2";?>"><?php echo "$navLink2Name";?></a></li>
                     </ul>
                 </div>
             </div>
         </nav>
         <div class="container">
             <div class="row">
-                <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+                <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2 text-center">
                     <h2>
                     <?php 
                         echo $message;
