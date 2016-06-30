@@ -31,7 +31,8 @@
          *
          * @access public
          * @param String
-         * @param String 
+         * @param String
+         * @param Array 
          * @return Boolean
          */
         public static function validateSelect($data, $type, $states = array() ) {
@@ -43,6 +44,31 @@
             if ( ($type == 'states') && ($data != '') && !(in_array($data, $states)) ) {
             return true;
             }
+            return false;
+        }
+
+        /**
+         * Validates the select field
+         *
+         * @access public
+         * @param String
+         * @param String 
+         * @return Boolean
+         */
+        public static function validateRadio($data, $type ) {
+
+            if ( ($type == 'gender') && !(in_array($data, array('m', 'f', 'o'))) ) {
+                return true;
+            }
+
+            if ( ($type == 'mStatus') && !(in_array($data, array('married', 'unmarried'))) ) {
+                return true;
+            }
+
+            if ( ($type == 'employment') && !(in_array($data, array('employed', 'unemployed'))) ) {
+                return true;
+            }
+
             return false;
         }
 

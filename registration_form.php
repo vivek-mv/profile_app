@@ -179,6 +179,12 @@
         
         $gender = Validation::getCorrectData($_POST["gender"]);
         $_SESSION["gender"] = $gender;
+
+        if ( Validation::validateRadio($gender, 'gender') ) {
+            $genderErr = 'Please provide a valid gender';
+            $error++;
+        }
+
         $dob = Validation::getCorrectData($_POST["dob"]);
         $_SESSION["dob"] = $dob;
         $mobile = Validation::getCorrectData($_POST["mobile"]);
@@ -248,9 +254,19 @@
 
         $_SESSION["maritalStatus"] = $maritalStatus;
 
+        if ( Validation::validateRadio($maritalStatus, 'mStatus') ) {
+            $maritalStatusErr = 'Please provide valid data';
+            $error++;
+        }
+
         $employment = Validation::getCorrectData($_POST["employment"]);
 
         $_SESSION["employment"] = $employment;
+        
+        if ( Validation::validateRadio($employment, 'employment') ) {
+            $employmentErr = 'Please provide valid data';
+            $error++;
+        }
 
         $employer = Validation::getCorrectData($_POST["employer"]);
         
@@ -738,6 +754,13 @@
                             </div>
                             <!-- Radio button for gender -->
                             <div class="form-group">
+                                <span class="error"> 
+                                <?php
+                                    if( !empty($genderErr) ) {
+                                        echo "*".$genderErr;
+                                    }
+                                ?>
+                                </span>
                                 <label class="col-md-3 control-label" for="gender">Gender</label>
                                 <div class="col-md-7"> 
                                     <label class="radio-inline">
@@ -876,6 +899,13 @@
                             </div>
                             <!-- Radio button for marital status -->
                             <div class="form-group">
+                                <span class="error"> 
+                                <?php 
+                                    if( !empty($maritalStatusErr) ) {
+                                        echo "*".$maritalStatusErr;
+                                    }
+                                ?>
+                                </span>
                                 <label class="col-md-3 control-label" for="m_status">Marital Status</label>
                                 <div class="col-md-7"> 
                                     <label class="radio-inline">
@@ -897,6 +927,13 @@
                             </div>
                             <!-- Radio button for employment -->
                             <div class="form-group">
+                                <span class="error"> 
+                                <?php
+                                    if( !empty($employmentErr) ) {
+                                        echo "*".$employmentErr;
+                                    }
+                                ?>
+                                </span>
                                 <label class="col-md-3 control-label" for="employment">Employment</label>
                                 <div class="col-md-7"> 
                                     <label class="radio-inline">

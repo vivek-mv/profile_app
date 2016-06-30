@@ -22,6 +22,9 @@ var validation = {
 
 		//validate email field
 		validateEmail();
+
+		//gender span not in pos
+		
 		//check for required fields
 	}
 }
