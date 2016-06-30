@@ -27,7 +27,7 @@
         }
 
         /**
-         * Validates the select field
+         * Validates the select fields
          *
          * @access public
          * @param String
@@ -48,7 +48,7 @@
         }
 
         /**
-         * Validates the select field
+         * Validates the radio fields
          *
          * @access public
          * @param String
@@ -67,6 +67,24 @@
 
             if ( ($type == 'employment') && !(in_array($data, array('employed', 'unemployed'))) ) {
                 return true;
+            }
+
+            return false;
+        }
+
+        /**
+         * Validates the checkbox fields
+         *
+         * @access public
+         * @param Array
+         * @return Boolean
+         */
+        public static function validateCheckbox($data) {
+
+            foreach ($data as $value) {
+                if ( !(in_array($value, array('', 'mail', 'msg', 'phone', 'any'))) ) {
+                    return true;
+                }
             }
 
             return false;

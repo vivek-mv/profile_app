@@ -262,7 +262,7 @@
         $employment = Validation::getCorrectData($_POST["employment"]);
 
         $_SESSION["employment"] = $employment;
-        
+
         if ( Validation::validateRadio($employment, 'employment') ) {
             $employmentErr = 'Please provide valid data';
             $error++;
@@ -425,9 +425,14 @@
         //Check for Communication Medium,if its empty then assign an empty array
         if( isset($_POST["commMed"]) ) {
            $commMedium = $_POST["commMed"];
-           $_SESSION["commMedium"] = $commMedium;  
+           $_SESSION["commMedium"] = $commMedium; 
+
+           if ( Validation::validateCheckbox($commMedium) ) {
+                $commMediumErr = 'Please provide a valid medium';
+                $error++;
+            } 
         }else{
-            $commMedium=array();
+            $commMedium = array();
         }
         
 
@@ -1287,6 +1292,13 @@
                                             <label>Communication medium:</label>
                                         </div>
                                         <div class="col-xs-9 col-sm-8 col-md-8 col-lg-8 col-md-offset-2 col-lg-offset-2">
+                                            <div class="error"> 
+                                            <?php
+                                                if( !empty($commMediumErr) ) {
+                                                    echo "*".$commMediumErr;
+                                                }
+                                            ?>
+                                            </div>
                                             <div class="checkbox-inline">
                                                 <input type="checkbox" id="mail" name="commMed[]" value="mail"
                                                 <?php
