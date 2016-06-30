@@ -27,6 +27,26 @@
         }
 
         /**
+         * Validates the select field
+         *
+         * @access public
+         * @param String
+         * @param String 
+         * @return Boolean
+         */
+        public static function validateSelect($data, $type, $states = array() ) {
+
+            if ( ($type == 'prefix') && ($data != 'mr') && ($data != 'mis') ) {
+            return true;
+            }
+
+            if ( ($type == 'states') && ($data != '') && !(in_array($data, $states)) ) {
+            return true;
+            }
+            return false;
+        }
+
+        /**
          * Validates the text field
          *
          * @access public

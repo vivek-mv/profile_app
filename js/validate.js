@@ -100,10 +100,11 @@ function validateNumber() {
 function validateEmail() {
 
 	var checkEmail = /^[a-zA-Z0-9@._-]*$/;
-	var atpos = email.value.indexOf("@");
-    var dotpos = email.value.lastIndexOf(".");
+	var email = $('.email');
+	var atpos = email[0].value.indexOf("@");
+    var dotpos = email[0].value.lastIndexOf(".");
 
-	$('.email').on( "blur keyup", function(){
+	email.on( "blur keyup", function(){
 		//set the error text to empty string
 		$(this).parent().children('span').text('');
 		validation.noError = true;

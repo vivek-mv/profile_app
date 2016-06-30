@@ -135,6 +135,12 @@
         
         $prefix = Validation::getCorrectData($_POST["prefix"]);
         $_SESSION["prefix"] = $prefix;
+
+        if ( Validation::validateSelect($prefix,'prefix') ) {
+            $prefixErr = 'Please select a valid prefix';
+            $error++;
+        }
+
         $firstName = Validation::getCorrectData($_POST["firstName"]);
         
         if ( !Validation::validateText($firstName) ) {
@@ -315,6 +321,11 @@
         $resedenceState = Validation::getCorrectData($_POST["residenceState"]);
         $_SESSION["residenceState"] = $resedenceState;
 
+        if ( Validation::validateSelect($resedenceState, 'states', $states) ) {
+            $residenceStateErr = 'Please select valid state';
+            $error++;
+        }
+
         $residenceZip = Validation::getCorrectData($_POST["residenceZip"]);
         
         if ( Validation::validateNumber($residenceZip) ) {
@@ -359,6 +370,12 @@
         
         $officeState = Validation::getCorrectData($_POST["officeState"]);
         $_SESSION["officeState"] = $officeState;
+
+        if ( Validation::validateSelect($officeState, 'states', $states) ) {
+            $officeStateErr = 'Please select valid state';
+            $error++;
+        }
+
         $officeZip = Validation::getCorrectData($_POST["officeZip"]);
         
         if ( Validation::validateNumber($officeZip) ) {
@@ -619,6 +636,13 @@
                             <div class="form-group">
                                 <label class="col-md-3 control-label" for="selectbasic1">Prefix</label>
                                 <div class="col-md-7">
+                                    <span class="error"> 
+                                    <?php 
+                                        if( !empty($prefixErr) ) {
+                                            echo "*".$prefixErr;
+                                        }
+                                    ?>
+                                    </span>
                                     <select id="selectbasic1" name="prefix" class="form-control" >
                                         <option value="mr" 
                                         <?php 
@@ -997,6 +1021,13 @@
                             <div class="form-group">
                                 <label class="col-md-3 control-label" >State</label>
                                 <div class="col-md-7">
+                                    <span class="error"> 
+                                    <?php
+                                        if( !empty($residenceStateErr) ) {
+                                            echo "*".$residenceStateErr;
+                                        }
+                                    ?>
+                                    </span>
                                     <select name="residenceState" class="form-control">
                                         <option value="">Select State</option>
                                         <?php
@@ -1112,6 +1143,13 @@
                             <div class="form-group">
                                 <label class="col-md-3 control-label" >State</label>
                                 <div class="col-md-7">
+                                    <span class="error"> 
+                                    <?php
+                                        if( !empty($officeStateErr) ) {
+                                            echo "*".$officeStateErr;
+                                        }
+                                    ?>
+                                    </span>
                                     <select name="officeState" class="form-control">
                                         <option value="">Select State</option>
                                         <?php
