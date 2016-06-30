@@ -144,17 +144,21 @@ function validatePassword() {
 	var checkPassword = /^[a-zA-Z0-9]*$/ ;
 	$('.password').on("blur keyup", function(){
 		//set the error text to empty string
-		$(this).parent().children('span').text('');
+		$('.password').parent().children('span').text('');
 		validation.noError = true;
 
-		if ( !checkPassword.test($(this)[0].value) ) {
+		if ( !checkPassword.test($('.password')[0].value) ) {
 			validation.noError = false;
-			$(this).parent().children('span').text("Only letters and numbers are allowed");
-		} else if ( $(this)[0].value.length > constants.passwordLength ) {
+			$('.password').parent().children('span').text("Only letters and numbers are allowed");
+		
+		} else if ( $('.password')[0].value.length > constants.passwordLength ) {
 			validation.noError = false;
-			$(this).parent().children('span').text("Only " + constants.passwordLength + " charaters allowed");
+			$('.password').parent().children('span').text("Only " + constants.passwordLength + " charaters allowed");
+		
+		}else if ( ($('.password')[0].value !== $('.password')[1].value)) {
+			validation.noError = false;
+			$('.password').parent().children('span').text("Passwords dont match ");
 		}
-		//do validation of password match
 
 	});
 }

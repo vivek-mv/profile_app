@@ -227,7 +227,7 @@
         $checkEmail = "SELECT * FROM employee WHERE employee.email =  '" . $email . "'";
         $checkEmailPresent = $dbOperations->executeSql($checkEmail);
         
-        if ( (!isset($_SESSION['employeeId'])) && (!$checkEmailPresent->num_rows == 0) ) {
+        if ( ($email != '') && (!isset($_SESSION['employeeId'])) && (!$checkEmailPresent->num_rows == 0) ) {
             $emailErr = "Email already present";
             $error++;
         }
@@ -708,7 +708,7 @@
                                             echo 'value="'.$firstName.'"';
                                         }
                                     ?> 
-                                    required >
+                                    >
                                 </div>
                             </div>
                             <!-- Input field for middle name -->
@@ -878,7 +878,7 @@
                                             echo 'value="'.$email.'"';
                                         }
                                     ?>
-                                    required >
+                                    >
                                 </div>
                             </div>
                             <!-- Input field for password -->

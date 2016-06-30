@@ -145,11 +145,10 @@
          */
         public static function validateEmail($data) {
 
-            if ( !preg_match("/^[a-zA-Z0-9@._]*$/", $data) ) {
+            if ( !($data == '') && (!preg_match("/^[a-zA-Z0-9@._]*$/", $data)) ) {
                 
                 return true;
-            }
-            if ( !filter_var($data, FILTER_VALIDATE_EMAIL) ) {
+            }else if ( !($data == '') && (!filter_var($data, FILTER_VALIDATE_EMAIL)) ) {
                 return true; 
             }
             return false;
