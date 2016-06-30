@@ -26,6 +26,12 @@ var validation = {
 		//validate password field
 		validatePassword();
 
+		//validate street field
+		validateStreet();
+
+		//validate note field
+		validateNote();
+
 		//gender,radio, checkbox span not in pos
 
 		//check for required fields
@@ -162,3 +168,81 @@ function validatePassword() {
 
 	});
 }
+
+/**
+ * Validates street fields
+ * @param void
+ * @retrun void
+ */
+function validateStreet() {
+
+	$('.street').on( "blur keyup ", function(){
+		//set the error text to empty string
+		$(this).parent().children('span').text('');
+		validation.noError = true;
+
+		if ( $(this)[0].value.length > constants.streetLength ) {
+
+			validation.noError = false;
+			$(this).parent().children('span').text("Only "+constants.streetLength+" characters  allowed");
+		}
+		
+		if ( !(/^[a-zA-Z0-9()\/\- ]*$/.test($(this)[0].value) ) ) {
+			//search for escaping slashes
+			validation.noError = false;
+			$(this).parent().children('span').text("Only these a-zA-Z0-9()/- are allowed");
+		}
+	}); 
+}
+
+/**
+ * Validates note fields
+ * @param void
+ * @retrun void
+ */
+function validateNote() {
+
+	$('.note').on( "blur keyup ", function(){
+		//set the error text to empty string
+		$(this).parent().children('span').text('');
+		validation.noError = true;
+
+		if ( $(this)[0].value.length > constants.noteLength ) {
+
+			validation.noError = false;
+			$(this).parent().children('span').text("Only "+constants.noteLength+" characters  allowed");
+		}
+		
+		if ( !(/^[a-zA-Z0-9 ]*$/.test($(this)[0].value) ) ) {
+			//search for escaping slashes
+			validation.noError = false;
+			$(this).parent().children('span').text("Only characters and numbers are allowed");
+		}
+	}); 
+}
+
+/**
+ * check for required fields on submit
+ * @param void
+ * @retrun void
+ */
+function checkRequired() { 
+	if ( ($('#firstName')[0].value == '') || ($('#email')[0].value == '') || ($('#password')[0].value == '') ) {
+		
+		if ( $.trim($('#firstName')[0].value) == '' ) {
+			$('#firstName').parent().children('span').text("This field is required");
+		}
+
+		if ( $('#email')[0].value == '' ) {
+			$('#email').parent().children('span').text("This field is required");
+		}
+
+		if ( $('#password')[0].value == '' ) {
+			$('#password').parent().children('span').text("This field is required");
+		}
+		validation.noError = false;
+		return false;
+	}
+	return true; 
+}
+

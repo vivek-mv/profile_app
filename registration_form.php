@@ -647,7 +647,7 @@
             ?>
         </h1>
         <form action=<?php echo $form_action; ?> method="post" role="form" class="form-horizontal" 
-            enctype="multipart/form-data" onsubmit="return validation.noError;">
+            enctype="multipart/form-data" onsubmit="return checkRequired() && validation.noError;">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                     <fieldset>
@@ -697,7 +697,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="firstName" type="text" placeholder="First Name" class="form-control input-md text_input" 
+                                    <input  id="firstName" name="firstName" type="text" placeholder="First Name" class="form-control input-md text_input" 
                                     <?php
 
                                         if( isset($empDetails["firstName"]) ) {
@@ -869,7 +869,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="email" type="email" placeholder="example@mail.com" class="form-control input-md email"
+                                    <input  id="email" name="email" type="email" placeholder="example@mail.com" class="form-control input-md email"
                                     <?php 
                                         if( isset($empDetails["email"]) ) {
                                             echo 'value="'.$empDetails["email"].'"';
@@ -892,7 +892,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="password" type="password" placeholder="Password" class="form-control input-md password">
+                                    <input id="password" name="password" type="password" placeholder="Password" class="form-control input-md password">
                                 </div>
                             </div>
                             <!-- Input field for confirm password -->
@@ -1024,7 +1024,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="residenceStreet" type="text" placeholder="Street" class="form-control input-md"
+                                    <input  name="residenceStreet" type="text" placeholder="Street" class="form-control input-md street"
                                     <?php
                                         if( isset($empResidence["street"]) ) {
                                             echo 'value="'.$empResidence["street"].'"';
@@ -1146,7 +1146,8 @@
                                             echo "*".$officeStreetErr;
                                         }
                                     ?>
-                                    <input  name="officeStreet" type="text" placeholder="Street" class="form-control input-md"
+                                    </span>
+                                    <input  name="officeStreet" type="text" placeholder="Street" class="form-control input-md street"
                                     <?php 
                                         if( isset($empOffice["street"]) ) {
                                             echo 'value="'.$empOffice["street"].'"';
@@ -1275,7 +1276,7 @@
                                                 }
                                             ?>
                                             </span>                     
-                                            <textarea class="form-control" id="note" name="note" 
+                                            <textarea class="form-control note" id="note" name="note" 
                                                 rows="3"><?php if( isset($empDetails["note"]) ) {
                                                     echo $empDetails["note"];
                                                 } 
