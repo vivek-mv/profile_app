@@ -82,7 +82,7 @@
         public static function validateCheckbox($data) {
 
             foreach ($data as $value) {
-                if ( !(in_array($value, array('', 'mail', 'msg', 'phone', 'any'))) ) {
+                if ( !(in_array($value, array('mail', 'msg', 'phone', 'any'))) ) {
                     return true;
                 }
             }

@@ -23,8 +23,11 @@ var validation = {
 		//validate email field
 		validateEmail();
 
-		//gender span not in pos
-		
+		//validate password field
+		validatePassword();
+
+		//gender,radio, checkbox span not in pos
+
 		//check for required fields
 	}
 }
@@ -104,20 +107,54 @@ function validateEmail() {
 
 	var checkEmail = /^[a-zA-Z0-9@._-]*$/;
 	var email = $('.email');
-	var atpos = email[0].value.indexOf("@");
-    var dotpos = email[0].value.lastIndexOf(".");
-
 	email.on( "blur keyup", function(){
 		//set the error text to empty string
 		$(this).parent().children('span').text('');
 		validation.noError = true;
+		var atpos = email[0].value.indexOf("@");
+    	var dotpos = email[0].value.lastIndexOf(".");
 
 		if ( !checkEmail.test($(this)[0].value) ) {
 
 			validation.noError = false;
 			$(this).parent().children('span').text("Invalid email");
 			
-		} else if ( $(this)[0].value !== '' ) {
+		}else if ( $(this)[0].value == '' ) {
+			$(this).parent().children('span').text('');
+			validation.noError = true;
+
+		} else if ( $(this)[0].value.length > constants.emailLength ) {
+
+			validation.noError = false;
+			$(this).parent().children('span').text("Email should be less than " + constants.emailLength + " charaters");
+		} else if ( (atpos<1) || (dotpos<atpos+2) || (dotpos+2 >= $(this)[0].value.length) ) {
+
+			validation.noError = false;
+			$(this).parent().children('span').text("Invalid email");
 		}
 	}); 
+}
+
+/**
+ * Validates password field
+ * @param void
+ * @retrun void
+ */
+function validatePassword() { 
+	var checkPassword = /^[a-zA-Z0-9]*$/ ;
+	$('.password').on("blur keyup", function(){
+		//set the error text to empty string
+		$(this).parent().children('span').text('');
+		validation.noError = true;
+
+		if ( !checkPassword.test($(this)[0].value) ) {
+			validation.noError = false;
+			$(this).parent().children('span').text("Only letters and numbers are allowed");
+		} else if ( $(this)[0].value.length > constants.passwordLength ) {
+			validation.noError = false;
+			$(this).parent().children('span').text("Only " + constants.passwordLength + " charaters allowed");
+		}
+		//do validation of password match
+
+	});
 }

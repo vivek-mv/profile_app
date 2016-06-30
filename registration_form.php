@@ -892,14 +892,14 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="password" type="password" placeholder="Password" class="form-control input-md" required >
+                                    <input  name="password" type="password" placeholder="Password" class="form-control input-md password">
                                 </div>
                             </div>
                             <!-- Input field for confirm password -->
                             <div class="form-group">
                                 <label class="col-md-3 control-label" for="password">Confirm Password</label>  
                                 <div class="col-md-7">
-                                    <input  name="confirmPassword" type="password" placeholder="Password" class="form-control input-md" required >
+                                    <input  name="confirmPassword" type="password" placeholder="Password" class="form-control input-md password">
                                 </div>
                             </div>
                             <!-- Radio button for marital status -->
