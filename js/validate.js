@@ -214,7 +214,7 @@ function validateNote() {
 		}
 		
 		if ( !(/^[a-zA-Z0-9 ]*$/.test($(this)[0].value) ) ) {
-			//search for escaping slashes
+			
 			validation.noError = false;
 			$(this).parent().children('span').text("Only characters and numbers are allowed");
 		}

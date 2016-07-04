@@ -38,11 +38,11 @@
         public static function validateSelect($data, $type, $states = array() ) {
 
             if ( ($type == 'prefix') && ($data != 'mr') && ($data != 'mis') ) {
-            return true;
+                return true;
             }
 
             if ( ($type == 'states') && ($data != '') && !(in_array($data, $states)) ) {
-            return true;
+                return true;
             }
             return false;
         }
@@ -100,7 +100,7 @@
         public static function validateText($data) {
 
         	if ( !preg_match("/^[a-zA-Z ]*$/", $data) ) {
-            return false;
+                return false;
         	}
         	return true;
         }
@@ -115,10 +115,7 @@
          */
         public static function validateLength($data, $length) {
 
-            if ( strlen($data) > $length ) {
-            return true;
-            }
-            return false;
+            return ( strlen($data) > $length );
         }
 
         /**
@@ -130,10 +127,7 @@
          */
         public static function validateNumber($data) {
 
-            if (!preg_match("/^[0-9]*$/", $data)) {
-                return true;
-            }
-            return false;
+            return (!preg_match("/^[0-9]*$/", $data));
         }
 
         /**
@@ -145,11 +139,10 @@
          */
         public static function validateEmail($data) {
 
-            if ( !($data == '') && (!preg_match("/^[a-zA-Z0-9@._]*$/", $data)) ) {
+            if ( !($data == '') && (!preg_match("/^[a-zA-Z0-9@._]*$/", $data)) 
+                && (!filter_var($data, FILTER_VALIDATE_EMAIL)) ) {
                 
                 return true;
-            }else if ( !($data == '') && (!filter_var($data, FILTER_VALIDATE_EMAIL)) ) {
-                return true; 
             }
             return false;
         }
@@ -163,10 +156,7 @@
          */
         public static function validatePhone($data) {
 
-            if ( !empty($data) && strlen($data) != 10 ) {
-            return true;
-            }
-            return false;
+            return ( !empty($data) && strlen($data) != 10 );
         }
 
         /**
@@ -178,10 +168,7 @@
          */
         public static function validateZip($data) {
 
-            if ( !empty($data) && strlen($data) != 6 ) {
-            return true;
-            }
-            return false;
+            return ( !empty($data) && strlen($data) != 6 );
         }
 
         /**
@@ -193,10 +180,7 @@
          */
         public static function validateFax($data) {
 
-            if ( !empty($data) && strlen($data) > 15 ) {
-            return true;
-            }
-            return false;
+            return ( !empty($data) && strlen($data) > 15 );
         }
 
         /**
@@ -208,10 +192,7 @@
          */
         public static function validatePassword($data) {
             
-            if ( !preg_match("/^[a-zA-Z0-9]*$/", $data) ) {
-            return true;
-            }
-            return false;
+            return ( !preg_match("/^[a-zA-Z0-9]*$/", $data) );
         }
 	}
 ?>

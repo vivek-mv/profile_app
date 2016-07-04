@@ -68,18 +68,9 @@ class DbOperations {
             return false;
         }
 
-        //Delete employee address
-        if ( !$this->executeSql($deleteAddress) ) {
-
-        	return false;
-        }
-        //Delete employee communication medium
-        if ( !$this->executeSql($deleteCommMode) ) {
-
-        	return false;
-        }
-        //Delete employee details
-        if ( !$this->executeSql($deleteEmployee) ) {
+        //Delete employee address,communication medium, and details
+        if ( !$this->executeSql($deleteAddress) ||  !$this->executeSql($deleteCommMode)
+            || !$this->executeSql($deleteEmployee) ) {
 
         	return false;
         }
@@ -122,8 +113,14 @@ class DbOperations {
 
         if ( $addressType === 0 ) {
 
-            $selectEmpDetails = "SELECT employee.eid, employee.prefix, employee.firstName, employee.middleName, employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline, employee.email, employee.password, employee.maritalStatus, employee.employment, employee.employer, employee.note,employee.photo,commMedium.empId, commMedium.msg, commMedium.email AS comm_email, commMedium.call , commMedium.any FROM employee JOIN commMedium ON employee.eid = commMedium.empId WHERE eid =" . 
-                $employeeId;
+            $selectEmpDetails = "SELECT employee.eid, employee.prefix, employee.firstName, 
+                employee.middleName, employee.lastName, employee.gender, employee.dob, 
+                employee.mobile, employee.landline, employee.email, employee.password, 
+                employee.maritalStatus, employee.employment, employee.employer, employee.note,
+                employee.photo,commMedium.empId, commMedium.msg, commMedium.email AS comm_email, 
+                commMedium.call , commMedium.any FROM employee JOIN commMedium 
+                ON employee.eid = commMedium.empId WHERE eid =" . $employeeId;
+
             $details = $this->executeSql($selectEmpDetails);
 
             return $details;
@@ -132,6 +129,7 @@ class DbOperations {
         $addressQuery = "SELECT address.eid , address.type , address.street , address.city ,
             address.state , address.zip , address.fax FROM address
             WHERE address.eid =" . $employeeId . " AND address.type = " . $addressType;
+
         $address = $this->executeSql($addressQuery); 
 
         return $address;
@@ -149,14 +147,15 @@ class DbOperations {
     public function insert($tableName, $data, $employeeId = 0) {
 
         if ( $tableName == 'employee' && $employeeId === 0 ) {
-            $insertEmp = "INSERT INTO employee (`prefix`, `firstName`, `middleName`, `lastName`, `gender`, `dob`, `mobile`,`landline`, `email`, `password`, `maritalStatus`, `employment`, `employer`, `photo`, `note`)
+            $insertEmp = "INSERT INTO employee (`prefix`, `firstName`, `middleName`, `lastName`, `gender`,
+                `dob`, `mobile`,`landline`, `email`, `password`, `maritalStatus`, `employment`, `employer`, `photo`, `note`)
                 VALUES ('".$data['prefix']."', '".$data['firstName']."', '".$data['middleName']."',
                 '".$data['lastName']."', '".$data['gender']."', '".$data['dob']."', '".$data['mobile']."',
                 '".$data['landline']."','".$data['email']."','".$data['password']."', '".$data['maritalStatus']."' ,
                 '".$data['employment']."', '".$data['employer']."','".$data['photo']."', '".$data['note']."')";
             
             $insertEmployee = $this->executeSql($insertEmp);
-            if ( $insertEmployee === TRUE ) {
+            if ( $insertEmployee ) {
                 //if success then return the last insert id
                 return $this->conn->insert_id;
             }else {
@@ -174,11 +173,7 @@ class DbOperations {
             
             $address = $this->executeSql($insertAdd);
 
-            if ( $address == true ) {
-                return true;
-            }else {
-                return false;
-            }
+            return $address;
         }
 
         if ( $tableName == 'commMedium' && $employeeId != 0 ) {
@@ -189,11 +184,7 @@ class DbOperations {
 
             $commMedium = $this->executeSql($insertCommMedium);
 
-            if ( $commMedium == true ) {
-                return true;
-            }else {
-                return false;
-            }
+            return $commMedium;
         }
     }
 
@@ -212,7 +203,9 @@ class DbOperations {
         if ( $tableName == 'address' && $addressType == 1) {
 
             //Update residence address
-            $updateResidenceAdd = "UPDATE address SET street = '" . $data['rstreet'] . "', city ='" . $data['rcity'] ."',state = '" . $data['rstate'] . "' , zip = '" . $data['rzip'] . "', fax = '" . $data['rfax'] .
+            $updateResidenceAdd = "UPDATE address SET street = '" . $data['rstreet'] 
+                . "', city ='" . $data['rcity'] ."',state = '" . $data['rstate'] . "' ,
+                zip = '" . $data['rzip'] . "', fax = '" . $data['rfax'] .
                 "' where eid = " . $employeeId . " && type = ".$addressType;
             
             $updateAdd = $this->executeSql($updateResidenceAdd);
@@ -221,16 +214,19 @@ class DbOperations {
 
         if ( $tableName == 'address' && $addressType == 2 ) {
             //Update office address
-            $updateOfficeAdd = "UPDATE address SET street = '" . $data['ostreet'] . "', city ='" . $data['ocity'] . "',state = '" . $data['ostate'] . "' , zip = '" . $data['ozip'] . "', fax = '" . $data['ofax'] .
-                "' where eid = " . $employeeId . " && type = ".$addressType;
+            $updateOfficeAdd = "UPDATE address SET street = '" . $data['ostreet'] . "', city ='" 
+            . $data['ocity'] . "',state = '" . $data['ostate'] . "' , zip = '" . $data['ozip'] 
+            . "', fax = '" . $data['ofax'] ."' where eid = " . $employeeId . " && type = "
+            .$addressType;
 
             $updateAdd = $this->executeSql($updateOfficeAdd);
             return $updateAdd;
         }
 
         if ( $tableName == 'commMedium' ) {
-            $updateCommMedium = "UPDATE commMedium SET msg ='" . $data['msg'] . "' , email ='" . $data['email'] . "',
-                `call` ='" . $data['call'] . "' , any ='" . $data['any'] . "' where empId =" . $employeeId;
+            $updateCommMedium = "UPDATE commMedium SET msg ='" . $data['msg'] 
+            . "' , email ='" . $data['email'] . "',`call` ='" . $data['call'] 
+            . "' , any ='" . $data['any'] . "' where empId =" . $employeeId;
 
             $updateComm = $this->executeSql($updateCommMedium);
             return $updateComm;

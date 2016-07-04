@@ -41,7 +41,7 @@
         if ( $error == 0 ) {
             require_once('dbOperations.php');
             $dbOperations = new DbOperations();
-            $query = "SELECT * FROM employee WHERE employee.email = '" . $email . "' AND 
+            $query = "SELECT employee.eid, employee.firstName FROM employee WHERE employee.email = '" . $email . "' AND 
                 employee.password = '" . md5($password) . "'";
             $employeeData = $dbOperations->executeSql($query);
 
