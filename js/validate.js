@@ -1,14 +1,9 @@
 
-$(document).ready(function(){
-	//Register events for validation
-	validation.validate();
-});
-
 // object to store any errors and call all the validation functions
 var validation = {
 	noError: true,
 	/**
-	 * Calls all the validation function
+	 * Calls all the validation functions
 	 * @param void
 	 * @retrun void
 	 */
@@ -37,6 +32,11 @@ var validation = {
 		//check for required fields
 	}
 }
+
+$(document).ready(function(){
+	//Register events for validation
+	validation.validate();
+});
 
  /**
  * Validates text fields
@@ -82,21 +82,21 @@ function validateNumber() {
 			$(this).parent().children('span').text("Only numbers are allowed");
 		} else if ( $(this)[0].value !== '' ) {
 
-			//validation for phone numbers
-			if ( (($(this)[0].name == 'mobile') || ($(this)[0].name == 'landline')) &&  ($(this)[0].value.length != constants.mobileLength) ) {
+				//validation for phone numbers
+			if ( (($(this)[0].name === 'mobile') || ($(this)[0].name === 'landline')) &&  ($(this)[0].value.length !== constants.mobileLength) ) {
 			
 				validation.noError = false;
 				$(this).parent().children('span').text("You must enter "+constants.mobileLength+" digits");
-			}
-
-			//validation for zip numbers
-			if ( (($(this)[0].name == 'residenceZip') || ($(this)[0].name == 'officeZip')) &&  ($(this)[0].value.length != constants.zipLength) ) {
+			
+			} else if ( (($(this)[0].name === 'residenceZip') || ($(this)[0].name === 'officeZip')) &&  ($(this)[0].value.length !== constants.zipLength) ) {
+				
+				//validation for zip numbers
 				validation.noError = false;
 				$(this).parent().children('span').text("You must enter "+constants.zipLength+" digits");
-			}
-
-			//validation for fax numbers
-			if ( (($(this)[0].name == 'residenceFax') || ($(this)[0].name == 'officeFax')) &&  ($(this)[0].value.length != constants.faxLength )	 ) {
+			
+			} else if ( (($(this)[0].name === 'residenceFax') || ($(this)[0].name === 'officeFax')) &&  ($(this)[0].value.length !== constants.faxLength )	 ) {
+				
+				//validation for fax numbers
 				validation.noError = false;
 				$(this).parent().children('span').text("You must enter "+constants.faxLength+" digits");
 			}
@@ -125,7 +125,7 @@ function validateEmail() {
 			validation.noError = false;
 			$(this).parent().children('span').text("Invalid email");
 			
-		}else if ( $(this)[0].value == '' ) {
+		}else if ( $(this)[0].value === '' ) {
 			$(this).parent().children('span').text('');
 			validation.noError = true;
 
@@ -226,23 +226,14 @@ function validateNote() {
  * @param void
  * @retrun void
  */
-function checkRequired() { 
-	if ( ($('#firstName')[0].value == '') || ($('#email')[0].value == '') || ($('#password')[0].value == '') ) {
-		
-		if ( $.trim($('#firstName')[0].value) == '' ) {
-			$('#firstName').parent().children('span').text("This field is required");
-		}
+function checkRequired() {
 
-		if ( $('#email')[0].value == '' ) {
-			$('#email').parent().children('span').text("This field is required");
+	$.each($( ".required" ), function() {
+		if ( $(this)[0].value === '' ) {
+			$(this).parent().children('span').text("This field is required");
+			validation.noError = false;
+				
 		}
-
-		if ( $('#password')[0].value == '' ) {
-			$('#password').parent().children('span').text("This field is required");
-		}
-		validation.noError = false;
-		return false;
-	}
-	return true; 
+	}); 
 }
 

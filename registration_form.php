@@ -647,7 +647,7 @@
             ?>
         </h1>
         <form action=<?php echo $form_action; ?> method="post" role="form" class="form-horizontal" 
-            enctype="multipart/form-data" onsubmit="return checkRequired() && validation.noError;">
+            enctype="multipart/form-data" onsubmit=" checkRequired();return validation.noError;">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                     <fieldset>
@@ -697,7 +697,8 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  id="firstName" name="firstName" type="text" placeholder="First Name" class="form-control input-md text_input" 
+                                    <input  id="firstName" name="firstName" type="text" placeholder="First Name" 
+                                        class="form-control input-md text_input required" 
                                     <?php
 
                                         if( isset($empDetails["firstName"]) ) {
@@ -869,7 +870,8 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  id="email" name="email" type="email" placeholder="example@mail.com" class="form-control input-md email"
+                                    <input  id="email" name="email" type="email" placeholder="example@mail.com" 
+                                        class="form-control input-md email required"
                                     <?php 
                                         if( isset($empDetails["email"]) ) {
                                             echo 'value="'.$empDetails["email"].'"';
@@ -892,7 +894,8 @@
                                         }
                                     ?>
                                     </span>
-                                    <input id="password" name="password" type="password" placeholder="Password" class="form-control input-md password">
+                                    <input id="password" name="password" type="password" placeholder="Password" 
+                                        class="form-control input-md password required">
                                 </div>
                             </div>
                             <!-- Input field for confirm password -->
