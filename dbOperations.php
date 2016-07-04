@@ -11,20 +11,20 @@ require_once('db_conn.php');
  * @link void
  */
 class DbOperations {
-	private $conn = null;
-	
-	/**
+    private $conn = null;
+
+    /**
      *Constructor
      *
      * @access public
      * @param void 
      * @return void
      */
-	public function __construct() {
+    public function __construct() {
 
-		$db = Database::getInstance();
-		$this->conn = $db->getConnection();
-	}
+        $db = Database::getInstance();
+        $this->conn = $db->getConnection();
+    }
 
     /**
      *Takes a query string and executes the query
@@ -38,16 +38,16 @@ class DbOperations {
         return mysqli_query($this->conn, $query);
     }
 
-	/**
+    /**
      *Deletes the employee record 
      *
      * @access public
      * @param String 
      * @return boolean
      */
-	public function delete($employeeId) {
+    public function delete($employeeId) {
         
-		//Query to delete a row from the registration database with the respective employee id
+        //Query to delete a row from the registration database with the respective employee id
         $deleteAddress = "DELETE FROM address WHERE eid=" . $employeeId . ";";
         $deleteCommMode = "DELETE FROM commMedium WHERE empId=" . $employeeId . ";";
         $deleteEmployee = "DELETE FROM employee WHERE eid=" . $employeeId . ";";
@@ -58,7 +58,7 @@ class DbOperations {
         $delImage = $this->executeSql($image);
 
         if ( !$delImage ) {
-        	return false;
+            return false;
         }
         
         $getImg = $delImage->fetch_assoc();
@@ -72,22 +72,22 @@ class DbOperations {
         if ( !$this->executeSql($deleteAddress) ||  !$this->executeSql($deleteCommMode)
             || !$this->executeSql($deleteEmployee) ) {
 
-        	return false;
+            return false;
         }
         //Return true if delete is successfull
         return true;
 
-	}
+    }
 
-	/**
+    /**
      *Selects all the details of all the employees
      *
      * @access public
      * @param void 
      * @return object/boolean
      */
-	public function selectAllEmployees() {
-		
+    public function selectAllEmployees() {
+
         //Get the records of all the employees
         $selectEmpDetails = "SELECT employee.eid, employee.firstName, employee.middleName,
             employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline,
@@ -99,7 +99,7 @@ class DbOperations {
         
         $employeeDetails = $this->executeSql($selectEmpDetails);
         return $employeeDetails;
-	}
+    }
 
     /**
      *Selects employee details a particular employee using employee id.(and address type when its provided)

@@ -45,7 +45,7 @@
             $wish = 'You have successfully updated your details';
         }
         if ( isset($_GET['message']) && $_GET['message'] == '1' ) {
-            $wish = 'It seems that you are to upload a very large file <br>
+            $wish = 'It seems that you are trying to upload a very large file <br>
                 Please upload an image of size less than 2 MB';
         }
         

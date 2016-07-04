@@ -9,9 +9,9 @@
      * @author vivek
      * @link void
      */
-	Class Validation {
+    Class Validation {
 
-		/**
+        /**
          * Filters the data from form input fields
          *
          * @access public
@@ -99,10 +99,10 @@
          */
         public static function validateText($data) {
 
-        	if ( !preg_match("/^[a-zA-Z ]*$/", $data) ) {
+            if ( !preg_match("/^[a-zA-Z ]*$/", $data) ) {
                 return false;
-        	}
-        	return true;
+            }
+            return true;
         }
 
         /**
@@ -194,5 +194,30 @@
             
             return ( !preg_match("/^[a-zA-Z0-9]*$/", $data) );
         }
-	}
+
+        /**
+         * Validation for note field
+         *
+         * @access public
+         * @param String
+         * @return Boolean
+         */
+        public static function validateNote($data) {
+
+            return ( !preg_match("/^[a-zA-Z0-9@#!*()&\n\"\' ]*$/", $data) );
+        }
+
+        /**
+         * Validation for DOB field
+         *
+         * @access public
+         * @param String
+         * @return Boolean
+         */
+        public static function validateDob($data) {
+
+            $d = DateTime::createFromFormat('Y-m-d', $data);
+            return !($d && $d->format('Y-m-d') === $data);
+        }
+    }
 ?>

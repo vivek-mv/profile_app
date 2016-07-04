@@ -186,6 +186,12 @@
         }
 
         $dob = Validation::getCorrectData($_POST["dob"]);
+
+        if ( $dob !== '' && Validation::validateDob($dob) ) {
+            $dobErr = 'Please provide a valid DOB';
+            $error++;
+        }
+
         $_SESSION["dob"] = $dob;
         $mobile = Validation::getCorrectData($_POST["mobile"]);
         
@@ -422,6 +428,11 @@
             $error++;
         }
 
+        if ( Validation::validateNote($note) ) {
+            $noteErr = 'Only these a-zA-Z0-9@#!*()\"\'& are allowed';
+            $error++;
+        }
+
         //Check for Communication Medium,if its empty then assign an empty array
         if( isset($_POST["commMed"]) ) {
            $commMedium = $_POST["commMed"];
@@ -444,8 +455,8 @@
             //Array to store employee details
             $empData = array( 'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
                 'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile, 'landline' => $landline,
-                'email' => $email, 'password' => md5($password), 'maritalStatus' => $maritalStatus, 'employment' => $employment, 'employer' => $employer,
-                'photo' => $photo, 'note' => $note);
+                'email' => $email, 'password' => md5($password), 'maritalStatus' => $maritalStatus, 'employment' => $employment,
+                'employer' => $employer, 'photo' => $photo, 'note' => $note);
             //Insert the employee details and get the last insert id.
             $empID = $dbOperations->insert('employee', $empData);
             
@@ -561,7 +572,7 @@
         }
     }
 
-    //When user clicks the update button in the details page,then this code is executed
+    //When user clicks the update button in the details page
     if ( isset($_GET["userId"]) && isset($_GET["userAction"]) ) {
 
         //Check for user's session
@@ -613,6 +624,9 @@
             .error{
                 color: red;
             }
+            .required-field{
+                color: red;
+            }
         </style>
     </head>
     <body>
@@ -646,7 +660,7 @@
                 }
             ?>
         </h1>
-        <form action=<?php echo $form_action; ?> method="post" role="form" class="form-horizontal" 
+        <form id="form" action=<?php echo $form_action; ?> method="post" role="form" class="form-horizontal"
             enctype="multipart/form-data" onsubmit=" checkRequired();return validation.noError;">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
@@ -688,7 +702,10 @@
                             </div>
                             <!-- Input field for first name -->
                             <div class="form-group">
-                                <label class="col-md-3 control-label" for="firstName">First Name</label>  
+                                <label class="col-md-3 control-label" for="firstName">
+                                    First Name
+                                    <span class="required-field">*</span>
+                                </label>
                                 <div class="col-md-7">
                                     <span class="error"> 
                                     <?php 
@@ -801,9 +818,16 @@
                             <div class="form-group">
                                 <label class="col-md-3 control-label" for="datepicker">D.O.B</label>  
                                 <div class="col-md-7">
+                                    <span class="error">
+                                    <?php
+                                    if( !empty($dobErr) ) {
+                                        echo "*".$dobErr;
+                                    }
+                                    ?>
+                                    </span>
                                     <input name="dob" type="date" placeholder="D.O.B" class="form-control input-md" 
                                     <?php
-                                        if( isset($empDetails["dob"]) ) { 
+                                        if( isset($empDetails["dob"]) ) {
                                             echo 'value="'.$empDetails["dob"].'"'; 
                                         }
                                         else if ( !empty($_SESSION["dob"]) ) {
@@ -861,7 +885,10 @@
                             </div>
                             <!-- Input field for email -->
                             <div class="form-group">
-                                <label class="col-md-3 control-label" for="firstName">Email</label>  
+                                <label class="col-md-3 control-label" for="firstName">
+                                    Email
+                                    <span class="required-field">*</span>
+                                </label>
                                 <div class="col-md-7">
                                     <span class="error">
                                     <?php 
@@ -885,7 +912,10 @@
                             </div>
                             <!-- Input field for password -->
                             <div class="form-group">
-                                <label class="col-md-3 control-label" for="password">Password</label>  
+                                <label class="col-md-3 control-label" for="password">
+                                    Password
+                                    <span class="required-field">*</span>
+                                </label>
                                 <div class="col-md-7">
                                     <span class="error"> 
                                     <?php 
@@ -1370,7 +1400,7 @@
                         }
                         ?>
                         class="btn btn-primary"> &nbsp;  &nbsp;  &nbsp;
-                    <input type= 
+                    <input id="reset" type=
                     <?php 
                        if( (isset($_GET['userAction']) && $_GET['userAction']=='update') 
                             || ( isset($_GET["userId"]) && $_GET["userId"] > 0) ) {
@@ -1389,4 +1419,4 @@
         <script type="text/javascript" src="js/constants.js?a=5"></script>
         <script type="text/javascript" src="js/validate.js?a=17"></script>
     </body>
-    <html>
+    </html>

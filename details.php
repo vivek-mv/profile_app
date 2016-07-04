@@ -80,7 +80,7 @@
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
                     <h2>Registered Employees</h2>
-              		<?php
+                    <?php
                         $employeeDetails = $dbOperations->selectAllEmployees();
 
                         if ( $employeeDetails === false ) {
@@ -98,7 +98,7 @@
                     <table class="table table-striped table-responsive">
                         <thead>
                           <tr>
-                          	<th>Name</th>
+                            <th>Name</th>
                             <th>Gender</th>
                             <th>D.O.B</th>
                             <th>Phone</th>
@@ -114,13 +114,14 @@
                           </tr>
                         </thead>
                         <tbody>
-            	    	<?php
+                        <?php
                             //Make employeeId = 0 ,so that if condition returns true for the first time.
                             $employeeId = 0;
                             //Fetch all the records and loop through them
                             while ( $row = $employeeDetails->fetch_assoc() ) {
 
                                 if ( $employeeId != $row["empId"] ) {
+
                                     echo "<tr>";
                                     echo "<td>" . $row["firstName"] ." ". $row["middleName"] ." ". $row["lastName"] . "</td>";
 
@@ -133,9 +134,28 @@
                                     } else {
                                         echo "<td>Others</td>";
                                     }
-                                    echo "<td>" . date_format( new DateTime( $row["dob"] ), 'd-m-Y' ) . "</td>";
-                                    echo "<td>" . $row["mobile"] . "(M)<br>" . $row["landline"] . "(L)</td>";
+
+                                    if ( $row["dob"] == '0000-00-00' ) {
+                                        echo "<td></td>";
+
+                                    } else {
+                                        echo "<td>" . date_format( new DateTime( $row["dob"] ), 'd-m-Y' ) . "</td>";
+                                    }
+
+                                    echo "<td>";
+
+                                    if ( $row["mobile"] !== '' ) {
+                                        echo $row["mobile"] . "(M)<br>";
+                                    }
+
+                                    if ( $row["landline"] !== '' ) {
+                                        echo $row["landline"] . "(L)";
+                                    }
+
+                                    echo "</td>";
+
                                     echo "<td>" . $row["email"] . "</td>";
+
                                     echo "<td>" . ucfirst( $row["maritalStatus"] ) . "</td>";
 
                                     if ( $row["employment"] == 'employed' && !empty($row["employer"]) ) {
@@ -179,7 +199,7 @@
                                     echo '<td>';
 
                                     //Display photo only if photo is present
-                                    if( !empty($row["photo"]) ) {
+                                    if ( !empty($row["photo"]) ) {
                                         echo '<img src="profile_pic/'.$row["photo"].'" alt="profile pic " 
                                             height="150" width="150" >';
                                     }
@@ -188,6 +208,7 @@
 
                                     //Display edit and delete option to the loged in user only
                                     if ( $row['eid'] == $_SESSION['employeeId'] ) {
+
                                         echo "<a href='registration_form.php?userId=" . $row["eid"] . "&userAction=update' target='_self' >
                                         <span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></a>";
                                     }
@@ -209,9 +230,9 @@
                                 $employeeId = $row["empId"];
                             }
                         ?>
-        	            </tbody>
-        	        </table>
-              	</div>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </body>
