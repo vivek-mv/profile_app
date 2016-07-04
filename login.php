@@ -96,7 +96,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
-                    <form action="login.php" method="post" role="form" class="form-vertical">
+                    <form action="login.php" method="post" role="form" class="form-vertical"
+                          onsubmit="checkRequired();return validation.noError;">
                         <fieldset>
                             <legend>Login In</legend>
                             <span class="error">
@@ -118,13 +119,13 @@
                                             }
                                         ?>
                                         </span>
-                                        <input  name="email" type="email" placeholder="example@mail.com" class="form-control input-md" 
+                                        <input  name="email" type="email" placeholder="example@mail.com" class="form-control input-md email required"
                                         <?php
                                             if( isset($email) ) {
                                                 echo 'value='.$email;
                                             }
                                         ?>
-                                        required >
+                                        >
                                     </div>
                                 </div>
                                 <!-- Input field for password -->
@@ -138,13 +139,13 @@
                                             }
                                         ?>
                                         </span>
-                                        <input  name="password" type="password" placeholder="Password" class="form-control input-md" 
+                                        <input  name="password" type="password" placeholder="Password" class="form-control input-md password required"
                                         <?php
                                             if( isset($password) ) {
                                                 echo 'value='.$password;
                                             }
                                         ?>
-                                        required >
+                                        >
                                     </div>
                                 </div>
                                 <div class="text-center">
@@ -156,5 +157,11 @@
                 </div>
             </div>
         </div>
+        <script src="https://code.jquery.com/jquery-3.0.0.min.js"
+                integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="
+                crossorigin="anonymous">
+        </script>
+        <script type="text/javascript" src="js/constants.js?a=5"></script>
+        <script type="text/javascript" src="js/validate.js?a=17"></script>
     </body>
 </html>
