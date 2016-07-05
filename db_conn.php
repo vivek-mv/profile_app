@@ -2,8 +2,10 @@
 //include constants.php
 require_once('constants.php');
 
+require_once('logErrors.php');
+
 /**
- * Mysql database class - only one connection alowed
+ * Mysql database class - only one connection allowed
  * @access public
  * @package void
  * @subpackage void
@@ -32,7 +34,16 @@ Class Database {
     }
     // Constructor
     private function __construct() {
-        $this->connection = new mysqli(HOST, USER, PASSWORD, DBNAME);
+        $this->connection = @new mysqli(HOST, USER, PASSWORD, DBNAME);
+
+        if (mysqli_connect_errno())
+        {
+            // log the error to error logs file
+            logError('Database error occured in db_conn.php : ' . mysqli_connect_error());
+
+            echo "Currently we are facing some server issues , Please come back after some time";
+            exit();
+        }
     }
 
     // Get mysqli connection

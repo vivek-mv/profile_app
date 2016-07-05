@@ -1,6 +1,6 @@
 <?php
     /**
-     * Writes the error to the log file.
+     * Writes the errors to the log file.
      * @param String
      * @retrun void
      */
