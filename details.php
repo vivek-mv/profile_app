@@ -19,6 +19,8 @@
     require_once('constants.php');
 
     require_once('dbOperations.php');
+
+    require_once('logErrors.php');
     
     //Display error message if delete fails in the same page
     if ( isset($_GET["Message"]) && $_GET["Message"] == 1 ) {
@@ -84,6 +86,11 @@
                         $employeeDetails = $dbOperations->selectAllEmployees();
 
                         if ( $employeeDetails === false ) {
+
+                            // log the error to error logs file
+                            logError('Database error occured while fetching the details of all employees 
+                                in detailss.php ');
+                            
                             echo '<h1> Sorry your request could not be processed, please try after some time :( </h1>';
                             exit();
                         }

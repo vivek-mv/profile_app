@@ -5,6 +5,9 @@
     //Get the current working directly and assign to APP_PATH constant
     define("APP_PATH", getcwd());
 
+    //Error log file path
+    define("ERROR_LOG_PATH", "/var/www/html/project/logs/error_logs.txt");
+
     //Define image size to be uploaded
     define("IMAGE_SIZE", 2097152);
 

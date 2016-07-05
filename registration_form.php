@@ -9,8 +9,11 @@
 
     //Include Constants file 
     require_once('constants.php');
+
     //Include dbOperations file
     require_once('dbOperations.php');
+
+    require_once('logErrors.php');
 
     //dbOperations object 
     $dbOperations = new DbOperations();
@@ -457,11 +460,17 @@
                 'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile, 'landline' => $landline,
                 'email' => $email, 'password' => md5($password), 'maritalStatus' => $maritalStatus, 'employment' => $employment,
                 'employer' => $employer, 'photo' => $photo, 'note' => $note);
+
             //Insert the employee details and get the last insert id.
             $empID = $dbOperations->insert('employee', $empData);
             
             if ( $empID === false ) {
                 $_SESSION['dbErr'] = 1;
+
+                // log the error to error logs file
+                logError('Database error occured while inserting the employee details,in 
+                    registration_form.php ');
+
                 header("Location:registration_form.php");
                 exit();    
             }
@@ -477,6 +486,11 @@
 
             if ( !$address ) {
                 $_SESSION['dbErr'] = 1;
+
+                // log the error to error logs file
+                logError('Database error occured while inserting the employee address ,in 
+                    registration_form.php ');
+
                 header("Location:registration_form.php");
                 exit();
             }
@@ -494,6 +508,11 @@
             $commMedium = $dbOperations->insert('commMedium', $commMediumData, $empID);
             if ( !$commMedium ) {
                 $_SESSION['dbErr'] = 1;
+
+                // log the error to error logs file
+                logError('Database error occured while inserting the employee comm. medium,in 
+                    registration_form.php ');
+                
                 header("Location:registration_form.php");
                 exit();
             }
@@ -528,6 +547,11 @@
                 'rstate' => $resedenceState, 'rzip' => $residenceZip, 'rfax' => $residenceFax);
 
             if ( !$dbOperations->update('address', $updateResidenceData, $_GET["userId"], 1) ) {
+
+                // log the error to error logs file
+                logError('Database error occured while updating the employee residence address ,
+                    in registration_form.php ');
+
                 header("Location:registration_form.php?dbErr=1");
             } 
             
@@ -535,6 +559,11 @@
                 'ostate' => $officeState, 'ozip' => $officeZip, 'ofax' => $officeFax);
             
             if ( !$dbOperations->update('address', $updateOfficeData, $_GET["userId"], 2) ) {
+
+                // log the error to error logs file
+                logError('Database error occured while updating the employee office address ,
+                    in registration_form.php ');
+
                 header("Location:registration_form.php?dbErr=1");
             }
             
@@ -548,6 +577,11 @@
                 'any' => $any );
                 
             if ( !$dbOperations->update('commMedium', $updateCommMedium, $_GET["userId"] ) ) {
+
+                // log the error to error logs file
+                logError('Database error occured while updating the employee comm. medium details 
+                    in registration_form.php ');
+
                 header("Location:registration_form.php?dbErr=1");
             }
             
@@ -564,6 +598,11 @@
                 'employment' => $employment, 'employer' => $employer, 'insertImage' => $insertImage, 'note' => $note );
                 
             if ( !$dbOperations->update('employee', $updateEmpDetails, $_GET["userId"] ) ) {
+
+                // log the error to error logs file
+                logError('Database error occured while updating the employee details 
+                    in registration_form.php ');
+
                 header("Location:registration_form.php?dbErr=1");
             }
             
@@ -589,6 +628,11 @@
 
         $details = $dbOperations->selectEmployee($_GET["userId"]);
         if ( $details === false ) {
+
+            // log the error to error logs file
+            logError('Database error occured while getting the employee details (when user clicks the edit btn 
+                on the details page),in registration_form.php ');
+            
             header("Location:registration_form.php?dbErr=1");
             exit();
         }
@@ -596,6 +640,12 @@
         
         $residence = $dbOperations->selectEmployee($_GET["userId"], 1);
         if ( $residence === false ) {
+
+
+            // log the error to error logs file
+            logError('Database error occured while getting the employee residence details (when user clicks the edit btn 
+                on the details page),in registration_form.php ');
+
             header("Location:registration_form.php?dbErr=1");
             exit();
         }
@@ -603,6 +653,11 @@
 
         $office = $dbOperations->selectEmployee($_GET["userId"], 2);
         if ( $office === false ) {
+
+            // log the error to error logs file
+            logError('Database error occured while getting the employee office details (when user clicks the edit btn 
+                on the details page),in registration_form.php ');
+
             header("Location:registration_form.php?dbErr=1");
             exit();
         }
