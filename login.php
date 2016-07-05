@@ -119,7 +119,8 @@
                                             }
                                         ?>
                                         </span>
-                                        <input  name="email" type="email" placeholder="example@mail.com" class="form-control input-md email required"
+                                        <input  name="email" type="email" placeholder="example@mail.com"
+                                            class="form-control input-md email required"
                                         <?php
                                             if( isset($email) ) {
                                                 echo 'value='.$email;
@@ -139,7 +140,8 @@
                                             }
                                         ?>
                                         </span>
-                                        <input  name="password" type="password" placeholder="Password" class="form-control input-md password required"
+                                        <input  name="password" type="password" placeholder="Password"
+                                            class="form-control input-md password required"
                                         <?php
                                             if( isset($password) ) {
                                                 echo 'value='.$password;

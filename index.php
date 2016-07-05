@@ -2,10 +2,7 @@
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
     
-    if ( isset($_GET['message']) && $_GET['message'] == 'register' ) {
-
-        $message = 'Successfully Registered';
-    } else if ( isset($_GET['message']) && $_GET['message'] == 1 ) {
+    if ( isset($_GET['message']) && $_GET['message'] == 1 ) {
 
         $message = 'It seems that you are trying to upload a very large file,<br>
             . Please upload an image of size less than 2 MB ';

@@ -502,8 +502,8 @@
             session_unset();
             session_destroy();
 
-            //If successfully inserted ,then redirect to index page
-            header("Location:index.php?message=register");
+            //If successfully inserted ,then display the success message
+            $message = 'registerSuccess';
         }
 
         //If there are no errors and submit name is update
@@ -651,7 +651,11 @@
             </div>
         </nav>
         <div class="container">
-        <h1><?php 
+            <?php if ( isset($message) && $message === 'registerSuccess' ) { ?>
+                  <h2>Successfully Registered</h2>
+            <?php exit(); } ?>
+        <h1>
+            <?php
                 if( (isset($_GET['userAction']) && $_GET['userAction']=='update') 
                     || ( isset($_GET["userId"]) && $_GET["userId"] > 0) ) {
                     echo "Please edit your data";
