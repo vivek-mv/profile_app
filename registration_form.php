@@ -303,26 +303,26 @@
         }
 
         if ( isset($_FILES['image']) && !empty($_FILES['image']['name']) && $_FILES['image']['size'] != 0 ) {
-          $file_name = $_FILES['image']['name'];
-          $file_size = $_FILES['image']['size'];
-          $file_tmp = $_FILES['image']['tmp_name'];
-          $file_type = $_FILES['image']['type'];
-          $path_parts = pathinfo($_FILES['image']['name']);
-          $file_ext = strtolower( $path_parts['extension'] );
-          
-          $extensions = array("jpeg","jpg","png");
-          
-          if ( in_array($file_ext,$extensions) === false ) {
-            $imageErr = 'Extension not allowed, please choose a JPEG or PNG file.';
-            $error++;
-          }
-          
-          if ( $file_size > IMAGE_SIZE ) { 
-             $imageErr ='File size must be less than'.IMAGE_SIZE_MB;
-             $error++;
-          }
+            $file_name = $_FILES['image']['name'];
+            $file_size = $_FILES['image']['size'];
+            $file_tmp = $_FILES['image']['tmp_name'];
+            $file_type = $_FILES['image']['type'];
+            $path_parts = pathinfo($_FILES['image']['name']);
+            $file_ext = strtolower( $path_parts['extension'] );
 
-          $photo = $file_name;
+            $extensions = array("jpeg","jpg","png");
+
+            if ( in_array($file_ext,$extensions) === false ) {
+                $imageErr = 'Extension not allowed, please choose a JPEG or PNG file.';
+                $error++;
+            }
+
+            if ( $file_size > IMAGE_SIZE ) {
+                $imageErr ='File size must be less than'.IMAGE_SIZE_MB;
+                $error++;
+            }
+
+            $photo = $file_name;
         }
         
         $residenceStreet = Validation::getCorrectData($_POST["residenceStreet"]);
@@ -592,10 +592,13 @@
                 $insertImage = ", photo = '".$photo."'";
             }
 
-            $updateEmpDetails = array( 'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
+            $updateEmpDetails = array(
+                'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
                 'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile,
-                'landline' => $landline, 'email' => $email, 'password' => md5($password), 'maritalStatus' => $maritalStatus,
-                'employment' => $employment, 'employer' => $employer, 'insertImage' => $insertImage, 'note' => $note );
+                'landline' => $landline, 'email' => $email, 'password' => md5($password),
+                'maritalStatus' => $maritalStatus, 'employment' => $employment, 'employer' => $employer,
+                'insertImage' => $insertImage, 'note' => $note
+            );
                 
             if ( !$dbOperations->update('employee', $updateEmpDetails, $_GET["userId"] ) ) {
 
@@ -1369,13 +1372,15 @@
                                             ?>
                                             </span>                     
                                             <textarea class="form-control note" id="note" name="note" 
-                                                rows="3"><?php if( isset($empDetails["note"]) ) {
+                                                rows="3">
+                                                <?php if( isset($empDetails["note"]) ) {
                                                     echo $empDetails["note"];
                                                 } 
                                                 if( isset($note) ) {
                                                     echo $note;
                                                 }
-                                            ?></textarea>
+                                                ?>
+                                            </textarea>
                                         </div>
                                     </div>
                                 </div>

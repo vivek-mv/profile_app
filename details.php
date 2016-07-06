@@ -62,12 +62,12 @@
             <nav class="navbar navbar-default">
                 <div class="container">
                     <div class="navbar-header">
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" 
-                            aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                                aria-expanded="false" aria-controls="navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
                         </button>
                         <a class="navbar-brand" href="index.php">HOME</a>
                     </div>
@@ -80,29 +80,45 @@
                 </div>
             </nav>
             <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
-                    <h2>Registered Employees</h2>
-                    <?php
-                        $employeeDetails = $dbOperations->selectAllEmployees();
+                <div class="col-md-offset-8 col-md-4">
+                    <form>
+                        <div class="input-group">
+                            <input type="text" class="form-control getData" placeholder="Search by name or email ...">
+                            <span class="input-group-btn ">
+                                <button class="btn btn-default " type="submit">
+                                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <h2>Registered Employees</h2>
+                <?php
+                $employeeDetails = $dbOperations->selectAllEmployees();
 
-                        if ( $employeeDetails === false ) {
+                if ( $employeeDetails === false ) {
 
-                            // log the error to error logs file
-                            logError('Database error occured while fetching the details of all employees 
-                                in detailss.php ');
-                            
-                            echo '<h1> Sorry your request could not be processed, please try after some time :( </h1>';
-                            exit();
-                        }
-                        //When no data is present in the table,display message
-                        if ( $employeeDetails->num_rows == 0 ) {
+                    // log the error to error logs file
+                    logError('Database error occured while fetching the details of all employees 
+                            in detailss.php ');
 
-                            echo '<h1> Sorry ! Nothing to display </h1>';
-                            exit();
-                        }
-                    ?>
+                    echo '<h1> Sorry your request could not be processed, please try after some time :( </h1>';
+                    exit();
+                }
+                //When no data is present in the table,display message
+                if ( $employeeDetails->num_rows == 0 ) {
 
-                    <table class="table table-striped table-responsive">
+                    echo '<h1> Sorry ! Nothing to display </h1>';
+                    exit();
+                }
+                ?>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 table-responsive">
+
+                    <table class="table table-striped">
                         <thead>
                           <tr>
                             <th>Name</th>
@@ -219,10 +235,10 @@
                                         echo "<a href='registration_form.php?userId=" . $row["eid"] . "&userAction=update' target='_self' >
                                         <span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></a>";
                                     }
-                                    echo "</td>";
+                                    echo "</td><td>";
 
                                     if ( $row['eid'] == $_SESSION['employeeId'] ) {
-                                        echo "<td><a href='details.php?userId=" . $row["eid"] . "&userAction=delete' target='_self' > 
+                                        echo "<a href='details.php?userId=" . $row["eid"] . "&userAction=delete' target='_self' > 
                                             <span class='glyphicon glyphicon-remove' aria-hidden='true'></span></a>";
                                     }
                                     
@@ -242,6 +258,11 @@
                 </div>
             </div>
         </div>
+        <script src="https://code.jquery.com/jquery-3.0.0.min.js"
+                integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="
+                crossorigin="anonymous">
+        </script>
+        <script type="text/javascript" src="js/search.js"></script>
     </body>
 </html>
 

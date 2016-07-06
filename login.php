@@ -163,7 +163,7 @@
                 integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="
                 crossorigin="anonymous">
         </script>
-        <script type="text/javascript" src="js/constants.js?a=5"></script>
-        <script type="text/javascript" src="js/validate.js?a=17"></script>
+        <script type="text/javascript" src="js/constants.js"></script>
+        <script type="text/javascript" src="js/validate.js"></script>
     </body>
 </html>
