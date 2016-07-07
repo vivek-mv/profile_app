@@ -56,6 +56,11 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <style>
+            .sort{
+                cursor: pointer;
+            }
+        </style>
     </head>
     <body>
         <div class="container">
@@ -121,14 +126,17 @@
                     <table class="table table-striped">
                         <thead>
                           <tr>
-                            <th id="name">
+                            <th class="sort">
                                 Name
-                                <span id="sortShape" class="glyphicon glyphicon-triangle-top"></span>
+                                <span class="glyphicon glyphicon-triangle-top"></span>
                             </th>
                             <th>Gender</th>
                             <th>D.O.B</th>
                             <th>Phone</th>
-                            <th>Email</th>
+                            <th class="sort">
+                                Email
+                                <span class="glyphicon glyphicon-triangle-top"></span>
+                            </th>
                             <th>Marital Status</th>
                             <th>Employment </th>
                             <th>Comm. Mode</th>

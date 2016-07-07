@@ -3,37 +3,48 @@ $(document).ready(function(){
     var order = 'DESC';
     var upShape = 'glyphicon glyphicon-triangle-top';
     var downShape = 'glyphicon glyphicon-triangle-bottom';
+
     //Populate the table when the page is entered for the first time
     //Make search data as empty string , so that all the rows are displayed
-    handleAjax.sendAjax("ajax.php", '','ASC' );
+    handleAjax.sendAjax("ajax.php", '','ASC','employee.firstName' );
 
     //Register event for search input when it empty
     $('.getData').on( "keyup", function(){
 
         if ( $.trim($('.getData').val()) == '' ) {
             //Display all the rows
-            handleAjax.sendAjax("ajax.php", '','ASC' );
+            handleAjax.sendAjax("ajax.php", '','ASC','employee.firstName' );
         }
     });
 
     //Register event for search submission
     $("form").submit(function() {
         var searchInput = $.trim($('.getData').val());
-        handleAjax.sendAjax("ajax.php", searchInput,'ASC' );
+        handleAjax.sendAjax("ajax.php", searchInput,'ASC','employee.firstName' );
         return false;
     });
 
     //Register event for sorting
-    $('#name').click(function () {
+    $('.sort').click(function () {
         var searchInput = $.trim($('.getData').val());
-        handleAjax.sendAjax("ajax.php", searchInput,order );
-        $('#sortShape').removeClass(upShape).addClass(downShape);
-        //change the sort order
+
+        var sortBy = 'employee.firstName';console.log($(this)[0].innerText);
+
+        var test = $(this)[0].innerText;
+        if ( test == 'Email' ) {
+            sortBy = 'employee.email';
+        }
+        console.log(sortBy);
+        handleAjax.sendAjax("ajax.php", searchInput, order, sortBy);
+
+        //change the sort order and change the sort arrow shape
         if ( order === 'DESC' ) {
             order = 'ASC';
+            $(this).children().removeClass(upShape).addClass(downShape);
             
         } else {
             order = 'DESC';
+            $(this).children().removeClass(downShape).addClass(upShape);
         }
     });
 });
@@ -46,12 +57,13 @@ var handleAjax = {
      * @param String
      * @retrun void
      */
-     function (searchUrl,searchData,sortOrder) {
+     function (searchUrl,searchData,sortOrder,sortByFieldName) {
         $.ajax({
             url: searchUrl,
             data: {
                 data: searchData,
                 order:sortOrder,
+                sortBy:sortByFieldName,
                 ajax: 1
             },
             dataType : 'json',
