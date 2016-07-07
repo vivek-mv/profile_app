@@ -121,7 +121,10 @@
                     <table class="table table-striped">
                         <thead>
                           <tr>
-                            <th>Name</th>
+                            <th id="name">
+                                Name
+                                <span id="sortShape" class="glyphicon glyphicon-triangle-top"></span>
+                            </th>
                             <th>Gender</th>
                             <th>D.O.B</th>
                             <th>Phone</th>

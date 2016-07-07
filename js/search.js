@@ -1,23 +1,40 @@
 $(document).ready(function(){
 
+    var order = 'DESC';
+    var upShape = 'glyphicon glyphicon-triangle-top';
+    var downShape = 'glyphicon glyphicon-triangle-bottom';
     //Populate the table when the page is entered for the first time
     //Make search data as empty string , so that all the rows are displayed
-    handleAjax.sendAjax("ajax.php", '' );
+    handleAjax.sendAjax("ajax.php", '','ASC' );
 
     //Register event for search input when it empty
     $('.getData').on( "keyup", function(){
 
         if ( $.trim($('.getData').val()) == '' ) {
             //Display all the rows
-            handleAjax.sendAjax("ajax.php", '' );
+            handleAjax.sendAjax("ajax.php", '','ASC' );
         }
     });
 
     //Register event for search submission
     $("form").submit(function() {
-        var searchInput = $.trim($('.getData').val())
-        handleAjax.sendAjax("ajax.php", searchInput );
+        var searchInput = $.trim($('.getData').val());
+        handleAjax.sendAjax("ajax.php", searchInput,'ASC' );
         return false;
+    });
+
+    //Register event for sorting
+    $('#name').click(function () {
+        var searchInput = $.trim($('.getData').val());
+        handleAjax.sendAjax("ajax.php", searchInput,order );
+        $('#sortShape').removeClass(upShape).addClass(downShape);
+        //change the sort order
+        if ( order === 'DESC' ) {
+            order = 'ASC';
+            
+        } else {
+            order = 'DESC';
+        }
     });
 });
 
@@ -29,11 +46,12 @@ var handleAjax = {
      * @param String
      * @retrun void
      */
-     function (searchUrl,searchData) {
+     function (searchUrl,searchData,sortOrder) {
         $.ajax({
             url: searchUrl,
             data: {
                 data: searchData,
+                order:sortOrder,
                 ajax: 1
             },
             dataType : 'json',
