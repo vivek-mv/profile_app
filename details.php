@@ -117,7 +117,7 @@
             </div>
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 table-responsive">
-
+                    <div id="noRecords" class="collapse"><h2>Sorry, No records found.</h2></div>
                     <table class="table table-striped">
                         <thead>
                           <tr>
@@ -136,132 +136,13 @@
                             <th>Delete</th>
                           </tr>
                         </thead>
-                        <tbody>
-                        <?php
-                            //Make employeeId = 0 ,so that if condition returns true for the first time.
-                            $employeeId = 0;
-                            //Fetch all the records and loop through them
-                            while ( $row = $employeeDetails->fetch_assoc() ) {
-
-                                if ( $employeeId != $row["empId"] ) {
-
-                                    echo "<tr>";
-                                    echo "<td>" . $row["firstName"] ." ". $row["middleName"] ." ". $row["lastName"] . "</td>";
-
-                                    if ( $row["gender"] == 'm' ) {
-                                        echo "<td>Male</td>";
-
-                                    } else if ( $row["gender"] == 'f' ) {
-                                        echo "<td>Female</td>";
-
-                                    } else {
-                                        echo "<td>Others</td>";
-                                    }
-
-                                    if ( $row["dob"] == '0000-00-00' ) {
-                                        echo "<td></td>";
-
-                                    } else {
-                                        echo "<td>" . date_format( new DateTime( $row["dob"] ), 'd-m-Y' ) . "</td>";
-                                    }
-
-                                    echo "<td>";
-
-                                    if ( $row["mobile"] !== '' ) {
-                                        echo $row["mobile"] . "(M)<br>";
-                                    }
-
-                                    if ( $row["landline"] !== '' ) {
-                                        echo $row["landline"] . "(L)";
-                                    }
-
-                                    echo "</td>";
-
-                                    echo "<td>" . $row["email"] . "</td>";
-
-                                    echo "<td>" . ucfirst( $row["maritalStatus"] ) . "</td>";
-
-                                    if ( $row["employment"] == 'employed' && !empty($row["employer"]) ) {
-                                        echo "<td>" . ucfirst( $row["employment"] ) . " in " . ucfirst( $row["employer"] ) . "</td>";
-
-                                    } else {
-                                        echo "<td>" . ucfirst( $row["employment"] ) . "</td>";
-                                    }
-
-                                    echo "<td>";
-
-                                    if ( $row["msg"] == 1 ) {
-                                        echo "Message";
-                                    }
-
-                                    if ( $row["comm_email"] == 1 ) {
-                                        echo "<br>Email";
-                                    }
-
-                                    if ( $row["call"] == 1 ) {
-                                        echo "<br>Phone";
-                                    }
-
-                                    if ( $row["any"] == 1 ) {
-                                        echo "<br>Any";
-                                    }
-
-                                    echo "</td>";
-                                }
-
-                                //when address is residence
-                                if ( $row["type"] == 1 ) {
-                                    echo "<td>" . $row["street"] . "<br>" . $row["city"] . "," . $row["zip"] 
-                                    . "<br>" . $row["state"] . "</td>";
-                                }
-
-                                //when address is office
-                                if ( $row["type"] == 2 ) {
-                                    echo "<td>" . $row["street"] . "<br>" . $row["city"] . "," . $row["zip"] 
-                                    . "<br>" . $row["state"] . "</td>";
-                                    echo '<td>';
-
-                                    //Display photo only if photo is present
-                                    if ( !empty($row["photo"]) ) {
-                                        echo '<img src="profile_pic/'.$row["photo"].'" alt="profile pic " 
-                                            height="150" width="150" >';
-                                    }
-
-                                    echo '</td><td>';
-
-                                    //Display edit and delete option to the loged in user only
-                                    if ( $row['eid'] == $_SESSION['employeeId'] ) {
-
-                                        echo "<a href='registration_form.php?userId=" . $row["eid"] . "&userAction=update' target='_self' >
-                                        <span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></a>";
-                                    }
-                                    echo "</td><td>";
-
-                                    if ( $row['eid'] == $_SESSION['employeeId'] ) {
-                                        echo "<a href='details.php?userId=" . $row["eid"] . "&userAction=delete' target='_self' > 
-                                            <span class='glyphicon glyphicon-remove' aria-hidden='true'></span></a>";
-                                    }
-                                    
-                                    echo "</td>";
-
-                                }
-
-                                if ( $employeeId == $row["empId"] ) {
-                                    echo "</tr>";
-                                }
-
-                                $employeeId = $row["empId"];
-                            }
-                        ?>
+                        <tbody id="tablebody">
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-        <script src="https://code.jquery.com/jquery-3.0.0.min.js"
-                integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="
-                crossorigin="anonymous">
-        </script>
+        <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
         <script type="text/javascript" src="js/search.js"></script>
     </body>
 </html>
