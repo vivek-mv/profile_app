@@ -61,6 +61,19 @@ $(document).ready(function(){
         handleAjax.sendAjax("ajax.php", searchInput, 'ASC', 'employee.firstName',limit);
     }));
 
+    //Register event for first page button
+    $(document).on('click', '#first', (function () {
+        var searchInput = $.trim($('.getData').val());
+        handleAjax.sendAjax("ajax.php", searchInput, 'ASC', 'employee.firstName','0,5');
+    }));
+
+    //Register event for last page button
+    $(document).on('click', '#last', (function () {
+        var searchInput = $.trim($('.getData').val());
+        limit = (totalPage * 5) - 5;
+        handleAjax.sendAjax("ajax.php", searchInput, 'ASC', 'employee.firstName',limit+',5');
+    }));
+
     //Register event for displaying pagination buttons
     $(document).on('click', '.displayPageButton' , (function () {
         var pageNo = $(this)[0].innerText;
@@ -159,13 +172,13 @@ function handlePageNumbers(currentPage) {
      startPage -= (startPage - diff > 0) ? diff : 0;
 
      if (startPage > 1) {
-         $('.appendBtn').append('<li class="page displayPageButton"><a href="#">' + 'First' + '</a></li>');
+         $('.appendBtn').append('<li id="first"><a href="#">' + 'First' + '</a></li>');
      }
      for(var i=startPage; i<=endPage; i++){
          $('.appendBtn').append('<li class="page displayPageButton"><a href="#">' + i + '</a></li>');
      }
      if (endPage < totalPage) {
-         $('.appendBtn').append('<li class="page displayPageButton"><a href="#">' + 'Last' + '</a></li>');
+         $('.appendBtn').append('<li id="last" ><a href="#">' + 'Last' + '</a></li>');
      }
 }
 
