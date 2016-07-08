@@ -153,10 +153,11 @@
                 </div>
             </div>
             <div class="row">
+                <div id="showRowMsg" class="col-md-3"></div>
                 <div class="col-md-offset-5">
                     <nav>
                         <ul class="pagination appendBtn">
-                            
+
                         </ul>
                     </nav>
                 </div>

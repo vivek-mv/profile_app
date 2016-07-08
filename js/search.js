@@ -59,6 +59,8 @@ $(document).ready(function(){
         limit = limit1 + ',' +  limit2;
         var searchInput = $.trim($('.getData').val());
         handleAjax.sendAjax("ajax.php", searchInput, 'ASC', 'employee.firstName',limit);
+        limit2 = limit1+5;
+        $('#showRowMsg').text('Showing '+limit1+'-'+limit2+' of '+' '+totalPage*5+' entries');
     }));
 
     //Register event for first page button
