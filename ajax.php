@@ -34,7 +34,7 @@
          * @param String $data
          * @return String
          */
-        public function getSearchResult($searchData, $sortOrder, $orderBy ) {
+        public function getSearchResult($searchData, $sortOrder, $orderBy, $limit ) {
             $query = "SELECT employee.eid, employee.firstName, employee.middleName,
                 employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline,
                 employee.email, employee.maritalStatus, employee.employment, employee.employer,
@@ -52,6 +52,7 @@
                 ON  employee.eid = office.eid AND  office.type = 2
                 WHERE (employee.firstName LIKE '%$searchData%') OR (employee.email LIKE '%$searchData%')
                 ORDER BY $orderBy $sortOrder
+                LIMIT $limit
                 ";
             $dbOperations = new DbOperations();
             $employeeDetails = $dbOperations->executeSql($query);
@@ -158,7 +159,7 @@
     }
 
     $ajaxHandler = new AjaxHandler();
-    $ajaxHandler->getSearchResult($_POST['data'],$_POST['order'],$_POST['sortBy']);
+    $ajaxHandler->getSearchResult($_POST['data'], $_POST['order'], $_POST['sortBy'], $_POST['limit']);
 ?>
 
 

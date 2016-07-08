@@ -6,36 +6,36 @@ $(document).ready(function(){
 
     //Populate the table when the page is entered for the first time
     //Make search data as empty string , so that all the rows are displayed
-    handleAjax.sendAjax("ajax.php", '','ASC','employee.firstName' );
+    handleAjax.sendAjax("ajax.php", '','ASC','employee.firstName', '0,5' );
 
-    //Register event for search input when it empty
+    //Register event for search input when it gets empty
     $('.getData').on( "keyup", function(){
 
         if ( $.trim($('.getData').val()) == '' ) {
             //Display all the rows
-            handleAjax.sendAjax("ajax.php", '','ASC','employee.firstName' );
+            handleAjax.sendAjax("ajax.php", '','ASC','employee.firstName','0,5' );
         }
     });
 
     //Register event for search submission
     $("form").submit(function() {
         var searchInput = $.trim($('.getData').val());
-        handleAjax.sendAjax("ajax.php", searchInput,'ASC','employee.firstName' );
+        handleAjax.sendAjax("ajax.php", searchInput,'ASC','employee.firstName','0,5' );
         return false;
     });
 
     //Register event for sorting
     $('.sort').click(function () {
+
+        var sortBy = 'employee.firstName';
+
         var searchInput = $.trim($('.getData').val());
 
-        var sortBy = 'employee.firstName';console.log($(this)[0].innerText);
-
-        var test = $(this)[0].innerText;
-        if ( test == 'Email' ) {
+        if ( $(this)[0].innerText == "Email" ) {
             sortBy = 'employee.email';
         }
-        console.log(sortBy);
-        handleAjax.sendAjax("ajax.php", searchInput, order, sortBy);
+
+        handleAjax.sendAjax("ajax.php", searchInput, order, sortBy,'0,5');
 
         //change the sort order and change the sort arrow shape
         if ( order === 'DESC' ) {
@@ -47,6 +47,17 @@ $(document).ready(function(){
             $(this).children().removeClass(downShape).addClass(upShape);
         }
     });
+    
+    //Register event for paginationg
+    $('.page').click(function () {
+        var currentPage = $(this)[0].innerText;
+        var limit1 = (currentPage * 5);
+        var limit2 = 5;
+        var limit = limit1 + ',' +  limit2;
+        console.log(limit);
+        var searchInput = $.trim($('.getData').val());
+        handleAjax.sendAjax("ajax.php", searchInput, 'ASC', 'employee.firstName',limit);
+    });
 });
 
 var handleAjax = {
@@ -57,13 +68,14 @@ var handleAjax = {
      * @param String
      * @retrun void
      */
-     function (searchUrl,searchData,sortOrder,sortByFieldName) {
+     function (searchUrl,searchData,sortOrder,sortByFieldName,limitBy) {
         $.ajax({
             url: searchUrl,
             data: {
                 data: searchData,
-                order:sortOrder,
-                sortBy:sortByFieldName,
+                order: sortOrder,
+                sortBy: sortByFieldName,
+                limit: limitBy,
                 ajax: 1
             },
             dataType : 'json',
