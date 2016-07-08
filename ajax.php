@@ -35,15 +35,17 @@
          * @return String
          */
         public function getSearchResult($searchData, $sortOrder, $orderBy, $limit ) {
-            $query = "SELECT employee.eid, employee.firstName, employee.middleName,
+
+            $dbOperations = new DbOperations();
+            $cols = "employee.eid, employee.firstName, employee.middleName,
                 employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline,
                 employee.email, employee.maritalStatus, employee.employment, employee.employer,
                 employee.photo, commMedium.msg, commMedium.email 
                 AS comm_email, commMedium.call, commMedium.any, residence.street AS rStreet,
                 residence.city AS rCity,residence.state AS rState, residence.zip AS rZip, residence.fax AS rFax,
                 office.street AS oStreet, office.city AS oCity ,office.state AS oState, office.zip AS oZip, 
-                office.fax AS oFax
-                FROM employee 
+                office.fax AS oFax";
+            $query_joins = "FROM employee 
                 JOIN commMedium 
                 ON employee.eid = commMedium.empId 
                 JOIN address AS residence
@@ -51,14 +53,20 @@
                 JOIN address AS office
                 ON  employee.eid = office.eid AND  office.type = 2
                 WHERE (employee.firstName LIKE '%$searchData%') OR (employee.email LIKE '%$searchData%')
-                ORDER BY $orderBy $sortOrder
-                LIMIT $limit
                 ";
-            $dbOperations = new DbOperations();
-            $employeeDetails = $dbOperations->executeSql($query);
+            $query_1 = "SELECT $cols $query_joins";
+            $countRows = $dbOperations->executeSql($query_1);
+            $rowcount=mysqli_num_rows($countRows);
+
+            $query_2 = "SELECT $cols $query_joins ORDER BY $orderBy $sortOrder LIMIT $limit";
+
+            $employeeDetails = $dbOperations->executeSql($query_2);
 
             $json = [];
             while($row = $employeeDetails->fetch_assoc()){
+
+                //total no of rows
+                $row['totalPage'] = ceil($rowcount/5);
 
                 //check for gender
                 if ( $row['gender'] == 'm' ) {

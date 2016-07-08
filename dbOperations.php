@@ -89,13 +89,16 @@ class DbOperations {
     public function selectAllEmployees() {
 
         //Get the records of all the employees
-        $selectEmpDetails = "SELECT employee.eid, employee.firstName, employee.middleName,
-            employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline,
-            employee.email, employee.maritalStatus, employee.employment, employee.employer,
-            employee.photo, commMedium.empId, commMedium.msg, commMedium.email AS comm_email, 
-            commMedium.call, commMedium.any, address.eid, address.type, address.street, address.city ,
-            address.state, address.zip, address.fax FROM employee JOIN commMedium ON 
-            employee.eid = commMedium.empId JOIN address ON  employee.eid = address.eid";
+        $selectEmpDetails =
+            "SELECT employee.eid, employee.firstName, employee.middleName,
+                employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline,
+                employee.email, employee.maritalStatus, employee.employment, employee.employer,
+                employee.photo, commMedium.empId, commMedium.msg, commMedium.email AS comm_email, 
+                commMedium.call, commMedium.any, address.eid, address.type, address.street, address.city ,
+                address.state, address.zip, address.fax 
+            FROM employee 
+            JOIN commMedium ON employee.eid = commMedium.empId 
+            JOIN address ON  employee.eid = address.eid";
         
         $employeeDetails = $this->executeSql($selectEmpDetails);
         return $employeeDetails;
@@ -113,22 +116,27 @@ class DbOperations {
 
         if ( $addressType === 0 ) {
 
-            $selectEmpDetails = "SELECT employee.eid, employee.prefix, employee.firstName, 
-                employee.middleName, employee.lastName, employee.gender, employee.dob, 
-                employee.mobile, employee.landline, employee.email, employee.password, 
-                employee.maritalStatus, employee.employment, employee.employer, employee.note,
-                employee.photo,commMedium.empId, commMedium.msg, commMedium.email AS comm_email, 
-                commMedium.call , commMedium.any FROM employee JOIN commMedium 
-                ON employee.eid = commMedium.empId WHERE eid =" . $employeeId;
+            $selectEmpDetails =
+                "SELECT employee.eid, employee.prefix, employee.firstName, employee.middleName,
+                        employee.lastName, employee.gender, employee.dob, employee.mobile,
+                        employee.landline, employee.email, employee.password, employee.maritalStatus,
+                        employee.employment, employee.employer, employee.note, employee.photo, commMedium.empId, 
+                        commMedium.msg, commMedium.email AS comm_email, commMedium.call, commMedium.any
+                FROM employee
+                JOIN commMedium ON employee.eid = commMedium.empId
+                WHERE eid =" . $employeeId;
 
             $details = $this->executeSql($selectEmpDetails);
 
             return $details;
         }
 
-        $addressQuery = "SELECT address.eid , address.type , address.street , address.city ,
-            address.state , address.zip , address.fax FROM address
-            WHERE address.eid =" . $employeeId . " AND address.type = " . $addressType;
+        $addressQuery =
+            "SELECT address.eid , address.type , address.street , address.city ,
+              address.state , address.zip , address.fax 
+            FROM address
+            WHERE address.eid =" . $employeeId . " 
+            AND address.type = " . $addressType;
 
         $address = $this->executeSql($addressQuery); 
 

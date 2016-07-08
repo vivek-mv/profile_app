@@ -155,22 +155,8 @@
             <div class="row">
                 <div class="col-md-offset-5">
                     <nav>
-                        <ul class="pagination">
-                            <li class="page">
-                                <a href="#" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page"><a href="#">1</a></li>
-                            <li class="page"><a href="#">2</a></li>
-                            <li class="page"><a href="#">3</a></li>
-                            <li class="page"><a href="#">4</a></li>
-                            <li class="page"><a href="#">5</a></li>
-                            <li class="page">
-                                <a href="#" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
+                        <ul class="pagination appendBtn">
+                            
                         </ul>
                     </nav>
                 </div>

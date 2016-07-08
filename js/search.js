@@ -1,5 +1,7 @@
+var totalPage = '';
+var curPage = '1';
 $(document).ready(function(){
-
+    var limit = '0,5';
     var order = 'DESC';
     var upShape = 'glyphicon glyphicon-triangle-top';
     var downShape = 'glyphicon glyphicon-triangle-bottom';
@@ -30,12 +32,13 @@ $(document).ready(function(){
         var sortBy = 'employee.firstName';
 
         var searchInput = $.trim($('.getData').val());
+        var sortText = $.trim($(this)[0].innerText);
 
-        if ( $(this)[0].innerText == "Email" ) {
+        if ( sortText == "Email" ) {
             sortBy = 'employee.email';
         }
 
-        handleAjax.sendAjax("ajax.php", searchInput, order, sortBy,'0,5');
+        handleAjax.sendAjax("ajax.php", searchInput, order, sortBy,limit);
 
         //change the sort order and change the sort arrow shape
         if ( order === 'DESC' ) {
@@ -49,15 +52,21 @@ $(document).ready(function(){
     });
     
     //Register event for paginationg
-    $('.page').click(function () {
+    $(document).on('click', '.page' , (function () {
         var currentPage = $(this)[0].innerText;
-        var limit1 = (currentPage * 5);
+        var limit1 = (currentPage * 5) - 5;
         var limit2 = 5;
-        var limit = limit1 + ',' +  limit2;
-        console.log(limit);
+        limit = limit1 + ',' +  limit2;
         var searchInput = $.trim($('.getData').val());
         handleAjax.sendAjax("ajax.php", searchInput, 'ASC', 'employee.firstName',limit);
-    });
+    }));
+
+    //Register event for displaying pagination buttons
+    $(document).on('click', '.displayPageButton' , (function () {
+        var pageNo = $(this)[0].innerText;
+        $('.appendBtn').empty();
+        handlePageNumbers(pageNo);
+    }));
 });
 
 var handleAjax = {
@@ -88,13 +97,14 @@ var handleAjax = {
                         $("#tablebody").empty();
                         $("table").hide();
                         $('#noRecords').show();
+                        $('.appendBtn').empty();
                     } else {
                         alert('you need to login ');
                         location.reload();
                     }
 
                 } else {
-
+                    totalPage = response[0].totalPage;
                     //populate the table using the response data
                     handleAjax.displayEmployeeDetails(response);
                 }
@@ -134,9 +144,30 @@ var handleAjax = {
                 '</tr>'
             );
         });
+
+         $('.appendBtn').empty();
+         //Display the pagination buttons
+         handlePageNumbers(curPage);
     }
 }
+function handlePageNumbers(currentPage) {
+     curPage = currentPage;
+     var startPage = (curPage < 5)? 1 : curPage - 4;
+     var endPage = 8 + startPage;
+     endPage = (totalPage < endPage) ? totalPage : endPage;
+     var diff = startPage - endPage + 8;
+     startPage -= (startPage - diff > 0) ? diff : 0;
 
+     if (startPage > 1) {
+         $('.appendBtn').append('<li class="page displayPageButton"><a href="#">' + 'First' + '</a></li>');
+     }
+     for(var i=startPage; i<=endPage; i++){
+         $('.appendBtn').append('<li class="page displayPageButton"><a href="#">' + i + '</a></li>');
+     }
+     if (endPage < totalPage) {
+         $('.appendBtn').append('<li class="page displayPageButton"><a href="#">' + 'Last' + '</a></li>');
+     }
+}
 
 
 
