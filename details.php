@@ -21,6 +21,11 @@
     require_once('dbOperations.php');
 
     require_once('logErrors.php');
+
+    require_once('header.php');
+    //Setup Navigation links
+    $header = new Header();
+    $header->setNavLinks('details.php', 'DETAILS', 'logout.php', 'LOG OUT');
     
     //Display error message if delete fails in the same page
     if ( isset($_GET["Message"]) && $_GET["Message"] == 1 ) {
@@ -64,26 +69,7 @@
     </head>
     <body>
         <div class="container">
-            <nav class="navbar navbar-default">
-                <div class="container">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-                                aria-expanded="false" aria-controls="navbar">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="index.php">HOME</a>
-                    </div>
-                    <div id="navbar" class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav">
-                            <li><a href="details.php">DETAILS</a></li>
-                            <li><a href="logout.php">LOG OUT</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+           <?php $header->renderHeader(); ?>
             <div class="row">
                 <div class="col-md-offset-8 col-md-4">
                     <form>

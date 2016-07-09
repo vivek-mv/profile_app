@@ -1,25 +1,24 @@
 <?php 
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
-    
-    if ( isset($_GET['message']) && $_GET['message'] == 1 ) {
 
-        $message = 'It seems that you are trying to upload a very large file,<br>
+     if ( isset($_GET['message']) ) {
+         if ( $_GET['message'] == 1 ) {
+
+             $message = 'It seems that you are trying to upload a very large file,<br>
             . Please upload an image of size less than 2 MB ';
-    } else if ( isset($_GET['message']) && $_GET['message'] == 2 ) {
+         } else if ( $_GET['message'] == 2 ) {
 
-        $message = 'Please login to access your account';
-    } else {
+             $message = 'Please login to access your account';
+         }
+     } else {
 
         $message = 'Welcome to employee registration portal';
-    }
-
+     }
+    require_once('header.php');
     //Setup Navigation links
-    $navLink1 = 'registration_form.php';
-    $navLink1Name = 'SIGN UP';
-
-    $navLink2 = 'login.php';
-    $navLink2Name = 'LOG IN';
+    $header = new Header();
+    $header->setNavLinks('registration_form.php', 'SIGN UP', 'login.php', 'LOG IN');
 
     //Start the session
     session_start();
@@ -53,11 +52,7 @@
         $message = 'Welcome ' . $_SESSION['employeeFirstName'] . ' , ' . $wish;
 
         //Change Navigation links
-        $navLink1 = 'details.php';
-        $navLink1Name = 'DETAILS';
-
-        $navLink2 = 'logout.php';
-        $navLink2Name = 'LOG OUT';
+        $header->setNavLinks('details.php', 'DETAILS', 'logout.php', 'LOG OUT');
     }
 ?>
 <!DOCTYPE html>
@@ -70,26 +65,7 @@
             integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     </head>
     <body>
-        <nav class="navbar navbar-default">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" 
-                        aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="index.php">HOME</a>
-                </div>
-                <div id="navbar" class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a href="<?php echo "$navLink1";?> "><?php echo "$navLink1Name";?></a></li>
-                        <li><a href="<?php echo "$navLink2";?>"><?php echo "$navLink2Name";?></a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        <?php $header->renderHeader(); ?>
         <div class="container">
             <div class="row">
                 <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2 text-center">

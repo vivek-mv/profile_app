@@ -155,7 +155,8 @@ class DbOperations {
     public function insert($tableName, $data, $employeeId = 0) {
 
         if ( $tableName == 'employee' && $employeeId === 0 ) {
-            $insertEmp = "INSERT INTO employee (`prefix`, `firstName`, `middleName`, `lastName`, `gender`,
+            $insertEmp = "
+                INSERT INTO employee (`prefix`, `firstName`, `middleName`, `lastName`, `gender`,
                 `dob`, `mobile`,`landline`, `email`, `password`, `maritalStatus`, `employment`, `employer`, `photo`, `note`)
                 VALUES ('".$data['prefix']."', '".$data['firstName']."', '".$data['middleName']."',
                 '".$data['lastName']."', '".$data['gender']."', '".$data['dob']."', '".$data['mobile']."',
@@ -166,14 +167,16 @@ class DbOperations {
             if ( $insertEmployee ) {
                 //if success then return the last insert id
                 return $this->conn->insert_id;
-            }else {
-                return false;
             }
+
+            return false;
+
         }
 
         if ( $tableName == 'address' && $employeeId != 0 ) {
             // insert residence and office address
-            $insertAdd = "INSERT INTO address (`eid`,`type`,`street`,`city`,`state`,`zip`,`fax`)
+            $insertAdd =
+                "INSERT INTO address (`eid`,`type`,`street`,`city`,`state`,`zip`,`fax`)
                 VALUES ('".$data['employeeId']."','1','".$data['residenceStreet']."','".$data['resedenceCity']."',
                     '".$data['resedenceState']."','".$data['residenceZip']."','".$data['residenceFax']."') ,
                      ('".$data['employeeId']."','2','".$data['officeStreet']."','".$data['officeCity']."',
@@ -186,7 +189,8 @@ class DbOperations {
 
         if ( $tableName == 'commMedium' && $employeeId != 0 ) {
 
-            $insertCommMedium = "INSERT INTO commMedium (`empId`,`msg`,`email`,`call`,`any`)
+            $insertCommMedium =
+                "INSERT INTO commMedium (`empId`,`msg`,`email`,`call`,`any`)
                 VALUES ('".$data['employeeId']."','".$data['message']."','".$data['comEmail']."',
                     '".$data['call']."','".$data['any']."')";
 
@@ -211,10 +215,12 @@ class DbOperations {
         if ( $tableName == 'address' && $addressType == 1) {
 
             //Update residence address
-            $updateResidenceAdd = "UPDATE address SET street = '" . $data['rstreet'] 
+            $updateResidenceAdd =
+                "UPDATE address 
+                SET street = '" . $data['rstreet']
                 . "', city ='" . $data['rcity'] ."',state = '" . $data['rstate'] . "' ,
-                zip = '" . $data['rzip'] . "', fax = '" . $data['rfax'] .
-                "' where eid = " . $employeeId . " && type = ".$addressType;
+                zip = '" . $data['rzip'] . "', fax = '" . $data['rfax'] . "' 
+                WHERE eid = " . $employeeId . " && type = ".$addressType;
             
             $updateAdd = $this->executeSql($updateResidenceAdd);
             return $updateAdd;
@@ -222,19 +228,22 @@ class DbOperations {
 
         if ( $tableName == 'address' && $addressType == 2 ) {
             //Update office address
-            $updateOfficeAdd = "UPDATE address SET street = '" . $data['ostreet'] . "', city ='" 
-            . $data['ocity'] . "',state = '" . $data['ostate'] . "' , zip = '" . $data['ozip'] 
-            . "', fax = '" . $data['ofax'] ."' where eid = " . $employeeId . " && type = "
-            .$addressType;
+            $updateOfficeAdd =
+                "UPDATE address SET street = '" . $data['ostreet'] . "', city ='"
+                . $data['ocity'] . "',state = '" . $data['ostate'] . "' , zip = '" . $data['ozip']
+                . "', fax = '" . $data['ofax'] ."' where eid = " . $employeeId . " && type = "
+                .$addressType;
 
             $updateAdd = $this->executeSql($updateOfficeAdd);
             return $updateAdd;
         }
 
         if ( $tableName == 'commMedium' ) {
-            $updateCommMedium = "UPDATE commMedium SET msg ='" . $data['msg'] 
-            . "' , email ='" . $data['email'] . "',`call` ='" . $data['call'] 
-            . "' , any ='" . $data['any'] . "' where empId =" . $employeeId;
+            $updateCommMedium =
+                "UPDATE commMedium SET msg ='" . $data['msg']
+                . "' , email ='" . $data['email'] . "',`call` ='" . $data['call']
+                . "' , any ='" . $data['any'] . "' 
+                WHERE empId =" . $employeeId;
 
             $updateComm = $this->executeSql($updateCommMedium);
             return $updateComm;
@@ -242,19 +251,48 @@ class DbOperations {
 
         if ( $tableName == 'employee' ) {
             //update employee details
-            $updateEmpDetails = "UPDATE employee SET prefix = '" . $data['prefix'] . "' , firstName = '" . 
+            $updateEmpDetails =
+                "UPDATE employee 
+                SET prefix = '" . $data['prefix'] . "' , firstName = '" .
                 $data['firstName'] . "' , middleName = '" . $data['middleName'] . "' , lastName = '" .
                 $data['lastName'] . "' ,  gender = '" . $data['gender'] ."' , dob = '" . $data['dob'] . "' ,
                 mobile = '" . $data['mobile'] . "' , landline='" . $data['landline'] . "', email ='" 
                 . $data['email'] . "', password = '" . $data['password'] . "' , maritalStatus= '" . 
                 $data['maritalStatus'] . "' ,employment = '" .$data['employment'] . "' ,employer='" .
-                $data['employer'] ."'".$data['insertImage'] . ",note= '" . $data['note'] . "' where eid = " .
+                $data['employer'] ."'".$data['insertImage'] . ",note= '" . $data['note'] . "' 
+                WHERE eid = " .
                 $employeeId;
 
             $updateEmployee = $this->executeSql($updateEmpDetails);
             return $updateEmployee;
         }
     }
+
+    /** Checks whether email already exists or not
+     * @param String
+     * @return Boolean
+     */
+    public function checkEmailPresent($email) {
+
+        $checkEmail = "SELECT * FROM employee WHERE employee.email =  '" . $email . "'";
+        $checkEmailPresent = $this->executeSql($checkEmail);
+
+        return (!$checkEmailPresent->num_rows == 0) ;
+
+    }
 }
 
+//Check if email present of not when ajax request is comming
+if ( isset($_POST['data']) ) {
+    $email = htmlspecialchars($_POST['data']);
+    $dbo = new DbOperations();
+    $emailPresent = $dbo->checkEmailPresent($email);
+    if ( $emailPresent ) {
+        echo '1';
+        exit();
+    } else {
+        echo '0';
+        exit();
+    }
+}
 ?>

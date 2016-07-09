@@ -182,7 +182,7 @@ function handlePageNumbers(currentPage) {
      if (endPage < totalPage) {
          $('.appendBtn').append('<li id="last" ><a href="#">' + 'Last' + '</a></li>');
      }
-}
+}   
 
 
 

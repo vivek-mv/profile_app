@@ -42,21 +42,16 @@
     //Start session to store the form fields
     session_start();
 
-    //Setup Navigation links
-    $navLink1 = 'registration_form.php';
-    $navLink1Name = 'SIGN UP';
+    require_once('header.php');
 
-    $navLink2 = 'login.php';
-    $navLink2Name = 'LOG IN';
+    //Setup Navigation links
+    $header = new Header();
+    $header->setNavLinks('registration_form.php', 'SIGN UP', 'login.php', 'LOG IN');
 
     if ( isset($_SESSION['employeeId']) ) {
 
         //Change Navigation links
-        $navLink1 = 'details.php';
-        $navLink1Name = 'DETAILS';
-
-        $navLink2 = 'logout.php';
-        $navLink2Name = 'LOG OUT';
+        $header->setNavLinks('details.php', 'DETAILS', 'logout.php', 'LOG OUT');
     }
 
     //Check for any error messages from details page
@@ -688,26 +683,7 @@
         </style>
     </head>
     <body>
-        <nav class="navbar navbar-default">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" 
-                        aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="index.php">HOME</a>
-                </div>
-                <div id="navbar" class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a href="<?php echo "$navLink1";?> "><?php echo "$navLink1Name";?></a></li>
-                        <li><a href="<?php echo "$navLink2";?>"><?php echo "$navLink2Name";?></a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+       <?php $header->renderHeader(); ?>
         <div class="container">
             <?php if ( isset($message) && $message === 'registerSuccess' ) { ?>
                   <h2>Successfully Registered</h2>

@@ -2,6 +2,11 @@
     
     require_once('validation.php');
 
+    require_once('header.php');
+    //Setup Navigation links
+    $header = new Header();
+    $header->setNavLinks('registration_form.php', 'SIGN UP', 'login.php', 'LOG IN');
+
     if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
         $error = 0;
         if ( empty($_POST['email']) ) {
@@ -73,26 +78,7 @@
         </style>
     </head>
     <body>
-        <nav class="navbar navbar-default">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" 
-                        aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="index.php">HOME</a>
-                </div>
-                <div id="navbar" class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a href="registration_form.php">SIGN UP</a></li>
-                        <li><a href="login.php">LOG IN</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        <?php $header->renderHeader(); ?>
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">

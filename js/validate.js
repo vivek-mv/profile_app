@@ -44,6 +44,11 @@ $(document).ready(function(){
             $(this).text('');
         });
     });
+
+    //Register event for email checking
+    $('#email').on("blur", function () {
+        checkEmail();
+    });
 });
 
  /**
@@ -239,6 +244,30 @@ function checkRequired() {
 
         }
     });
+}
+
+/**
+ * check whether email already exits or not
+ * @param void
+ * @retrun void
+ */
+function checkEmail() {
+    var mail = $('#email').val();
+    if ( !(mail === '') ) {
+        $.ajax({
+            url: 'dbOperations.php',
+            data: {
+                data: mail
+            },
+            type: "POST",
+            success: function (response) {
+                if ( response == '1') {
+                    $('#email').parent().children('span').text('Email already taken, Please try another');
+                }
+            }
+        });
+    }
+
 }
 
 
