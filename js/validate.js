@@ -257,7 +257,8 @@ function checkEmail() {
         $.ajax({
             url: 'dbOperations.php',
             data: {
-                data: mail
+                data: mail,
+                code: '1'
             },
             type: "POST",
             success: function (response) {

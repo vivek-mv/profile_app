@@ -2,6 +2,7 @@ var totalPage = '';
 var curPage = '1';
 $(document).ready(function(){
     var limit = '0,5';
+    var sortBy = 'employee.firstName';
     var order = 'DESC';
     var upShape = 'glyphicon glyphicon-triangle-top';
     var downShape = 'glyphicon glyphicon-triangle-bottom';
@@ -16,6 +17,8 @@ $(document).ready(function(){
         if ( $.trim($('.getData').val()) == '' ) {
             //Display all the rows
             handleAjax.sendAjax("ajax.php", '','ASC','employee.firstName','0,5' );
+            order = 'DESC';
+            $('.sort').children().removeClass(downShape).addClass(upShape);
         }
     });
 
@@ -23,14 +26,15 @@ $(document).ready(function(){
     $("form").submit(function() {
         var searchInput = $.trim($('.getData').val());
         handleAjax.sendAjax("ajax.php", searchInput,'ASC','employee.firstName','0,5' );
+        order = 'DESC';
+        $('.sort').children().removeClass(downShape).addClass(upShape);
         return false;
     });
 
     //Register event for sorting
     $('.sort').click(function () {
 
-        var sortBy = 'employee.firstName';
-
+        sortBy = 'employee.firstName';
         var searchInput = $.trim($('.getData').val());
         var sortText = $.trim($(this)[0].innerText);
 
@@ -38,7 +42,7 @@ $(document).ready(function(){
             sortBy = 'employee.email';
         }
 
-        handleAjax.sendAjax("ajax.php", searchInput, order, sortBy,limit);
+        handleAjax.sendAjax("ajax.php", searchInput,order,sortBy,'0,5' );
 
         //change the sort order and change the sort arrow shape
         if ( order === 'DESC' ) {
@@ -53,27 +57,45 @@ $(document).ready(function(){
     
     //Register event for paginationg
     $(document).on('click', '.page' , (function () {
+        var sortOrder = order;
+        if ( order == 'DESC' ) {
+            sortOrder = 'ASC';
+        } else {
+            sortOrder = 'DESC'
+        }
         var currentPage = $(this)[0].innerText;
         var limit1 = (currentPage * 5) - 5;
         var limit2 = 5;
         limit = limit1 + ',' +  limit2;
         var searchInput = $.trim($('.getData').val());
-        handleAjax.sendAjax("ajax.php", searchInput, 'ASC', 'employee.firstName',limit);
+        handleAjax.sendAjax("ajax.php", searchInput, sortOrder, sortBy,limit);
         limit2 = limit1+5;
         $('#showRowMsg').text('Showing '+limit1+'-'+limit2+' of '+' '+totalPage*5+' entries');
     }));
 
     //Register event for first page button
     $(document).on('click', '#first', (function () {
+        var sortOrder = order;
+        if ( order == 'DESC' ) {
+            sortOrder = 'ASC';
+        } else {
+            sortOrder = 'DESC'
+        }
         var searchInput = $.trim($('.getData').val());
-        handleAjax.sendAjax("ajax.php", searchInput, 'ASC', 'employee.firstName','0,5');
+        handleAjax.sendAjax("ajax.php", searchInput, sortOrder, sortBy,'0,5');
     }));
 
     //Register event for last page button
     $(document).on('click', '#last', (function () {
+        var sortOrder = order;
+        if ( order == 'DESC' ) {
+            sortOrder = 'ASC';
+        } else {
+            sortOrder = 'DESC'
+        }
         var searchInput = $.trim($('.getData').val());
         limit = (totalPage * 5) - 5;
-        handleAjax.sendAjax("ajax.php", searchInput, 'ASC', 'employee.firstName',limit+',5');
+        handleAjax.sendAjax("ajax.php", searchInput, sortOrder, sortBy,limit+',5');
     }));
 
     //Register event for displaying pagination buttons

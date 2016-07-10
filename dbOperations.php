@@ -283,7 +283,7 @@ class DbOperations {
 }
 
 //Check if email present of not when ajax request is comming
-if ( isset($_POST['data']) ) {
+if ( isset($_POST['data']) && isset($_POST['code']) ) {
     $email = htmlspecialchars($_POST['data']);
     $dbo = new DbOperations();
     $emailPresent = $dbo->checkEmailPresent($email);
