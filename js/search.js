@@ -1,7 +1,10 @@
 var totalPage = '';
 var curPage = '1';
+var totalRecords = '';
+var limit = '0,5';
+var limit1 = 0;
+var limit2 = 4;
 $(document).ready(function(){
-    var limit = '0,5';
     var sortBy = 'employee.firstName';
     var order = 'DESC';
     var upShape = 'glyphicon glyphicon-triangle-top';
@@ -13,8 +16,10 @@ $(document).ready(function(){
 
     //Register event for search input when it gets empty
     $('.getData').on( "keyup", function(){
-
+        curPage = '1';
         if ( $.trim($('.getData').val()) == '' ) {
+            limit1 = (curPage * 5) - 5;
+            limit2 = limit1+4;
             //Display all the rows
             handleAjax.sendAjax("ajax.php", '','ASC','employee.firstName','0,5' );
             order = 'DESC';
@@ -24,7 +29,10 @@ $(document).ready(function(){
 
     //Register event for search submission
     $("form").submit(function() {
+        curPage = '1';
         var searchInput = $.trim($('.getData').val());
+        limit1 = (curPage * 5) - 5;
+        limit2 = limit1+4;
         handleAjax.sendAjax("ajax.php", searchInput,'ASC','employee.firstName','0,5' );
         order = 'DESC';
         $('.sort').children().removeClass(downShape).addClass(upShape);
@@ -64,17 +72,18 @@ $(document).ready(function(){
             sortOrder = 'DESC'
         }
         var currentPage = $(this)[0].innerText;
-        var limit1 = (currentPage * 5) - 5;
-        var limit2 = 5;
+        limit1 = (currentPage * 5) - 5;
+        limit2 = 5;
         limit = limit1 + ',' +  limit2;
         var searchInput = $.trim($('.getData').val());
         handleAjax.sendAjax("ajax.php", searchInput, sortOrder, sortBy,limit);
-        limit2 = limit1+5;
-        $('#showRowMsg').text('Showing '+limit1+'-'+limit2+' of '+' '+totalPage*5+' entries');
+        limit2 = limit1+4;
+        $('#showRowMsg').text('Showing '+limit1+'-'+limit2+' of ' + ' ' + totalRecords + ' entries');
     }));
 
     //Register event for first page button
     $(document).on('click', '#first', (function () {
+        curPage = '1';
         var sortOrder = order;
         if ( order == 'DESC' ) {
             sortOrder = 'ASC';
@@ -82,11 +91,15 @@ $(document).ready(function(){
             sortOrder = 'DESC'
         }
         var searchInput = $.trim($('.getData').val());
+        limit1 = (curPage * 5) - 5;
+        limit2 = limit1+4;
         handleAjax.sendAjax("ajax.php", searchInput, sortOrder, sortBy,'0,5');
+        $('#showRowMsg').text('Showing '+0+'-'+ 4 + ' of ' + ' ' + totalRecords + ' entries');
     }));
 
     //Register event for last page button
     $(document).on('click', '#last', (function () {
+        curPage = totalPage;
         var sortOrder = order;
         if ( order == 'DESC' ) {
             sortOrder = 'ASC';
@@ -95,7 +108,11 @@ $(document).ready(function(){
         }
         var searchInput = $.trim($('.getData').val());
         limit = (totalPage * 5) - 5;
+        limit1 = (curPage * 5) - 5;
+        limit2 = limit1+4;
         handleAjax.sendAjax("ajax.php", searchInput, sortOrder, sortBy,limit+',5');
+        $('#showRowMsg').text('Showing '+limit1+'-'+limit2+' of ' + ' ' + totalRecords + ' entries');
+
     }));
 
     //Register event for displaying pagination buttons
@@ -104,6 +121,7 @@ $(document).ready(function(){
         $('.appendBtn').empty();
         handlePageNumbers(pageNo);
     }));
+
 });
 
 var handleAjax = {
@@ -135,15 +153,18 @@ var handleAjax = {
                         $("table").hide();
                         $('#noRecords').show();
                         $('.appendBtn').empty();
+                        $('#showRowMsg').text('');
                     } else {
-                        alert('you need to login ');
+                        alert('You are logged out. Please login again ');
                         location.reload();
                     }
 
                 } else {
                     totalPage = response[0].totalPage;
+                    totalRecords = response[0].totalRecords;
                     //populate the table using the response data
-                    handleAjax.displayEmployeeDetails(response);
+                    handleAjax.displayEmployeeDetails(response);console.log(limit1+', '+limit2);
+                    $('#showRowMsg').text('Showing '+limit1+'-'+limit2+' of ' + ' ' + totalRecords + ' entries');
                 }
             }
         });

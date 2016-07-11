@@ -65,6 +65,9 @@
             $json = [];
             while($row = $employeeDetails->fetch_assoc()){
 
+                //total records
+                $row['totalRecords'] = $rowcount;
+                
                 //total no of rows
                 $row['totalPage'] = ceil($rowcount/5);
 
