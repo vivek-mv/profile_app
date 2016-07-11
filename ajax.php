@@ -28,7 +28,7 @@
     Class AjaxHandler {
 
         /**
-         * Handles the search requests
+         * Get the search results , convert results into json and send the json
          *
          * @access public
          * @param String $data
@@ -67,7 +67,7 @@
 
                 //total records
                 $row['totalRecords'] = $rowcount;
-                
+
                 //total no of rows
                 $row['totalPage'] = ceil($rowcount/5);
 

@@ -4,6 +4,8 @@ var totalRecords = '';
 var limit = '0,5';
 var limit1 = 0;
 var limit2 = 4;
+var lastBtn = 0;
+
 $(document).ready(function(){
     var sortBy = 'employee.firstName';
     var order = 'DESC';
@@ -42,6 +44,7 @@ $(document).ready(function(){
     //Register event for sorting
     $('.sort').click(function () {
 
+        curPage = '1';
         sortBy = 'employee.firstName';
         var searchInput = $.trim($('.getData').val());
         var sortText = $.trim($(this)[0].innerText);
@@ -49,6 +52,9 @@ $(document).ready(function(){
         if ( sortText == "Email" ) {
             sortBy = 'employee.email';
         }
+
+        limit1 = (curPage * 5) - 5;
+        limit2 = limit1+4;
 
         handleAjax.sendAjax("ajax.php", searchInput,order,sortBy,'0,5' );
 
@@ -61,6 +67,7 @@ $(document).ready(function(){
             order = 'DESC';
             $(this).children().removeClass(downShape).addClass(upShape);
         }
+
     });
     
     //Register event for paginationg
@@ -72,6 +79,9 @@ $(document).ready(function(){
             sortOrder = 'DESC'
         }
         var currentPage = $(this)[0].innerText;
+        if ( currentPage == totalPage ) {
+            lastBtn = 1;
+        }
         limit1 = (currentPage * 5) - 5;
         limit2 = 5;
         limit = limit1 + ',' +  limit2;
@@ -110,8 +120,8 @@ $(document).ready(function(){
         limit = (totalPage * 5) - 5;
         limit1 = (curPage * 5) - 5;
         limit2 = limit1+4;
+        lastBtn = 1 ;
         handleAjax.sendAjax("ajax.php", searchInput, sortOrder, sortBy,limit+',5');
-        $('#showRowMsg').text('Showing '+limit1+'-'+limit2+' of ' + ' ' + totalRecords + ' entries');
 
     }));
 
@@ -128,6 +138,9 @@ var handleAjax = {
     sendAjax :
      /**
      * Sends an ajax request
+     * @param String
+     * @param String
+     * @param String
      * @param String
      * @param String
      * @retrun void
@@ -160,11 +173,18 @@ var handleAjax = {
                     }
 
                 } else {
+                    
                     totalPage = response[0].totalPage;
                     totalRecords = response[0].totalRecords;
                     //populate the table using the response data
                     handleAjax.displayEmployeeDetails(response);
-                    $('#showRowMsg').text('Showing '+limit1+'-'+limit2+' of ' + ' ' + totalRecords + ' entries');
+                    if ( lastBtn === 1 ) {
+                        $('#showRowMsg').text('Showing ' + (limit1+1) + '-'+ totalRecords +' of ' + ' ' + totalRecords + ' entries');
+                        lastBtn = 0;
+                    } else {
+                        $('#showRowMsg').text('Showing '+(limit1+1)+'-'+ (limit2+1) +' of ' + ' ' + totalRecords + ' entries');
+                    }
+
                 }
             }
         });
@@ -172,7 +192,6 @@ var handleAjax = {
     displayEmployeeDetails :
      /**
      * Populate the table
-     * @param String
      * @param String
      * @retrun void
      */
