@@ -163,7 +163,7 @@ var handleAjax = {
                     totalPage = response[0].totalPage;
                     totalRecords = response[0].totalRecords;
                     //populate the table using the response data
-                    handleAjax.displayEmployeeDetails(response);console.log(limit1+', '+limit2);
+                    handleAjax.displayEmployeeDetails(response);
                     $('#showRowMsg').text('Showing '+limit1+'-'+limit2+' of ' + ' ' + totalRecords + ' entries');
                 }
             }
