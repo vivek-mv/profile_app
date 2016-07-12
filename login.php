@@ -1,5 +1,9 @@
-<?php 
-    
+<?php
+    session_start();
+    if ( isset($_SESSION['employeeId']) ) {
+        header("Location:index.php");
+        exit();
+    }
     require_once('validation.php');
 
     require_once('header.php');
@@ -56,7 +60,7 @@
             if ( $employeeData->num_rows == 0 ) {
                 $loginErr = 'Invalid login details';
             }else {
-                session_start();
+
                 $employee = $employeeData->fetch_assoc();
                 $_SESSION['employeeId'] = $employee['eid'];
                 $_SESSION['roleId'] = $employee['roleId'];
