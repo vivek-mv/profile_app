@@ -13,6 +13,8 @@
 
     require_once('dbOperations.php');
 
+    require_once('checkPermissions.php');
+
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
 
@@ -88,18 +90,24 @@
                     $row['photo'] = '<img src="profile_pic/'.$row['photo'].'" alt="profile pic "height="150" width="150">';
                 }
 
-                //show the edit and delete button for the loged in user
-                if ( $row['eid'] == $_SESSION['employeeId'] ) {
+                $checkPermission = new CheckPermissions();
+                if ( ($checkPermission->isAllowed('details','edit') && $checkPermission->isAllowed('details','delete')) ||
+                    $checkPermission->isAllowed('details','all') ) {
 
-                    $row['edit'] = "<a href='registration_form.php?userId=" . $row["eid"] . "&userAction=update' target='_self' >"
-                        ."<span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></a>";
+                    //show the edit and delete button for the loged in user
+                    if ( ($row['eid'] == $_SESSION['employeeId']) || ($_SESSION['roleId'] == '2') ) {
 
-                    $row['delete'] = "<a href='details.php?userId=" . $row["eid"] . "&userAction=delete' target='_self' >"
-                        ."<span class='glyphicon glyphicon-remove' aria-hidden='true'></span></a>";
-                } else {
-                    $row['edit'] = '';
+                        $row['edit'] = "<a href='registration_form.php?userId=" . $row["eid"] . "&userAction=update' target='_self' >"
+                            ."<span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></a>";
 
-                    $row['delete'] = '';
+                        $row['delete'] = "<a href='details.php?userId=" . $row["eid"] . "&userAction=delete' target='_self' >"
+                            ."<span class='glyphicon glyphicon-remove' aria-hidden='true'></span></a>";
+                    } else {
+                        $row['edit'] = '';
+
+                        $row['delete'] = '';
+                    }
+
                 }
 
                 //check for D.O.B

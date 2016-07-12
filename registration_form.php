@@ -619,7 +619,7 @@
         }
 
         //Check if the user is trying to access other accounts
-        if ( !($_SESSION['employeeId'] == $_GET["userId"]) ) {
+        if ( !($_SESSION['employeeId'] == $_GET["userId"]) && ($_SESSION['roleId'] != '2') ) {
             header('Location:index.php?message=2');
             exit();
         }

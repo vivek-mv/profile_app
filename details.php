@@ -23,6 +23,15 @@
     require_once('logErrors.php');
 
     require_once('header.php');
+
+    require_once('checkPermissions.php');
+
+    //Check for user permissions
+    $checkPermission = new CheckPermissions();
+    if ( !$checkPermission->isAllowed('details','view') && !$checkPermission->isAllowed('details','all') ) {
+        echo 'Sorry you are not authorised to access this page';
+        exit();
+    }
     //Setup Navigation links
     $header = new Header();
     $header->setNavLinks('details.php', 'DETAILS', 'logout.php', 'LOG OUT');

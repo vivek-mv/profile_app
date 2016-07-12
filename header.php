@@ -55,11 +55,21 @@ Class Header {
                     <ul class="nav navbar-nav">
                         <li><a href="index.php">HOME</a></li>
 
+                        <?php if ( isset($_SESSION['employeeId']) ) { ?>
+
+                        <li><a href="dashboard.php">DASHBOARD</a></li>
+
+                        <?php
+                        }
+                        ?>
+
                         <?php foreach ($this->navLinks as $navLink) { ?>
 
                             <li><a href="<?php echo $navLink['link'];?> "><?php echo $navLink['name'];?></a></li>
 
-                        <?php } ?>
+                        <?php
+                        }
+                        ?>
                     </ul>
                 </div>
             </div>

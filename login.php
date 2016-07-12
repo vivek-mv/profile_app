@@ -3,6 +3,9 @@
     require_once('validation.php');
 
     require_once('header.php');
+
+    require_once('acl.php');
+
     //Setup Navigation links
     $header = new Header();
     $header->setNavLinks('registration_form.php', 'SIGN UP', 'login.php', 'LOG IN');
@@ -46,7 +49,7 @@
         if ( $error == 0 ) {
             require_once('dbOperations.php');
             $dbOperations = new DbOperations();
-            $query = "SELECT employee.eid, employee.firstName FROM employee WHERE employee.email = '" . $email . "' AND 
+            $query = "SELECT employee.eid, employee.firstName, employee.roleId FROM employee WHERE employee.email = '" . $email . "' AND 
                 employee.password = '" . md5($password) . "'";
             $employeeData = $dbOperations->executeSql($query);
 
@@ -56,7 +59,12 @@
                 session_start();
                 $employee = $employeeData->fetch_assoc();
                 $_SESSION['employeeId'] = $employee['eid'];
+                $_SESSION['roleId'] = $employee['roleId'];
                 $_SESSION['employeeFirstName'] = $employee['firstName'];
+
+                //Get the user permissions and store in $_SESSION['userPermissions']
+                $acl = new Acl();
+                $acl->getResourcePermission($_SESSION['roleId']);
                 header("Location:index.php");
                 exit();
             }
