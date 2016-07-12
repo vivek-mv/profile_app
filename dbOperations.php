@@ -275,6 +275,9 @@ class DbOperations {
     public function checkEmailPresent($email) {
 
         $checkEmail = "SELECT * FROM employee WHERE employee.email =  '" . $email . "'";
+        if ( isset($_SESSION['employeeId']) ) {
+            $checkEmail = $checkEmail . " AND employee.eid != " . $_SESSION['employeeId'];
+        }
         $checkEmailPresent = $this->executeSql($checkEmail);
 
         return (!$checkEmailPresent->num_rows == 0) ;
@@ -282,8 +285,9 @@ class DbOperations {
     }
 }
 
-//Check if email present of not when ajax request is comming
+//Check if email present or not when ajax request is comming
 if ( isset($_POST['data']) && isset($_POST['code']) ) {
+    session_start();
     $email = htmlspecialchars($_POST['data']);
     $dbo = new DbOperations();
     $emailPresent = $dbo->checkEmailPresent($email);

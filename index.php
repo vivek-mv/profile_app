@@ -38,13 +38,13 @@
         }
 
         if ( isset($_GET['message']) && $_GET['message'] == 'update' ) {
-            $wish = 'You have successfully updated your details';
+            $wish = 'You have successfully updated the details';
         }
         if ( isset($_GET['message']) && $_GET['message'] == '1' ) {
             $wish = 'It seems that you are trying to upload a very large file <br>
                 Please upload an image of size less than 2 MB';
         }
-        
+
         if ( isset($_GET['message']) && $_GET['message'] == '2' ) {
             $wish = 'You can only access your account';
         }

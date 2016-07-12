@@ -168,7 +168,7 @@
 
             if ( @$json != null ) {
                 //send the json data
-                echo (json_encode($json));
+                echo json_encode($json);
             } else {
                 echo '{"error" : "1", "error_msg" : "noRecords", "error_code" : "404"}';
             }

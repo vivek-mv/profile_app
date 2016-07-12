@@ -229,9 +229,14 @@
 
         //Check if email id is already present or not
         $checkEmail = "SELECT * FROM employee WHERE employee.email =  '" . $email . "'";
+
+        if ( isset($_SESSION['employeeId']) ) {
+            $checkEmail = $checkEmail . "AND employee.eid != " . $_SESSION['employeeId'];
+        }
+
         $checkEmailPresent = $dbOperations->executeSql($checkEmail);
-        
-        if ( ($email != '') && (!isset($_SESSION['employeeId'])) && (!$checkEmailPresent->num_rows == 0) ) {
+
+        if ( ($email != '') &&  (!$checkEmailPresent->num_rows == 0) ) {
             $emailErr = "Email already present";
             $error++;
         }
