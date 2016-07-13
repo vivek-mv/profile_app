@@ -239,7 +239,11 @@ function handlePageNumbers(currentPage) {
          $('.appendBtn').append('<li id="first"><a href="#">' + 'First' + '</a></li>');
      }
      for(var i=startPage; i<=endPage; i++){
-         $('.appendBtn').append('<li class="page displayPageButton"><a href="#">' + i + '</a></li>');
+         var showActive = '';
+         if ( i == curPage ) {
+             showActive = 'active';
+         }
+         $('.appendBtn').append('<li class="page displayPageButton ' + showActive + '"><a href="#">' + i + '</a></li>');
      }
      if (endPage < totalPage) {
          $('.appendBtn').append('<li id="last" ><a href="#">' + 'Last' + '</a></li>');

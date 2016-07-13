@@ -5,7 +5,7 @@ session_start();
 require_once('checkPermissions.php');
 //Check for user permissions
 $checkPermission = new CheckPermissions();
-if ( !$checkPermission->isAllowed('details','view') && !$checkPermission->isAllowed('details','all') ) {
+if ( !$checkPermission->isAllowed('dashboard','view') && !$checkPermission->isAllowed('dashboard','all') ) {
     echo 'Sorry you are not authorised to access this page';
     exit();
 }
@@ -36,7 +36,7 @@ $header->setNavLinks('details.php', 'DETAILS', 'logout.php', 'LOG OUT');
             <?php } ?>
 
             <?php if ( $checkPermission->isAllowed('dashboard','add') || $checkPermission->isAllowed('dashboard','all')) {?>
-                <br><button class="btn btn-primary">ADD</button><br>
+                <br><button id="add" class="btn btn-primary">ADD</button><br>
             <?php } ?>
             <?php if ( $checkPermission->isAllowed('dashboard','edit') || $checkPermission->isAllowed('dashboard','all')) {?>
                 <br><button class="btn btn-primary">EDIT</button><br>
@@ -48,5 +48,7 @@ $header->setNavLinks('details.php', 'DETAILS', 'logout.php', 'LOG OUT');
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+    <script type="text/javascript" src="js/addPermissions.js"></script>
 </body>
 </html>

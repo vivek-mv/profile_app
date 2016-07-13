@@ -47,13 +47,21 @@
     
     //When user clicks the delete button in the details listing page
     if (isset($_GET["userAction"]) && $_GET["userAction"] == "delete") {
-        
+
         $deleteSuccess = $dbOperations->delete($_GET['userId']);
-        
+
         if ( $deleteSuccess ) {
-        //If delete is successfull then redirect to the same page
-        header("Location:details.php");
-        exit();
+
+            if ( $_SESSION['employeeId'] == $_GET['userId'] ) {
+
+                //If delete is successfull then redirect to the logout page
+                header("Location:logout.php");
+                exit();
+            } else {
+                header("Location:details.php");
+                exit();
+            }
+
         } else {
             //If delete fails 
             header("Location:details.php?Message=1");

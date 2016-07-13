@@ -65,6 +65,9 @@
             integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     </head>
     <body>
+        <noscript>
+            This site uses javascript to serve its full functionality. Please enable javascript . Thank You :)
+        </noscript>
         <?php $header->renderHeader(); ?>
         <div class="container">
             <div class="row">
@@ -77,5 +80,6 @@
                 </div>
             </div>
         </div>
+    <script type="text/javascript"></script>
     </body>
 </html>

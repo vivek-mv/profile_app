@@ -50,6 +50,14 @@
 
     if ( isset($_SESSION['employeeId']) ) {
 
+        require_once('checkPermissions.php');
+        //Check for user permissions
+        $checkPermission = new CheckPermissions();
+        if ( !$checkPermission->isAllowed('update','view') && !$checkPermission->isAllowed('update','all') ) {
+            echo 'Sorry you are not authorised to access this page';
+            exit();
+        }
+
         //Change Navigation links
         $header->setNavLinks('details.php', 'DETAILS', 'logout.php', 'LOG OUT');
     }
@@ -1439,7 +1447,14 @@
                         if( (isset($_GET['userAction']) && $_GET['userAction']=='update') 
                             || ( isset($_GET["userId"]) && $_GET["userId"] > 0) ) {
 
-                            echo 'UPDATE'; 
+                            if ( $checkPermission->isAllowed('update','edit')||
+                                $checkPermission->isAllowed('update','all') ) {
+                                echo 'UPDATE';
+                            } else {
+
+                                echo '" " style="display: none;"';
+                            }
+
                         } else {
                             echo 'SUBMIT';
                         }
@@ -1449,7 +1464,7 @@
                     <?php 
                        if( (isset($_GET['userAction']) && $_GET['userAction']=='update') 
                             || ( isset($_GET["userId"]) && $_GET["userId"] > 0) ) {
-                            
+
                             echo 'hidden'; } else {echo 'reset';
                         }
                         ?>

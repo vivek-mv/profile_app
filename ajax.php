@@ -91,23 +91,37 @@
                 }
 
                 $checkPermission = new CheckPermissions();
-                if ( ($checkPermission->isAllowed('details','edit') && $checkPermission->isAllowed('details','delete')) ||
+                if ( $checkPermission->isAllowed('details','edit')||
                     $checkPermission->isAllowed('details','all') ) {
 
-                    //show the edit and delete button for the loged in user
+                    //show the edit button for the logged in user
                     if ( ($row['eid'] == $_SESSION['employeeId']) || ($_SESSION['roleId'] == '2') ) {
 
                         $row['edit'] = "<a href='registration_form.php?userId=" . $row["eid"] . "&userAction=update' target='_self' >"
                             ."<span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></a>";
+                        
+                    } else {
+                        $row['edit'] = '';
+                    }
+
+                } else {
+                    $row['edit'] = '';
+                }
+
+                if ( $checkPermission->isAllowed('details','delete')||
+                    $checkPermission->isAllowed('details','all') ) {
+
+                    //show the delete button for the logged in user
+                    if ( ($row['eid'] == $_SESSION['employeeId']) || ($_SESSION['roleId'] == '2') ) {
 
                         $row['delete'] = "<a href='details.php?userId=" . $row["eid"] . "&userAction=delete' target='_self' >"
                             ."<span class='glyphicon glyphicon-remove' aria-hidden='true'></span></a>";
                     } else {
-                        $row['edit'] = '';
-
                         $row['delete'] = '';
                     }
 
+                } else {
+                    $row['delete'] = '';
                 }
 
                 //check for D.O.B
