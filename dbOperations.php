@@ -302,6 +302,7 @@ if ( isset($_POST['data']) && isset($_POST['code']) ) {
     session_start();
     $email = htmlspecialchars($_POST['data']);
     $dbo = new DbOperations();
+    $email = $dbo->escapeData($email);
     $emailPresent = $dbo->checkEmailPresent($email);
     if ( $emailPresent ) {
         echo '1';

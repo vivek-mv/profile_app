@@ -55,11 +55,12 @@
             $dbOperations = new DbOperations();
             $query = "SELECT employee.eid, employee.firstName, employee.roleId FROM employee WHERE employee.email = '" . $email . "' AND 
                 employee.password = '" . md5($password) . "'";
+
             $employeeData = $dbOperations->executeSql($query);
 
             if ( $employeeData->num_rows == 0 ) {
                 $loginErr = 'Invalid login details';
-            }else {
+            } else {
 
                 $employee = $employeeData->fetch_assoc();
                 $_SESSION['employeeId'] = $employee['eid'];
