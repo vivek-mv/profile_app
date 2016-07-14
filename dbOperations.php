@@ -17,7 +17,7 @@ class DbOperations {
      *Constructor
      *
      * @access public
-     * @param void 
+     * @param void
      * @return void
      */
     public function __construct() {
@@ -35,7 +35,19 @@ class DbOperations {
      */
     public function executeSql($query) {
 
-        return mysqli_query($this->conn, $query);
+        return $this->conn->query($query);
+    }
+
+    /**
+     *Escapes the sql query data variables
+     *
+     * @access public
+     * @param String
+     * @return String
+     */
+    public function escapeData($data) {
+
+        return $this->conn->real_escape_string($data);
     }
 
     /**

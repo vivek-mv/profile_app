@@ -158,6 +158,11 @@
             $firstnameErr = 'Only 20 characters allowed';
             $error++;
         }
+
+        if ( $firstName == '' ) {
+            $firstnameErr = 'This is a required field';
+            $error++;
+        }
         
         $middleName = Validation::getCorrectData($_POST["middleName"]);
         
@@ -249,6 +254,11 @@
             $error++;
         }
 
+        if ( $email == '' ) {
+            $emailErr = 'This is a required field';
+            $error++;
+        }
+
         $password = Validation::getCorrectData($_POST["password"]);
         $confirmPassword = Validation::getCorrectData($_POST["confirmPassword"]);
 
@@ -264,6 +274,11 @@
 
         if ( Validation::validateLength($password, 11) ) {
             $passwordErr = 'Only 11 characters allowed';
+            $error++;
+        }
+
+        if ( $password == '' ) {
+            $passwordErr = 'This is a required field';
             $error++;
         }
         
@@ -534,7 +549,12 @@
         }
 
         //If there are no errors and submit name is update
-        if( $error == 0 && $_POST["submit"]=="UPDATE" ) {
+        if( $error == 0 && $_POST["submit"] == "UPDATE" ) {
+
+            if ( !$checkPermission->isAllowed('update','edit') && !$checkPermission->isAllowed('update','all') ) {
+                echo 'Sorry you are not authorised to update the data';
+                exit();
+            }
 
             if( isset($_FILES['image']) && !empty($_FILES['image']['name']) && $_FILES['image']['size'] != 0) {
                 move_uploaded_file($_FILES['image']['tmp_name'],APP_PATH ."/profile_pic/".$_FILES['image']['name']);
@@ -696,6 +716,9 @@
         </style>
     </head>
     <body>
+        <noscript>
+            This site uses javascript to serve its full functionality. Please enable javascript . Thank You :)
+        </noscript>
        <?php $header->renderHeader(); ?>
         <div class="container">
             <?php if ( isset($message) && $message === 'registerSuccess' ) { ?>
