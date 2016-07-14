@@ -48,6 +48,11 @@
     //When user clicks the delete button in the details listing page
     if (isset($_GET["userAction"]) && $_GET["userAction"] == "delete") {
 
+        if ( !$checkPermission->isAllowed('details','delete') && !$checkPermission->isAllowed('details','all') ) {
+            echo 'Sorry you are not authorised to delete the data';
+            exit();
+        }
+
         $deleteSuccess = $dbOperations->delete($_GET['userId']);
 
         if ( $deleteSuccess ) {
@@ -85,6 +90,9 @@
         </style>
     </head>
     <body>
+        <noscript>
+            This site uses javascript to serve its full functionality. Please enable javascript . Thank You :)
+        </noscript>
         <div class="container">
            <?php $header->renderHeader(); ?>
             <div class="row">

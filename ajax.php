@@ -39,6 +39,7 @@
         public function getSearchResult($searchData, $sortOrder, $orderBy, $limit ) {
 
             $dbOperations = new DbOperations();
+            $searchData = $dbOperations->escapeData($searchData);
             $cols = "employee.eid, employee.firstName, employee.middleName,
                 employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline,
                 employee.email, employee.maritalStatus, employee.employment, employee.employer,
