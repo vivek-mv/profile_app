@@ -88,7 +88,16 @@
 
                 //build the image url if image is present
                 if ( !empty($row['photo']) ) {
+
                     $row['photo'] = '<img src="profile_pic/'.$row['photo'].'" alt="profile pic "height="150" width="150">';
+                } elseif ( $row['gender'] == 'Male' ) {
+
+                    $row['photo'] = '<img src="profile_pic/default_male.jpg" alt="profile pic "height="150" width="150">';
+                }elseif ( $row['gender'] == 'Female' ) {
+
+                    $row['photo'] = '<img src="profile_pic/default_female.jpg" alt="profile pic "height="150" width="150">';
+                }else {
+                    $row['photo'] = '<img src="profile_pic/default_others.png" alt="profile pic "height="150" width="150">';
                 }
 
                 $checkPermission = new CheckPermissions();
