@@ -97,8 +97,10 @@ function sendPermissions(checkboxObj,isChecked) {
  */
 function displayRRP(response) {
 
-    $('.row').append('<div id="formdiv" class="form-inline"></div>');
-    $('#formdiv').append('<select id="displayRole" class="form-control"></select>');
+
+    $('.row').append('<div class="panel panel-default" style="width: 70%;"><div class="panel-heading" style="text-align: center;">ADMIN PANEL</div><div class="panel-body dashboard"></div></div>');
+    $('.dashboard').append('<div id="formdiv" class="form-inline"></div>');
+    $('#formdiv').append(' Role : <select id="displayRole" class="form-control"></select>');
     //Display roles
     $.each(response.role, function(role) {
         $('#displayRole').append($('<option>', {
@@ -109,7 +111,7 @@ function displayRRP(response) {
     });
 
     //Display resources
-    $('#formdiv').append('<select id="displayResources" class="form-control"></select>');
+    $('#formdiv').append(' Resource : <select id="displayResources" class="form-control"></select>');
     $.each(response.resource, function(res) {
         $('#displayResources').append($('<option>', {
 
@@ -119,9 +121,9 @@ function displayRRP(response) {
     });
 
     //Display permissions
-    $('#formdiv').append('<div id="checkboxdiv" class="form-control"></div>');
+    $('#formdiv').append(' Permissions : <div id="checkboxdiv" class="form-control"></div>');
     $.each(response.permission, function(per) {
-
+        $('#checkboxdiv').append('&nbsp;&nbsp;&nbsp;');
         $('<input />', { type: 'checkbox', id:per, class:'checkbox', value: response.permission[per].permission_id }).appendTo('#checkboxdiv');
         $('<label />', { 'for': per, text: response.permission[per].permission_name }).appendTo('#checkboxdiv');
     });
