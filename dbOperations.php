@@ -288,7 +288,12 @@ class DbOperations {
 
         $checkEmail = "SELECT * FROM employee WHERE employee.email =  '" . $email . "'";
         if ( isset($_SESSION['employeeId']) ) {
-            $checkEmail = $checkEmail . " AND employee.eid != " . $_SESSION['employeeId'];
+            
+            if ( $_SESSION['roleId'] == '2' ) {
+                $checkEmail = $checkEmail . "AND employee.eid != " . $_SESSION['userId'];
+            } else {
+                $checkEmail = $checkEmail . "AND employee.eid != " . $_SESSION['employeeId'];
+            }
         }
         $checkEmailPresent = $this->executeSql($checkEmail);
 

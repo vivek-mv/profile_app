@@ -23,7 +23,13 @@ Class CheckPermissions {
 
         //Get the user permissions and store in $_SESSION['userPermissions']
         $acl = new Acl();
-        $acl->getResourcePermission($_SESSION['roleId']);
+
+        if ( isset($_SESSION['roleId']) ) {
+            $acl->getResourcePermission($_SESSION['roleId']);
+        } else {
+            header("Location:index.php");
+        }
+
         
         if ( isset($_SESSION['userPermissions']) ) {
             foreach ($_SESSION['userPermissions'] as $userPermission) {

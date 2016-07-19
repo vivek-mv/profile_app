@@ -244,7 +244,13 @@
         $checkEmail = "SELECT * FROM employee WHERE employee.email =  '" . $email . "'";
 
         if ( isset($_SESSION['employeeId']) ) {
-            $checkEmail = $checkEmail . "AND employee.eid != " . $_SESSION['employeeId'];
+            
+            if ( $_SESSION['roleId'] == '2' ) {
+                $checkEmail = $checkEmail . "AND employee.eid != " . $_SESSION['userId'];
+            } else {
+                $checkEmail = $checkEmail . "AND employee.eid != " . $_SESSION['employeeId'];
+            }
+
         }
 
         $checkEmailPresent = $dbOperations->executeSql($checkEmail);
@@ -655,6 +661,10 @@
         if ( !($_SESSION['employeeId'] == $_GET["userId"]) && ($_SESSION['roleId'] != '2') ) {
             header('Location:index.php?message=2');
             exit();
+        }
+
+        if ( $_SESSION['roleId'] == '2' ) {
+            $_SESSION['userId'] = $_GET["userId"];
         }
 
         $details = $dbOperations->selectEmployee($_GET["userId"]);
