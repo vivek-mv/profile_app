@@ -4,52 +4,75 @@
     *which deletes the respective employee record
     *from the database.
     */
+
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
-    
-    //include db connection
-    require_once('db_conn.php');
+
+    session_start();
+    //Check for user's session
+    if ( !isset($_SESSION['employeeId']) ) {
+        header('Location:index.php?message=2');
+        exit();
+    }
+
     //include the constants file
     require_once('constants.php');
+
+    require_once('dbOperations.php');
+
+    require_once('logErrors.php');
+
+    require_once('header.php');
+
+    require_once('checkPermissions.php');
+
+    //Check for user permissions
+    $checkPermission = new CheckPermissions();
+    if ( !$checkPermission->isAllowed('details','view') && !$checkPermission->isAllowed('details','all') ) {
+        echo 'Sorry you are not authorised to access this page';
+        exit();
+    }
+    //Setup Navigation links
+    $header = new Header();
+    $header->setNavLinks('details.php', 'DETAILS', 'logout.php', 'LOG OUT');
     
     //Display error message if delete fails in the same page
     if ( isset($_GET["Message"]) && $_GET["Message"] == 1 ) {
 
-        echo "Sorry delete failed !, please try after some time ";
+        echo 'Sorry delete failed !, please try after some time';
     }
+    
+    //Create DbOperations object which handles all the database operations
+    $dbOperations = new DbOperations();
     
     //When user clicks the delete button in the details listing page
     if (isset($_GET["userAction"]) && $_GET["userAction"] == "delete") {
 
-        //Query to delete a row from the registration database with the respective employee id
-        $deleteAddress = "DELETE FROM address WHERE eid=" . $_GET["userId"] . ";";
-        $deleteCommMode = "DELETE FROM commMedium WHERE empId=" . $_GET["userId"] . ";";
-        $deleteEmployee = "DELETE FROM employee WHERE eid=" . $_GET["userId"] . ";";
-
-        //Select the employee image from the employee table and remove it from profile_pic dir.
-        $image ="SELECT employee.photo FROM employee WHERE eid=" . $_GET["userId"] . ";";
-        $delImage = mysqli_query($conn, $image) or 
-                    header("Location:details.php?Message=1");
-        $getImg = $delImage->fetch_assoc();
-        
-        if ( !empty($getImg["photo"])  && !unlink(APP_PATH . "/profile_pic/".$getImg["photo"]) ) {
-
-            header("Location:details.php?Message=1");
+        if ( !$checkPermission->isAllowed('details','delete') && !$checkPermission->isAllowed('details','all') ) {
+            echo 'Sorry you are not authorised to delete the data';
+            exit();
         }
 
-        //Delete employee address
-        mysqli_query($conn, $deleteAddress) or 
-            header("Location:details.php?Message=1");
-        //Delete employee communication medium
-        mysqli_query($conn, $deleteCommMode) or 
-            header("Location:details.php?Message=1");
-        //Delete employee details
-        mysqli_query($conn, $deleteEmployee) or 
-            header("Location:details.php?Message=1");
+        $deleteSuccess = $dbOperations->delete($_GET['userId']);
 
-        //If delete is successfull then redirect to the same page
-        header("Location:details.php");
-        exit();
+        if ( $deleteSuccess ) {
+
+            if ( $_SESSION['employeeId'] == $_GET['userId'] ) {
+
+                //If delete is successfull then redirect to the logout page
+                header("Location:logout.php");
+                exit();
+            } else {
+                header("Location:details.php");
+                exit();
+            }
+
+        } else {
+            //If delete fails 
+            header("Location:details.php?Message=1");
+            exit();
+        }
+        
     }
   
 ?>
@@ -60,63 +83,71 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <style>
+            .sort{
+                cursor: pointer;
+            }
+        </style>
     </head>
     <body>
+        <noscript>
+            This site uses javascript to serve its full functionality. Please enable javascript . Thank You :)
+        </noscript>
         <div class="container">
-            <nav class="navbar navbar-default">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" 
-                    aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="index.php">VIVEK</a>
-                </div>
-                <div id="navbar" class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a href="registration_form.php">SIGN UP</a>
-                        </li>
-                        <li><a href="#">LOG IN</a>
-                        </li>
-                        <li><a href="details.php">DETAILS</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+           <?php $header->renderHeader(); ?>
             <div class="row">
-                <div class="col-xs-11 col-sm-11 col-md-11 col-lg-11 ">
-                    <h2>Registered Employees</h2>
-              		<?php
-                        //Get the records of all the employees
-                        $selectEmpDetails = "SELECT employee.eid, employee.firstName, employee.middleName,
-                            employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline,
-                            employee.email, employee.maritalStatus, employee.employment, employee.employer,
-                            employee.photo, commMedium.empId, commMedium.msg, commMedium.email AS comm_email, 
-                            commMedium.call, commMedium.any, address.eid, address.type, address.street, address.city ,
-                            address.state, address.zip, address.fax FROM employee JOIN commMedium ON 
-                            employee.eid = commMedium.empId JOIN address ON  employee.eid = address.eid";
-                        
-                        $employeeDetails = mysqli_query($conn, $selectEmpDetails) or 
-                                   header("Location:registration_form.php?dbErr=1");
+                <div class="col-md-offset-8 col-md-4">
+                    <form>
+                        <div class="input-group">
+                            <input type="text" class="form-control getData" placeholder="Search by name or email ...">
+                            <span class="input-group-btn ">
+                                <button class="btn btn-default " type="submit">
+                                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <h2>Registered Employees</h2>
+                <?php
+                $employeeDetails = $dbOperations->selectAllEmployees();
 
-                        //When no data is present in the table,display message
-                        if ( $employeeDetails->num_rows == 0 ) {
+                if ( $employeeDetails === false ) {
 
-                            echo '<h1> Sorry ! Nothing to display </h1>';
-                            exit();
-                        }
-                    ?>
+                    // log the error to error logs file
+                    logError('Database error occured while fetching the details of all employees 
+                            in detailss.php ');
 
-                    <table class="table table-striped table-responsive">
+                    echo '<h1> Sorry your request could not be processed, please try after some time :( </h1>';
+                    exit();
+                }
+                //When no data is present in the table,display message
+                if ( $employeeDetails->num_rows == 0 ) {
+
+                    echo '<h1> Sorry ! Nothing to display </h1>';
+                    exit();
+                }
+                ?>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 table-responsive">
+                    <div id="noRecords" class="collapse"><h2>Sorry, No records found.</h2></div>
+                    <table class="table table-striped">
                         <thead>
                           <tr>
-                          	<th>Name</th>
+                            <th class="sort">
+                                Name
+                                <span class="glyphicon glyphicon-triangle-top"></span>
+                            </th>
                             <th>Gender</th>
                             <th>D.O.B</th>
                             <th>Phone</th>
-                            <th>Email</th>
+                            <th class="sort">
+                                Email
+                                <span class="glyphicon glyphicon-triangle-top"></span>
+                            </th>
                             <th>Marital Status</th>
                             <th>Employment </th>
                             <th>Comm. Mode</th>
@@ -127,98 +158,24 @@
                             <th>Delete</th>
                           </tr>
                         </thead>
-                        <tbody>
-            	    	<?php
-                            //Make employeeId = 0 ,so that if condition returns true for the first time.
-                            $employeeId = 0;
-                            //Fetch all the records and loop through them
-                            while ( $row = $employeeDetails->fetch_assoc() ) {
+                        <tbody id="tablebody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div id="showRowMsg" class="col-md-3"></div>
+                <div class="col-md-offset-5">
+                    <nav>
+                        <ul class="pagination appendBtn">
 
-                                if ( $employeeId != $row["empId"] ) {
-                                    echo "<tr>";
-                                    echo "<td>" . $row["firstName"] ." ". $row["middleName"] ." ". $row["lastName"] . "</td>";
-
-                                    if ( $row["gender"] == 'm' ) {
-                                        echo "<td>Male</td>";
-
-                                    } else if ( $row["gender"] == 'f' ) {
-                                        echo "<td>Female</td>";
-
-                                    } else {
-                                        echo "<td>Others</td>";
-                                    }
-                                    echo "<td>" . date_format( new DateTime( $row["dob"] ), 'd-m-Y' ) . "</td>";
-                                    echo "<td>" . $row["mobile"] . "(M)<br>" . $row["landline"] . "(L)</td>";
-                                    echo "<td>" . $row["email"] . "</td>";
-                                    echo "<td>" . ucfirst( $row["maritalStatus"] ) . "</td>";
-
-                                    if ( $row["employment"] == 'employed' ) {
-                                        echo "<td>" . ucfirst( $row["employment"] ) . " in " . ucfirst( $row["employer"] ) . "</td>";
-
-                                    } else {
-                                        echo "<td>" . ucfirst( $row["employment"] ) . "</td>";
-                                    }
-
-                                    echo "<td>";
-
-                                    if ( $row["msg"] == 1 ) {
-                                        echo "Message";
-                                    }
-
-                                    if ( $row["comm_email"] == 1 ) {
-                                        echo "<br>Email";
-                                    }
-
-                                    if ( $row["call"] == 1 ) {
-                                        echo "<br>Phone";
-                                    }
-
-                                    if ( $row["any"] == 1 ) {
-                                        echo "<br>Any";
-                                    }
-
-                                    echo "</td>";
-                                }
-
-                                //when address is residence
-                                if ( $row["type"] == 1 ) {
-                                    echo "<td>" . $row["street"] . "<br>" . $row["city"] . "," . $row["zip"] 
-                                    . "<br>" . $row["state"] . "</td>";
-                                }
-
-                                //when address is office
-                                if ( $row["type"] == 2 ) {
-                                    echo "<td>" . $row["street"] . "<br>" . $row["city"] . "," . $row["zip"] 
-                                    . "<br>" . $row["state"] . "</td>";
-                                    echo '<td>';
-
-                                    //Display photo only if photo is present
-                                    if( !empty($row["photo"]) ) {
-                                        echo '<img src="profile_pic/'.$row["photo"].'" alt="profile pic " 
-                                            height="150" width="150" >';
-                                    }
-
-                                    echo '</td>';
-                                    echo "<td><a href='registration_form.php?userId=" . $row["eid"] . "&userAction=update' target='_self' >
-                                        <span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></a></td>";
-
-                                    echo "<td><a href='details.php?userId=" . $row["eid"] . "&userAction=delete' target='_self' > 
-                                        <span class='glyphicon glyphicon-remove' aria-hidden='true'></span></a></td>";
-
-                                }
-
-                                if ( $employeeId == $row["eid"] ) {
-                                    echo "</tr>";
-                                }
-
-                                $employeeId = $row["empId"];
-                            }
-                        ?>
-        	            </tbody>
-        	        </table>
-              	</div>
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
+        <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+        <script type="text/javascript" src="js/search.js"></script>
     </body>
 </html>
 

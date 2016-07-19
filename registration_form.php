@@ -7,15 +7,22 @@
     //Enable error reporting
     ini_set('error_reporting', E_ALL);
 
-    //Include Database Connection
-    require_once('db_conn.php');
     //Include Constants file 
     require_once('constants.php');
 
+    //Include dbOperations file
+    require_once('dbOperations.php');
+
+    require_once('logErrors.php');
+
+    //dbOperations object 
+    $dbOperations = new DbOperations();
+
     /**
      * Checks whether the employee details
-     * are present or not
-     *
+     * are present or not,which is used for
+     * retaining the form field values in
+     * case of any errors
      * @access public
      * @param String 
      * @return Boolean
@@ -35,17 +42,43 @@
     //Start session to store the form fields
     session_start();
 
-    //Destroy the session variable if registration form is opened for the first time
-    if ( empty($_POST) && empty($_GET) ) {
-       
-        //Destroy the session 
-        session_unset();
-        session_destroy();
+    require_once('header.php');
+
+    //Setup Navigation links
+    $header = new Header();
+    $header->setNavLinks('registration_form.php', 'SIGN UP', 'login.php', 'LOG IN');
+
+    if ( isset($_SESSION['employeeId']) ) {
+
+        require_once('checkPermissions.php');
+        //Check for user permissions
+        $checkPermission = new CheckPermissions();
+        if ( !$checkPermission->isAllowed('update','view') && !$checkPermission->isAllowed('update','all') ) {
+            echo 'Sorry you are not authorised to access this page';
+            exit();
+        }
+
+        //Change Navigation links
+        $header->setNavLinks('details.php', 'DETAILS', 'logout.php', 'LOG OUT');
     }
 
     //Check for any error messages from details page
     if ( (isset($_SESSION['dbErr'] ) && $_SESSION['dbErr'] == 1) || (isset($_GET["dbErr"]) && $_GET["dbErr"] == 1 ) ) {
         echo "Sorry , something bad happened .Please try after some time." ;
+        session_unset();
+        session_destroy();
+    }
+
+    //Destroy the session variable if registration form is opened for the first time
+    if ( empty($_POST) && empty($_GET) && !empty($_SESSION) ) {
+       
+        //if loged in user is trying to access a fresh registration page
+        if ( isset($_SESSION['employeeId']) ) {
+            header('Location:index.php');
+            exit();
+        }
+
+        //Destroy any session that is present 
         session_unset();
         session_destroy();
     }
@@ -100,286 +133,393 @@
     //Validate the input fields only if the request method is POST
     if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 
+        //Include the validation file
+        require_once('validation.php');
+
         //Initialize error to check for any errors that occur during validation
         $error = 0;
         
-         /**
-         * Performs validation for the form input fields
-         *
-         * @access public
-         * @param String $data
-         * @return String
-         */
-        function getCorrectData($data) {
-
-            $data = trim($data);
-            $data = stripslashes($data);
-            $data = htmlspecialchars($data);
-            return $data;
-        }
-        
-        $prefix = getCorrectData($_POST["prefix"]);
+        $prefix = Validation::getCorrectData($_POST["prefix"]);
         $_SESSION["prefix"] = $prefix;
-        $firstName = getCorrectData($_POST["firstName"]);
+
+        if ( Validation::validateSelect($prefix,'prefix') ) {
+            $prefixErr = 'Please select a valid prefix';
+            $error++;
+        }
+
+        $firstName = Validation::getCorrectData($_POST["firstName"]);
         
-        if ( !preg_match("/^[a-zA-Z ]*$/", $firstName) ) {
+        if ( !Validation::validateText($firstName) ) {
             $firstnameErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($firstName) > 20 ) {
+        if ( Validation::validateLength($firstName, 20) ) {
             $firstnameErr = 'Only 20 characters allowed';
             $error++;
         }
+
+        if ( $firstName == '' ) {
+            $firstnameErr = 'This is a required field';
+            $error++;
+        }
         
-        $middleName = getCorrectData($_POST["middleName"]);
+        $middleName = Validation::getCorrectData($_POST["middleName"]);
         
-        if ( !preg_match("/^[a-zA-Z ]*$/", $middleName) ) {
+        if ( !Validation::validateText($middleName) ) {
             $middleNameErr = 'Only letters and white space allowed'; 
             $error++; 
         }
 
-        if ( strlen($middleName) > 20 ) {
+        if ( Validation::validateLength($middleName, 20) ) {
             $middleNameErr = 'Only 20 characters allowed';
             $error++;
         }
         
-        $lastName = getCorrectData($_POST["lastName"]);
+        $lastName = Validation::getCorrectData($_POST["lastName"]);
         
-        if ( !preg_match("/^[a-zA-Z ]*$/", $lastName) ) {
+        if ( !Validation::validateText($lastName) ) {
             $lastNameErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($lastName) > 20 ) {
+        if ( Validation::validateLength($lastName, 20) ) {
             $lastNameErr = 'Only 20 characters allowed';
             $error++;
         }
         
-        $gender = getCorrectData($_POST["gender"]);
+        $gender = Validation::getCorrectData($_POST["gender"]);
         $_SESSION["gender"] = $gender;
-        $dob = getCorrectData($_POST["dob"]);
+
+        if ( Validation::validateRadio($gender, 'gender') ) {
+            $genderErr = 'Please provide a valid gender';
+            $error++;
+        }
+
+        $dob = Validation::getCorrectData($_POST["dob"]);
+
+        if ( $dob !== '' && Validation::validateDob($dob) ) {
+            $dobErr = 'Please provide a valid DOB';
+            $error++;
+        }
+
         $_SESSION["dob"] = $dob;
-        $mobile = getCorrectData($_POST["mobile"]);
+        $mobile = Validation::getCorrectData($_POST["mobile"]);
         
-        if (!preg_match("/^[0-9]*$/", $mobile)) {
+        if ( Validation::validateNumber($mobile) ) {
             $mobileErr = 'Only numbers are allowed in the mobile field';
             $error++;
         }
 
-        if ( !empty($mobile) && strlen($mobile) != 10 ) {
-            $mobileErr = 'mobile number should be 10 digits';
+        if ( Validation::validatePhone($mobile) ) {
+            $mobileErr = 'Mobile number should be 10 digits';
             $error++;
         }
         
-        $landline = getCorrectData($_POST["landline"]);
+        $landline = Validation::getCorrectData($_POST["landline"]);
         
-        if ( !preg_match("/^[0-9]*$/", $landline) ) {
+        if ( Validation::validateNumber($landline) ) {
             $landlineErr = 'Only numbers are allowed in the landline field';
             $error++;
         }
 
-        if ( !empty($landline) && strlen($landline) != 10 ) {
-            $landlineErr = 'landline number should be 10 digits';
+        if ( Validation::validatePhone($landline) ) {
+            $landlineErr = 'Landline number should be 10 digits';
             $error++;
         }
         
-        $email = getCorrectData($_POST["email"]);
+        $email = Validation::getCorrectData($_POST["email"]);
         
-        if ( !filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+        if ( Validation::validateEmail($email) ) {
             $emailErr = 'Invalid email format';
             $error++;
-        }
+        }   
 
-        if ( strlen($email) > 50 ) {
+        if ( Validation::validateLength($email, 50) ) {
             $emailErr = 'Only 50 characters allowed';
             $error++;
         }
+
+        //Check if email id is already present or not
+        $checkEmail = "SELECT * FROM employee WHERE employee.email =  '" . $email . "'";
+
+        if ( isset($_SESSION['employeeId']) ) {
+            
+            if ( $_SESSION['roleId'] == '2' ) {
+                $checkEmail = $checkEmail . "AND employee.eid != " . $_SESSION['userId'];
+            } else {
+                $checkEmail = $checkEmail . "AND employee.eid != " . $_SESSION['employeeId'];
+            }
+
+        }
+
+        $checkEmailPresent = $dbOperations->executeSql($checkEmail);
+
+        if ( ($email != '') &&  (!$checkEmailPresent->num_rows == 0) ) {
+            $emailErr = "Email already present";
+            $error++;
+        }
+
+        if ( $email == '' ) {
+            $emailErr = 'This is a required field';
+            $error++;
+        }
+
+        $password = Validation::getCorrectData($_POST["password"]);
+        $confirmPassword = Validation::getCorrectData($_POST["confirmPassword"]);
+
+        if ( $password !== $confirmPassword ) {
+            $passwordErr = 'Please type same password twice';
+            $error++;
+        }
         
-        $maritalStatus = getCorrectData($_POST["maritalStatus"]);
+        if ( Validation::validatePassword($password) ) {
+            $passwordErr = 'Only letters and numbers allowed';
+            $error++;
+        }
+
+        if ( Validation::validateLength($password, 11) ) {
+            $passwordErr = 'Only 11 characters allowed';
+            $error++;
+        }
+
+        if ( $password == '' ) {
+            $passwordErr = 'This is a required field';
+            $error++;
+        }
+        
+        $maritalStatus = Validation::getCorrectData($_POST["maritalStatus"]);
 
         $_SESSION["maritalStatus"] = $maritalStatus;
 
-        $employment = getCorrectData($_POST["employment"]);
+        if ( Validation::validateRadio($maritalStatus, 'mStatus') ) {
+            $maritalStatusErr = 'Please provide valid data';
+            $error++;
+        }
+
+        $employment = Validation::getCorrectData($_POST["employment"]);
 
         $_SESSION["employment"] = $employment;
 
-        $employer = getCorrectData($_POST["employer"]);
+        if ( Validation::validateRadio($employment, 'employment') ) {
+            $employmentErr = 'Please provide valid data';
+            $error++;
+        }
+
+        $employer = Validation::getCorrectData($_POST["employer"]);
         
-        if ( !preg_match("/^[a-zA-Z ]*$/", $employer) ) {
+        if ( !Validation::validateText($employer) ) {
             $employerErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($employer) > 25 ) {
+        if ( Validation::validateLength($employer, 25) ) {
             $employerErr = 'Only 25 characters allowed';
             $error++;
         }
 
         //Set photo to empty string in case no image is provided by the user
         $photo="";
+        
+        //Get the size of post if its too lagre(large than the max. post size),than redirect to home page
+        $postSize = $_SERVER['CONTENT_LENGTH'];
 
         //If the user upload any file greater than 8 MB then redirect to index.php
-        if ( $_FILES['image']['error'] == 1) { 
+        if ( ($postSize > POST_SIZE) || ($_FILES['image']['error'] == 1) ) { 
             $imageErr = 1;
             header("Location:index.php?message=".$imageErr);
             exit();
         }
 
-        if( isset($_FILES['image']) && !empty($_FILES['image']['name']) && $_FILES['image']['size'] != 0 ){
-          $file_name = $_FILES['image']['name'];
-          $file_size = $_FILES['image']['size'];
-          $file_tmp = $_FILES['image']['tmp_name'];
-          $file_type = $_FILES['image']['type'];
-          $path_parts = pathinfo($_FILES['image']['name']);
-          $file_ext = strtolower( $path_parts['extension'] );
-          
-          $extensions = array("jpeg","jpg","png");
-          
-          if( in_array($file_ext,$extensions) === false ) {
-            $imageErr = 'extension not allowed, please choose a JPEG or PNG file.';
-            $error++;
-          }
-          
-          if ( $file_size > IMAGE_SIZE ) { 
-             $imageErr ='File size must be less than'.IMAGE_SIZE_MB;
-             $error++;
-          }
+        if ( isset($_FILES['image']) && !empty($_FILES['image']['name']) && $_FILES['image']['size'] != 0 ) {
+            $file_name = $_FILES['image']['name'];
+            $file_size = $_FILES['image']['size'];
+            $file_tmp = $_FILES['image']['tmp_name'];
+            $file_type = $_FILES['image']['type'];
+            $path_parts = pathinfo($_FILES['image']['name']);
+            $file_ext = strtolower( $path_parts['extension'] );
 
-          $photo = $file_name;
+            $extensions = array("jpeg","jpg","png");
+
+            if ( in_array($file_ext,$extensions) === false ) {
+                $imageErr = 'Extension not allowed, please choose a JPEG or PNG file.';
+                $error++;
+            }
+
+            if ( $file_size > IMAGE_SIZE ) {
+                $imageErr ='File size must be less than'.IMAGE_SIZE_MB;
+                $error++;
+            }
+
+            $photo = $file_name;
         }
         
-        $residenceStreet = getCorrectData($_POST["residenceStreet"]);
+        $residenceStreet = Validation::getCorrectData($_POST["residenceStreet"]);
 
-        if ( strlen($residenceStreet) > 50 ) {
+        if ( Validation::validateLength($residenceStreet, 50) ) {
             $residenceStreetErr = 'Only 50 characters allowed';
             $error++;
         }
-        $resedenceCity = getCorrectData($_POST["resedenceCity"]);
+        $resedenceCity = Validation::getCorrectData($_POST["resedenceCity"]);
         
-        if (!preg_match("/^[a-zA-Z ]*$/", $resedenceCity)) {
+        if ( !Validation::validateText($resedenceCity) ) {
             $residenceCityErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($resedenceCity) > 50 ) {
+        if ( Validation::validateLength($resedenceCity, 50) ) {
             $residenceCityErr = 'Only 50 characters allowed';
             $error++;
         }
         
-        $resedenceState = getCorrectData($_POST["residenceState"]);
+        $resedenceState = Validation::getCorrectData($_POST["residenceState"]);
         $_SESSION["residenceState"] = $resedenceState;
 
-        $residenceZip = getCorrectData($_POST["residenceZip"]);
+        if ( Validation::validateSelect($resedenceState, 'states', $states) ) {
+            $residenceStateErr = 'Please select valid state';
+            $error++;
+        }
+
+        $residenceZip = Validation::getCorrectData($_POST["residenceZip"]);
         
-        if (!preg_match("/^[0-9]*$/", $residenceZip)) {
+        if ( Validation::validateNumber($residenceZip) ) {
             $residenceZipErr = 'Only numbers are allowed';
             $error++;
         }
 
-        if ( !empty($residenceZip) && strlen($residenceZip) != 6 ) {
-            $residenceZipErr = 'zip number should be 6 digits';
+        if ( Validation::validateZip($residenceZip) ) {
+            $residenceZipErr = 'Zip number should be 6 digits';
             $error++;
         }
         
-        $residenceFax = getCorrectData($_POST["residenceFax"]);
+        $residenceFax = Validation::getCorrectData($_POST["residenceFax"]);
 
-        if (!preg_match("/^[0-9]*$/", $residenceFax)) {
+        if ( Validation::validateNumber($residenceFax) ) {
             $residenceFaxErr = 'Only numbers are allowed';
             $error++;
         }
 
-        if ( !empty($residenceFax) && strlen($residenceFax) > 15 ) {
+        if ( Validation::validateFax($residenceFax) ) {
             $residenceFaxErr = 'Fax should be less than 15 digits';
             $error++;
         }
 
-        $officeStreet = getCorrectData($_POST["officeStreet"]);
+        $officeStreet = Validation::getCorrectData($_POST["officeStreet"]);
 
-        if ( strlen($officeStreet) > 50 ) {
+        if ( Validation::validateLength($officeStreet, 50) ) {
             $officeStreetErr = 'Only 50 characters allowed';
             $error++;
         }
-        $officeCity = getCorrectData($_POST["officeCity"]);
+        $officeCity = Validation::getCorrectData($_POST["officeCity"]);
         
-        if (!preg_match("/^[a-zA-Z ]*$/", $officeCity)) {
+        if ( !Validation::validateText($officeCity) ) {
             $officeCityErr = 'Only letters and white space allowed';
             $error++;
         }
 
-        if ( strlen($officeCity) > 50 ) {
+        if ( Validation::validateLength($officeCity, 50) ) {
             $officeCityErr = 'Only 50 characters allowed';
             $error++;
         }
         
-        $officeState = getCorrectData($_POST["officeState"]);
+        $officeState = Validation::getCorrectData($_POST["officeState"]);
         $_SESSION["officeState"] = $officeState;
-        $officeZip = getCorrectData($_POST["officeZip"]);
+
+        if ( Validation::validateSelect($officeState, 'states', $states) ) {
+            $officeStateErr = 'Please select valid state';
+            $error++;
+        }
+
+        $officeZip = Validation::getCorrectData($_POST["officeZip"]);
         
-        if (!preg_match("/^[0-9]*$/", $officeZip)) {
+        if ( Validation::validateNumber($officeZip) ) {
             $officeZipErr = "Only numbers are allowed";
             $error++;
         }
 
-        if ( !empty($officeZip) && strlen($officeZip) != 6 ) {
-            $officeZipErr = 'zip number should be 6 digits';
+        if ( Validation::validateZip($officeZip) ) {
+            $officeZipErr = 'Zip number should be 6 digits';
             $error++;
         }
         
-        $officeFax = getCorrectData($_POST["officeFax"]);
+        $officeFax = Validation::getCorrectData($_POST["officeFax"]);
 
-        if (!preg_match("/^[0-9]*$/", $officeFax)) {
+        if ( Validation::validateNumber($officeFax) ) {
             $officeFaxErr = "Only numbers are allowed";
             $error++;
         }
 
-        if ( !empty($officeFax) && strlen($officeFax) > 15 ) {
+        if ( Validation::validateFax($officeFax) ) {
             $officeFaxErr = 'Fax should be less than 15 digits';
             $error++;
         }
-        $note = getCorrectData($_POST["note"]);
+        $note = Validation::getCorrectData($_POST["note"]);
 
-        if ( strlen($note) > 150 ) {
+        if ( Validation::validateLength($note, 150) ) {
             $noteErr = 'Only 150 characters allowed';
+            $error++;
+        }
+
+        if ( Validation::validateNote($note) ) {
+            $noteErr = 'Only these a-zA-Z0-9@#!*()\"\'& are allowed';
             $error++;
         }
 
         //Check for Communication Medium,if its empty then assign an empty array
         if( isset($_POST["commMed"]) ) {
            $commMedium = $_POST["commMed"];
-           $_SESSION["commMedium"] = $commMedium;  
+           $_SESSION["commMedium"] = $commMedium; 
+
+           if ( Validation::validateCheckbox($commMedium) ) {
+                $commMediumErr = 'Please provide a valid medium';
+                $error++;
+            } 
         }else{
-            $commMedium=array();
+            $commMedium = array();
         }
         
 
         //Insert the user data in the database if there are no errors.
         if( $error == 0 && $_POST["submit"] == "SUBMIT" ) {
-
             //Move the image to a specific folder
             move_uploaded_file($_FILES['image']['tmp_name'],APP_PATH."/profile_pic/".$_FILES['image']['name']);
-            //insert the employee details
-            $insertEmp = "INSERT INTO employee (`prefix`, `firstName`, `middleName`, `lastName`, `gender`, `dob`, `mobile`,
-                `landline`, `email`, `maritalStatus`, `employment`, `employer`, `photo`, `note`)
-                VALUES ('$prefix', '$firstName', '$middleName', '$lastName', '$gender', '$dob', '$mobile', '$landline',
-                '$email', '$maritalStatus' ,'$employment', '$employer', '$photo', '$note')";
+
+            //Array to store employee details
+            $empData = array( 'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
+                'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile, 'landline' => $landline,
+                'email' => $email, 'password' => md5($password), 'maritalStatus' => $maritalStatus, 'employment' => $employment,
+                'employer' => $employer, 'photo' => $photo, 'note' => $note);
+
+            //Insert the employee details and get the last insert id.
+            $empID = $dbOperations->insert('employee', $empData);
             
-            //Get the last insert id as empId to insert address and comm. medium
-            if ( $conn->query($insertEmp ) === TRUE ) {
-
-                $empID = $conn->insert_id;
-            } else {
+            if ( $empID === false ) {
                 $_SESSION['dbErr'] = 1;
+
+                // log the error to error logs file
+                logError('Database error occured while inserting the employee details,in 
+                    registration_form.php ');
+
                 header("Location:registration_form.php");
-                exit();
+                exit();    
             }
-            // insert residence and office address
-            $insertAdd = "INSERT INTO address (`eid`,`type`,`street`,`city`,`state`,`zip`,`fax`)
-                    VALUES ('$empID','1','$residenceStreet','$resedenceCity','$resedenceState','$residenceZip',
-                    '$residenceFax') , ('$empID','2','$officeStreet','$officeCity','$officeState','$officeZip','$officeFax')";
 
-            if ( !$conn->query($insertAdd) ) {
+            //Array to store employye address
+            $empAddressData = array( 'employeeId' => $empID, 'residenceStreet' => $residenceStreet, 'resedenceCity' => $resedenceCity,
+                'resedenceState' => $resedenceState, 'residenceZip' => $residenceZip, 'residenceFax' => $residenceFax,
+                'officeStreet' => $officeStreet, 'officeCity' => $officeCity, 'officeState' => $officeState, 'officeZip' => $officeZip,
+                'officeFax' => $officeFax );
+             
+            //Insert the address
+            $address = $dbOperations->insert('address', $empAddressData, $empID);
+
+            if ( !$address ) {
                 $_SESSION['dbErr'] = 1;
+
+                // log the error to error logs file
+                logError('Database error occured while inserting the employee address ,in 
+                    registration_form.php ');
+
                 header("Location:registration_form.php");
                 exit();
             }
@@ -389,11 +529,19 @@
             $comEmail = in_array("mail", $commMedium) ? 1 : 0;
             $call = in_array("phone", $commMedium) ? 1 : 0;
             $any = in_array("any", $commMedium) ? 1 : 0;
-            $insertCommMedium = "INSERT INTO commMedium (`empId`,`msg`,`email`,`call`,`any`)
-                VALUES ('$empID','$msg','$comEmail','$call','$any')";
+
+            //Array to store employee communication medium
+            $commMediumData = array( 'employeeId' => $empID, 'message' => $msg, 'comEmail' => $comEmail,
+                'call' => $call, 'any' => $any );
             
-            if ( !$conn->query($insertCommMedium) ) {
+            $commMedium = $dbOperations->insert('commMedium', $commMediumData, $empID);
+            if ( !$commMedium ) {
                 $_SESSION['dbErr'] = 1;
+
+                // log the error to error logs file
+                logError('Database error occured while inserting the employee comm. medium,in 
+                    registration_form.php ');
+                
                 header("Location:registration_form.php");
                 exit();
             }
@@ -402,19 +550,24 @@
             session_unset();
             session_destroy();
 
-            //If successfully inserted ,then redirect to index page
-            header("Location:index.php?message=register");
+            //If successfully inserted ,then display the success message
+            $message = 'registerSuccess';
         }
 
         //If there are no errors and submit name is update
-        if( $error == 0 && $_POST["submit"]=="UPDATE" ) {
+        if( $error == 0 && $_POST["submit"] == "UPDATE" ) {
+
+            if ( !$checkPermission->isAllowed('update','edit') && !$checkPermission->isAllowed('update','all') ) {
+                echo 'Sorry you are not authorised to update the data';
+                exit();
+            }
 
             if( isset($_FILES['image']) && !empty($_FILES['image']['name']) && $_FILES['image']['size'] != 0) {
                 move_uploaded_file($_FILES['image']['tmp_name'],APP_PATH ."/profile_pic/".$_FILES['image']['name']);
 
                 $image ="SELECT employee.photo FROM employee WHERE eid=" . $_GET["userId"] . ";";
 
-                $result = mysqli_query($conn, $image) or 
+                $result = $dbOperations->executeSql($image) or 
                 header("Location:details.php?Message=1");
 
                 $row = $result->fetch_assoc();
@@ -424,17 +577,29 @@
                 }
             }
 
-            //Update residence address
-            $updateResidenceAdd = "UPDATE address SET street = '" . $residenceStreet . "', city ='" . $resedenceCity . "',
-            state = '" . $resedenceState . "' , zip = '" . $residenceZip . "', fax = '" .$residenceFax .
-            "' where eid = " . $_GET["userId"] . " && type = 1";
-            $conn->query($updateResidenceAdd) or header("Location:registration_form.php?dbErr=1");
+            $updateResidenceData = array( 'rstreet' => $residenceStreet, 'rcity' => $resedenceCity,
+                'rstate' => $resedenceState, 'rzip' => $residenceZip, 'rfax' => $residenceFax);
+
+            if ( !$dbOperations->update('address', $updateResidenceData, $_GET["userId"], 1) ) {
+
+                // log the error to error logs file
+                logError('Database error occured while updating the employee residence address ,
+                    in registration_form.php ');
+
+                header("Location:registration_form.php?dbErr=1");
+            } 
             
-            //Update office address
-            $updateOfficeAdd = "UPDATE address SET street = '" . $officeStreet . "', city ='" . $officeCity . "',
-                            state = '" . $officeState . "' , zip = '" . $officeZip . "', fax = '" . $officeFax .
-                            "' where eid = " . $_GET["userId"] . " && type = 2";
-            $conn->query($updateOfficeAdd) or header("Location:registration_form.php?dbErr=1");
+            $updateOfficeData = array( 'ostreet' => $officeStreet, 'ocity' => $officeCity,
+                'ostate' => $officeState, 'ozip' => $officeZip, 'ofax' => $officeFax);
+            
+            if ( !$dbOperations->update('address', $updateOfficeData, $_GET["userId"], 2) ) {
+
+                // log the error to error logs file
+                logError('Database error occured while updating the employee office address ,
+                    in registration_form.php ');
+
+                header("Location:registration_form.php?dbErr=1");
+            }
             
             // Update communication medium
             $msg = in_array("msg", $commMedium) ? 1 : 0;
@@ -442,9 +607,17 @@
             $call = in_array("phone", $commMedium) ? 1 : 0;
             $any = in_array("any", $commMedium) ? 1 : 0;
             
-            $updateCommMedium = "UPDATE commMedium SET msg ='" . $msg . "' , email ='" . $comEmail . "',
-                `call` ='" . $call . "' , any ='" . $any . "' where empId =" . $_GET["userId"];
-            $conn->query($updateCommMedium) or header("Location:registration_form.php?dbErr=1");
+            $updateCommMedium = array( 'msg' => $msg, 'email' => $comEmail, 'call' => $call,
+                'any' => $any );
+                
+            if ( !$dbOperations->update('commMedium', $updateCommMedium, $_GET["userId"] ) ) {
+
+                // log the error to error logs file
+                logError('Database error occured while updating the employee comm. medium details 
+                    in registration_form.php ');
+
+                header("Location:registration_form.php?dbErr=1");
+            }
             
             //If photo is empty then dont update photo
             if( empty($photo) ) {
@@ -452,52 +625,84 @@
             }else {
                 $insertImage = ", photo = '".$photo."'";
             }
-            //update employee details
-            $updateEmpDetails = "UPDATE employee SET prefix = '" . $prefix . "' , firstName = '" . $firstName . "' , 
-                middleName = '" . $middleName . "' , lastName = '" . $lastName . "' ,  gender = '" . $gender .
-                "' , dob = '" . $dob . "' , mobile = '" . $mobile . "' , landline='" . $landline . "', email ='" 
-                . $email . "', maritalStatus= '" . $maritalStatus . "' ,employment = '" . $employment . "' ,
-                employer='" . $employer ."'".$insertImage . ",note= '" . $note . "' where eid = " 
-                . $_GET["userId"];
-                
-            $conn->query($updateEmpDetails) or header("Location:registration_form.php?dbErr=1");
-            
-            //Destroy the session 
-            session_unset();
-            session_destroy();
 
+            $updateEmpDetails = array(
+                'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
+                'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile,
+                'landline' => $landline, 'email' => $email, 'password' => md5($password),
+                'maritalStatus' => $maritalStatus, 'employment' => $employment, 'employer' => $employer,
+                'insertImage' => $insertImage, 'note' => $note
+            );
+                
+            if ( !$dbOperations->update('employee', $updateEmpDetails, $_GET["userId"] ) ) {
+
+                // log the error to error logs file
+                logError('Database error occured while updating the employee details 
+                    in registration_form.php ');
+
+                header("Location:registration_form.php?dbErr=1");
+            }
+            
             //If update is successfull then redirect to index page
             header("Location:index.php?message=update");
         }
     }
 
-    //When user clicks the update button in the details page,then this code is executed
+    //When user clicks the update button in the details page
     if ( isset($_GET["userId"]) && isset($_GET["userAction"]) ) {
-        $selectEmpDetails = "SELECT employee.eid, employee.prefix, employee.firstName, employee.middleName, 
-            employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline, employee.email,
-            employee.maritalStatus, employee.employment, employee.employer, employee.note, employee.photo,
-            commMedium.empId, commMedium.msg, commMedium.email AS comm_email, commMedium.call , commMedium.any 
-            FROM employee JOIN commMedium ON employee.eid = commMedium.empId WHERE eid =" . $_GET["userId"];
 
-        $residenceAddress = "SELECT address.eid , address.type , address.street , address.city ,
-            address.state , address.zip , address.fax FROM address
-            WHERE address.eid =" . $_GET["userId"] . " AND address.type = 1";
+        //Check for user's session
+        if ( !isset($_SESSION['employeeId']) ) {
+            header('Location:index.php?message=2');
+            exit();
+        }
 
-        $officeAddress = "SELECT address.eid , address.type , address.street , address.city ,
-            address.state , address.zip , address.fax FROM address
-            WHERE address.eid =" . $_GET["userId"] . " AND address.type = 2";
+        //Check if the user is trying to access other accounts
+        if ( !($_SESSION['employeeId'] == $_GET["userId"]) && ($_SESSION['roleId'] != '2') ) {
+            header('Location:index.php?message=2');
+            exit();
+        }
 
-        $result1 = mysqli_query($conn, $selectEmpDetails) or 
+        if ( $_SESSION['roleId'] == '2' ) {
+            $_SESSION['userId'] = $_GET["userId"];
+        }
+
+        $details = $dbOperations->selectEmployee($_GET["userId"]);
+        if ( $details === false ) {
+
+            // log the error to error logs file
+            logError('Database error occured while getting the employee details (when user clicks the edit btn 
+                on the details page),in registration_form.php ');
+            
             header("Location:registration_form.php?dbErr=1");
-        $empDetails = $result1->fetch_assoc();
+            exit();
+        }
+        $empDetails = $details->fetch_assoc();
         
-        $result2 = mysqli_query($conn, $residenceAddress) or 
-            header("Location:registration_form.php?dbErr=1");
-        $empResidence = $result2->fetch_assoc();
+        $residence = $dbOperations->selectEmployee($_GET["userId"], 1);
+        if ( $residence === false ) {
 
-        $result3 = mysqli_query($conn, $officeAddress) or 
+
+            // log the error to error logs file
+            logError('Database error occured while getting the employee residence details (when user clicks the edit btn 
+                on the details page),in registration_form.php ');
+
             header("Location:registration_form.php?dbErr=1");
-        $empOffice = $result3->fetch_assoc();
+            exit();
+        }
+        $empResidence = $residence->fetch_assoc();
+
+        $office = $dbOperations->selectEmployee($_GET["userId"], 2);
+        if ( $office === false ) {
+
+            // log the error to error logs file
+            logError('Database error occured while getting the employee office details (when user clicks the edit btn 
+                on the details page),in registration_form.php ');
+
+            header("Location:registration_form.php?dbErr=1");
+            exit();
+        }
+        $empOffice = $office->fetch_assoc();
 
         //set the image name into a session variable,so that image keeps showing if the update fails due to error
         $_SESSION['photo'] = $empDetails['photo'];      
@@ -515,32 +720,22 @@
             .error{
                 color: red;
             }
+            .required-field{
+                color: red;
+            }
         </style>
     </head>
     <body>
-        <nav class="navbar navbar-default">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" 
-                        aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="index.php">VIVEK</a>
-                </div>
-                <div id="navbar" class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a href="registration_form.php">SIGN UP</a></li>
-                        <li><a href="#">LOG IN</a></li>
-                        <li><a href="details.php">DETAILS</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        <noscript>
+            This site uses javascript to serve its full functionality. Please enable javascript . Thank You :)
+        </noscript>
+       <?php $header->renderHeader(); ?>
         <div class="container">
-        <h1><?php 
+            <?php if ( isset($message) && $message === 'registerSuccess' ) { ?>
+                  <h2>Successfully Registered</h2>
+            <?php exit(); } ?>
+        <h1>
+            <?php
                 if( (isset($_GET['userAction']) && $_GET['userAction']=='update') 
                     || ( isset($_GET["userId"]) && $_GET["userId"] > 0) ) {
                     echo "Please edit your data";
@@ -549,8 +744,8 @@
                 }
             ?>
         </h1>
-        <form action=<?php echo $form_action; ?> method="post" role="form" class="form-horizontal" 
-            enctype="multipart/form-data">
+        <form id="form" action=<?php echo $form_action; ?> method="post" role="form" class="form-horizontal"
+            enctype="multipart/form-data" onsubmit=" checkRequired();return validation.noError;">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                     <fieldset>
@@ -560,6 +755,13 @@
                             <div class="form-group">
                                 <label class="col-md-3 control-label" for="selectbasic1">Prefix</label>
                                 <div class="col-md-7">
+                                    <span class="error"> 
+                                    <?php 
+                                        if( !empty($prefixErr) ) {
+                                            echo "*".$prefixErr;
+                                        }
+                                    ?>
+                                    </span>
                                     <select id="selectbasic1" name="prefix" class="form-control" >
                                         <option value="mr" 
                                         <?php 
@@ -584,7 +786,10 @@
                             </div>
                             <!-- Input field for first name -->
                             <div class="form-group">
-                                <label class="col-md-3 control-label" for="firstName">First Name</label>  
+                                <label class="col-md-3 control-label" for="firstName">
+                                    First Name
+                                    <span class="required-field">*</span>
+                                </label>
                                 <div class="col-md-7">
                                     <span class="error"> 
                                     <?php 
@@ -593,7 +798,8 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="firstName" type="text" placeholder="First Name" class="form-control input-md" 
+                                    <input  id="firstName" name="firstName" type="text" placeholder="First Name" 
+                                        class="form-control input-md text_input required" 
                                     <?php
 
                                         if( isset($empDetails["firstName"]) ) {
@@ -604,7 +810,7 @@
                                             echo 'value="'.$firstName.'"';
                                         }
                                     ?> 
-                                    required >
+                                    >
                                 </div>
                             </div>
                             <!-- Input field for middle name -->
@@ -618,7 +824,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="middleName" type="text" placeholder="Middle Name" class="form-control input-md"
+                                    <input  name="middleName" type="text" placeholder="Middle Name" class="form-control input-md text_input"
                                     <?php
                                         if( isset($empDetails["middleName"]) ) {
                                             echo 'value="'.$empDetails["middleName"].'"';
@@ -641,7 +847,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="lastName" type="text" placeholder="Last Name" class="form-control input-md" 
+                                    <input  name="lastName" type="text" placeholder="Last Name" class="form-control input-md text_input" 
                                     <?php
                                         if( isset($empDetails["lastName"]) ) {
                                             echo 'value="'.$empDetails["lastName"].'"';
@@ -655,6 +861,13 @@
                             </div>
                             <!-- Radio button for gender -->
                             <div class="form-group">
+                                <span class="error"> 
+                                <?php
+                                    if( !empty($genderErr) ) {
+                                        echo "*".$genderErr;
+                                    }
+                                ?>
+                                </span>
                                 <label class="col-md-3 control-label" for="gender">Gender</label>
                                 <div class="col-md-7"> 
                                     <label class="radio-inline">
@@ -689,9 +902,16 @@
                             <div class="form-group">
                                 <label class="col-md-3 control-label" for="datepicker">D.O.B</label>  
                                 <div class="col-md-7">
+                                    <span class="error">
+                                    <?php
+                                    if( !empty($dobErr) ) {
+                                        echo "*".$dobErr;
+                                    }
+                                    ?>
+                                    </span>
                                     <input name="dob" type="date" placeholder="D.O.B" class="form-control input-md" 
                                     <?php
-                                        if( isset($empDetails["dob"]) ) { 
+                                        if( isset($empDetails["dob"]) ) {
                                             echo 'value="'.$empDetails["dob"].'"'; 
                                         }
                                         else if ( !empty($_SESSION["dob"]) ) {
@@ -712,7 +932,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="mobile" type="text" placeholder="9999-9999-9999" class="form-control input-md"
+                                    <input  name="mobile" type="text" placeholder="9999-9999-9999" class="form-control input-md numbers"
                                     <?php 
                                         if( isset($empDetails["mobile"]) ) {
                                             echo 'value="'.$empDetails["mobile"].'"';
@@ -735,7 +955,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="landline" type="text" placeholder="9999-9999999" class="form-control input-md"
+                                    <input  name="landline" type="text" placeholder="9999-99999999" class="form-control input-md numbers"
                                     <?php
                                         if( isset($empDetails["landline"]) ) {
                                             echo 'value="'.$empDetails["landline"].'"';
@@ -749,7 +969,10 @@
                             </div>
                             <!-- Input field for email -->
                             <div class="form-group">
-                                <label class="col-md-3 control-label" for="firstName">Email</label>  
+                                <label class="col-md-3 control-label" for="firstName">
+                                    Email
+                                    <span class="required-field">*</span>
+                                </label>
                                 <div class="col-md-7">
                                     <span class="error">
                                     <?php 
@@ -758,7 +981,8 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="email" type="email" placeholder="example@mail.com" class="form-control input-md"
+                                    <input  id="email" name="email" type="email" placeholder="example@mail.com" 
+                                        class="form-control input-md email required"
                                     <?php 
                                         if( isset($empDetails["email"]) ) {
                                             echo 'value="'.$empDetails["email"].'"';
@@ -767,11 +991,43 @@
                                             echo 'value="'.$email.'"';
                                         }
                                     ?>
-                                    required >
+                                    >
+                                </div>
+                            </div>
+                            <!-- Input field for password -->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" for="password">
+                                    Password
+                                    <span class="required-field">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <span class="error"> 
+                                    <?php 
+                                        if( !empty($passwordErr) ) {
+                                            echo "*".$passwordErr;
+                                        }
+                                    ?>
+                                    </span>
+                                    <input id="password" name="password" type="password" placeholder="Password" 
+                                        class="form-control input-md password required">
+                                </div>
+                            </div>
+                            <!-- Input field for confirm password -->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" for="password">Confirm Password</label>  
+                                <div class="col-md-7">
+                                    <input  name="confirmPassword" type="password" placeholder="Password" class="form-control input-md password">
                                 </div>
                             </div>
                             <!-- Radio button for marital status -->
                             <div class="form-group">
+                                <span class="error"> 
+                                <?php 
+                                    if( !empty($maritalStatusErr) ) {
+                                        echo "*".$maritalStatusErr;
+                                    }
+                                ?>
+                                </span>
                                 <label class="col-md-3 control-label" for="m_status">Marital Status</label>
                                 <div class="col-md-7"> 
                                     <label class="radio-inline">
@@ -793,6 +1049,13 @@
                             </div>
                             <!-- Radio button for employment -->
                             <div class="form-group">
+                                <span class="error"> 
+                                <?php
+                                    if( !empty($employmentErr) ) {
+                                        echo "*".$employmentErr;
+                                    }
+                                ?>
+                                </span>
                                 <label class="col-md-3 control-label" for="employment">Employment</label>
                                 <div class="col-md-7"> 
                                     <label class="radio-inline">
@@ -823,7 +1086,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="employer" type="text" placeholder="Employer" class="form-control input-md"
+                                    <input  name="employer" type="text" placeholder="Employer" class="form-control input-md text_input"
                                     <?php
                                         if( isset($empDetails["employer"]) ) {
                                             echo 'value="'.$empDetails["employer"].'"';
@@ -878,7 +1141,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="residenceStreet" type="text" placeholder="Street" class="form-control input-md"
+                                    <input  name="residenceStreet" type="text" placeholder="Street" class="form-control input-md street"
                                     <?php
                                         if( isset($empResidence["street"]) ) {
                                             echo 'value="'.$empResidence["street"].'"';
@@ -901,7 +1164,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="resedenceCity" type="text" placeholder="City" class="form-control input-md"
+                                    <input  name="resedenceCity" type="text" placeholder="City" class="form-control input-md text_input"
                                     <?php
                                         if( isset($empResidence["city"]) ) {
                                             echo 'value="'.$empResidence["city"].'"';
@@ -917,6 +1180,13 @@
                             <div class="form-group">
                                 <label class="col-md-3 control-label" >State</label>
                                 <div class="col-md-7">
+                                    <span class="error"> 
+                                    <?php
+                                        if( !empty($residenceStateErr) ) {
+                                            echo "*".$residenceStateErr;
+                                        }
+                                    ?>
+                                    </span>
                                     <select name="residenceState" class="form-control">
                                         <option value="">Select State</option>
                                         <?php
@@ -943,7 +1213,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input name="residenceZip" type="text" placeholder="Zip" class="form-control input-md"
+                                    <input name="residenceZip" type="text" placeholder="Zip" class="form-control input-md numbers"
                                     <?php 
                                         if( isset($empResidence["zip"]) ) {
                                             echo 'value="'.$empResidence["zip"].'"';
@@ -966,7 +1236,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input name="residenceFax" type="text" placeholder="Fax" class="form-control input-md"
+                                    <input name="residenceFax" type="text" placeholder="Fax" class="form-control input-md numbers"
                                     <?php
                                         if( isset($empResidence["fax"]) ) {
                                             echo 'value="'.$empResidence["fax"].'"';
@@ -993,7 +1263,8 @@
                                             echo "*".$officeStreetErr;
                                         }
                                     ?>
-                                    <input  name="officeStreet" type="text" placeholder="Street" class="form-control input-md"
+                                    </span>
+                                    <input  name="officeStreet" type="text" placeholder="Street" class="form-control input-md street"
                                     <?php 
                                         if( isset($empOffice["street"]) ) {
                                             echo 'value="'.$empOffice["street"].'"';
@@ -1016,7 +1287,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input  name="officeCity" type="text" placeholder="City" class="form-control input-md"
+                                    <input  name="officeCity" type="text" placeholder="City" class="form-control input-md text_input"
                                     <?php 
                                         if( isset($empOffice["city"]) ) {
                                             echo 'value="'.$empOffice["city"].'"';
@@ -1032,6 +1303,13 @@
                             <div class="form-group">
                                 <label class="col-md-3 control-label" >State</label>
                                 <div class="col-md-7">
+                                    <span class="error"> 
+                                    <?php
+                                        if( !empty($officeStateErr) ) {
+                                            echo "*".$officeStateErr;
+                                        }
+                                    ?>
+                                    </span>
                                     <select name="officeState" class="form-control">
                                         <option value="">Select State</option>
                                         <?php
@@ -1058,7 +1336,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input name="officeZip" type="text" placeholder="Zip" class="form-control input-md"
+                                    <input name="officeZip" type="text" placeholder="Zip" class="form-control input-md numbers"
                                     <?php
                                         if( isset($empOffice["zip"]) ) {
                                             echo 'value="'.$empOffice["zip"].'"';
@@ -1081,7 +1359,7 @@
                                         }
                                     ?>
                                     </span>
-                                    <input name="officeFax" type="text" placeholder="Fax" class="form-control input-md"
+                                    <input name="officeFax" type="text" placeholder="Fax" class="form-control input-md numbers"
                                     <?php
                                         if( isset($empOffice["fax"]) ) {
                                             echo 'value="'.$empOffice["fax"].'"';
@@ -1115,15 +1393,15 @@
                                                 }
                                             ?>
                                             </span>                     
-                                            <textarea class="form-control" id="note" name="note" rows="3">
-                                            <?php
-                                                if( isset($empDetails["note"]) ) {
+                                            <textarea class="form-control note" id="note" name="note" 
+                                                rows="3">
+                                                <?php if( isset($empDetails["note"]) ) {
                                                     echo $empDetails["note"];
                                                 } 
                                                 if( isset($note) ) {
                                                     echo $note;
                                                 }
-                                            ?>
+                                                ?>
                                             </textarea>
                                         </div>
                                     </div>
@@ -1134,6 +1412,13 @@
                                             <label>Communication medium:</label>
                                         </div>
                                         <div class="col-xs-9 col-sm-8 col-md-8 col-lg-8 col-md-offset-2 col-lg-offset-2">
+                                            <div class="error"> 
+                                            <?php
+                                                if( !empty($commMediumErr) ) {
+                                                    echo "*".$commMediumErr;
+                                                }
+                                            ?>
+                                            </div>
                                             <div class="checkbox-inline">
                                                 <input type="checkbox" id="mail" name="commMed[]" value="mail"
                                                 <?php
@@ -1195,17 +1480,24 @@
                         if( (isset($_GET['userAction']) && $_GET['userAction']=='update') 
                             || ( isset($_GET["userId"]) && $_GET["userId"] > 0) ) {
 
-                            echo 'UPDATE'; 
+                            if ( $checkPermission->isAllowed('update','edit')||
+                                $checkPermission->isAllowed('update','all') ) {
+                                echo 'UPDATE';
+                            } else {
+
+                                echo '" " style="display: none;"';
+                            }
+
                         } else {
                             echo 'SUBMIT';
                         }
                         ?>
                         class="btn btn-primary"> &nbsp;  &nbsp;  &nbsp;
-                    <input type= 
+                    <input id="reset" type=
                     <?php 
                        if( (isset($_GET['userAction']) && $_GET['userAction']=='update') 
                             || ( isset($_GET["userId"]) && $_GET["userId"] > 0) ) {
-                            
+
                             echo 'hidden'; } else {echo 'reset';
                         }
                         ?>
@@ -1213,5 +1505,11 @@
                 </div>
         </form>
         </div>
+        <script src="https://code.jquery.com/jquery-3.0.0.min.js" 
+            integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=" 
+            crossorigin="anonymous">
+        </script>
+        <script type="text/javascript" src="js/constants.js?a=5"></script>
+        <script type="text/javascript" src="js/validate.js?a=17"></script>
     </body>
-    <html>
+    </html>

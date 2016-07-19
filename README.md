@@ -10,3 +10,5 @@ This is an employee registration app in which new employee can be registered and
 
 4 &nbsp;  Create a new folder named profile_pic in the root dir. of the application, it is used to store the images of the registered employees.
 
+5 &nbsp;  Create a new folder named logs,and inside that create a log.txt file. Keep that folder outside of  the root dir. of the application, it is used to store the error logs for the application. And then provide the path of the log.txt in the constants.php file.
+
