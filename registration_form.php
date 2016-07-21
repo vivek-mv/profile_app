@@ -318,6 +318,12 @@
             $error++;
         }
 
+        $stackUserId = Validation::getCorrectData($_POST["stackUserId"]);
+
+        if ( Validation::validateNumber($stackUserId) ) {
+            $stackUserIdErr = 'Only numbers are allowed ';
+            $error++;
+        }
         //Set photo to empty string in case no image is provided by the user
         $photo="";
         
@@ -488,7 +494,7 @@
             $empData = array( 'prefix' => $prefix, 'firstName' => $firstName, 'middleName' => $middleName,
                 'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile, 'landline' => $landline,
                 'email' => $email, 'password' => md5($password), 'maritalStatus' => $maritalStatus, 'employment' => $employment,
-                'employer' => $employer, 'photo' => $photo, 'note' => $note);
+                'employer' => $employer,'stackUserId' => $stackUserId, 'photo' => $photo, 'note' => $note);
 
             //Insert the employee details and get the last insert id.
             $empID = $dbOperations->insert('employee', $empData);
@@ -631,7 +637,7 @@
                 'lastName' => $lastName, 'gender' => $gender, 'dob' => $dob, 'mobile' => $mobile,
                 'landline' => $landline, 'email' => $email, 'password' => md5($password),
                 'maritalStatus' => $maritalStatus, 'employment' => $employment, 'employer' => $employer,
-                'insertImage' => $insertImage, 'note' => $note
+                'insertImage' => $insertImage,'stackUserId' => $stackUserId, 'note' => $note
             );
                 
             if ( !$dbOperations->update('employee', $updateEmpDetails, $_GET["userId"] ) ) {
@@ -1095,6 +1101,30 @@
                                             echo 'value='.$employer;
                                         }
                                     ?>
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Input field for stackoverflow user id -->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" for="employer">StackoverflowId</label>
+                                <div class="col-md-7">
+                                    <span class="error">
+                                    <?php
+                                    if( !empty($stackUserId) ) {
+                                        echo "*".$stackUserIdErr;
+                                    }
+                                    ?>
+                                    </span>
+                                    <input  name="stackUserId" type="text" placeholder="Stackoverflow UserId" class="form-control input-md "
+                                        <?php
+                                        if( isset($empDetails["stackId"]) ) {
+                                            echo 'value="'.$empDetails["stackId"].'"';
+                                        }
+                                        if( isset($stackUserId) ) {
+                                            echo 'value='.$stackUserId;
+                                        }
+                                        ?>
                                     >
                                 </div>
                             </div>

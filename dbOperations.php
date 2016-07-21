@@ -132,7 +132,7 @@ class DbOperations {
                 "SELECT employee.eid, employee.prefix, employee.firstName, employee.middleName,
                         employee.lastName, employee.gender, employee.dob, employee.mobile,
                         employee.landline, employee.email, employee.password, employee.maritalStatus,
-                        employee.employment, employee.employer, employee.note, employee.photo, commMedium.empId, 
+                        employee.employment, employee.employer, employee.note, employee.photo,employee.stackId, commMedium.empId, 
                         commMedium.msg, commMedium.email AS comm_email, commMedium.call, commMedium.any
                 FROM employee
                 JOIN commMedium ON employee.eid = commMedium.empId
@@ -169,11 +169,11 @@ class DbOperations {
         if ( $tableName == 'employee' && $employeeId === 0 ) {
             $insertEmp = "
                 INSERT INTO employee (`prefix`, `firstName`, `middleName`, `lastName`, `gender`,
-                `dob`, `mobile`,`landline`, `email`, `password`, `maritalStatus`, `employment`, `employer`, `photo`, `note`)
+                `dob`, `mobile`,`landline`, `email`, `password`, `maritalStatus`, `employment`, `employer`, `photo`, `note`,`stackId`)
                 VALUES ('".$data['prefix']."', '".$data['firstName']."', '".$data['middleName']."',
                 '".$data['lastName']."', '".$data['gender']."', '".$data['dob']."', '".$data['mobile']."',
                 '".$data['landline']."','".$data['email']."','".$data['password']."', '".$data['maritalStatus']."' ,
-                '".$data['employment']."', '".$data['employer']."','".$data['photo']."', '".$data['note']."')";
+                '".$data['employment']."', '".$data['employer']."','".$data['photo']."', '".$data['note']."','".$data['stackUserId']."')";
             
             $insertEmployee = $this->executeSql($insertEmp);
             if ( $insertEmployee ) {
@@ -271,7 +271,7 @@ class DbOperations {
                 mobile = '" . $data['mobile'] . "' , landline='" . $data['landline'] . "', email ='" 
                 . $data['email'] . "', password = '" . $data['password'] . "' , maritalStatus= '" . 
                 $data['maritalStatus'] . "' ,employment = '" .$data['employment'] . "' ,employer='" .
-                $data['employer'] ."'".$data['insertImage'] . ",note= '" . $data['note'] . "' 
+                $data['employer'] ."'".$data['insertImage'] . ",  stackId = '" . $data['stackUserId'] ."' ,note= '" . $data['note'] . "' 
                 WHERE eid = " .
                 $employeeId;
 

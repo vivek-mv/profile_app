@@ -84,7 +84,8 @@ INSERT INTO `employee` (`eid`, `prefix`, `firstName`, `middleName`, `lastName`, 
 
 ------------------------------------------------------
 
-
+ALTER TABLE  `employee` ADD  `stackId` INT NOT NULL DEFAULT  '0';
+------------------------------------------------------
 
 
 

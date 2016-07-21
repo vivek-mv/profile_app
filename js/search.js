@@ -132,6 +132,11 @@ $(document).ready(function(){
         handlePageNumbers(pageNo);
     }));
 
+    //Register event to display the stackoverflow info
+    $(document).on('click', '.showStackInfo', function () {
+        displayStackInfo(this.children[0].value);
+    });
+
 });
 
 var handleAjax = {
@@ -205,7 +210,8 @@ var handleAjax = {
             var record = jsonObj[row];
             tbody.append(
                 '<tr>' +
-                '<td>' + record.firstName + ' ' + record.middleName + ' ' + record.lastName + '</td>' +
+                '<td class="showStackInfo" data-toggle="modal" data-target="#myModal">' + record.firstName + ' ' + record.middleName + ' ' + record.lastName +
+                 '<input type="hidden" value=' + record.stackId + '>' + '</td>' +
                 '<td>' + record.gender + '</td>' +
                 '<td>' + record.dob + '</td>' +
                 '<td>' + record.phone + '</td>' +
@@ -250,8 +256,45 @@ function handlePageNumbers(currentPage) {
      }
 }   
 
+function displayStackInfo(stackUserId) {
+    if ( stackUserId == '0' ) {
+        $('#noAccount').css('display','inline');
+        $('.modal-body').css('display','none');
+    } else {
+        $('#noAccount').css('display','none');
+        $('#invalidAccount').css('display','none');
+        $('.modal-body').css('display','inline');
+        $('#loaderImg').css('display','inline');
+        $('.panel').hide();
+        $.ajax({
+            url: 'https://api.stackexchange.com/users/' + stackUserId + '?site=stackoverflow',
+            dataType : 'json',
+            success: function (response) {
+
+                if ( response.items == '' || response.error_id   ) {
+
+                    $('#loaderImg').css('display','none');
+                    $('#invalidAccount').css('display','inline');
+                } else {
+                    $('#display-name').html(response.items[0].display_name);
+                    $('#profile_pic').attr('src',response.items[0].profile_image);
+                    $('#age').html(response.items[0].age);
+                    $('#reputation').html(response.items[0].reputation);
+                    $('#b_badges').html(response.items[0].badge_counts.bronze);
+                    $('#s_badges').html(response.items[0].badge_counts.silver);
+                    $('#g_badges').html(response.items[0].badge_counts.gold);
+                    $('#location').html(response.items[0].location);
+                    $('#link').attr('href',response.items[0].link);
+                    $('#loaderImg').css('display','none');
+                    $('.panel').show();
+                }
 
 
+            }
+        });
+    }
+
+}
 
 
 

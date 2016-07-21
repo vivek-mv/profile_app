@@ -43,7 +43,7 @@
             $cols = "employee.eid, employee.firstName, employee.middleName,
                 employee.lastName, employee.gender, employee.dob, employee.mobile, employee.landline,
                 employee.email, employee.maritalStatus, employee.employment, employee.employer,
-                employee.photo, commMedium.msg, commMedium.email 
+                employee.photo, employee.stackId, commMedium.msg, commMedium.email 
                 AS comm_email, commMedium.call, commMedium.any, residence.street AS rStreet,
                 residence.city AS rCity,residence.state AS rState, residence.zip AS rZip, residence.fax AS rFax,
                 office.street AS oStreet, office.city AS oCity ,office.state AS oState, office.zip AS oZip, 
