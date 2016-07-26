@@ -216,14 +216,18 @@ var handleAjax = {
                 '<td>' + record.dob + '</td>' +
                 '<td>' + record.phone + '</td>' +
                 '<td>' + record.email + '</td>' +
-                '<td>' + record.maritalStatus + '</td>' +
-                '<td>' + record.employment + '</td>' +
-                '<td>' + record.medium + '</td>' +
-                '<td>' + record.residenceAddress + '</td>' +
-                '<td>' + record.officeAddress + '</td>' +
-                '<td>' + record.photo + '</td>' +
                 '<td>' + record.edit + '</td>' +
                 '<td>' + record.delete + '</td>' +
+                '<td>' +
+                '<input class="viewDetails btn btn-primary" type="button" name="viewDetails" value="View Details"' +
+                ' onclick="displayDetails(' + record.eid + ')"> ' +
+                '<input type="hidden" id="' + record.eid + '_mStatus" name="maritalStatus" value="' + record.maritalStatus + '">' +
+                '<input type="hidden" id="' + record.eid + '_employment" name="employment" value="' + record.employment + '">' +
+                '<input type="hidden" id="' + record.eid + '_commMedium" name="commMedium" value="' + record.medium + '">' +
+                '<input type="hidden" id="' + record.eid + '_residenceAddress" name="residenceAddress" value="' + record.residenceAddress + '">' +
+                '<input type="hidden" id="' + record.eid + '_officeAddress" name="officeAddress" value="' + record.officeAddress + '">' +
+                '<input type="hidden" id="' + record.eid + '_photo" name="photo" value="' + record.photo + '">' +
+                '</td>' +
                 '</tr>'
             );
         });
@@ -258,11 +262,11 @@ function handlePageNumbers(currentPage) {
 
 function displayStackInfo(stackUserId) {
     if ( stackUserId == '0' ) {
-        $('#noAccount').css('display','inline');
+        $('#stackNoAccount').css('display','inline');
         $('.modal-body').css('display','none');
     } else {
-        $('#noAccount').css('display','none');
-        $('#invalidAccount').css('display','none');
+        $('#stackNoAccount').css('display','none');
+        $('#stackInvalidAccount').css('display','none');
         $('.modal-body').css('display','inline');
         $('#loaderImg').css('display','inline');
         $('.panel').hide();
@@ -274,7 +278,7 @@ function displayStackInfo(stackUserId) {
                 if ( response.items == '' || response.error_id   ) {
 
                     $('#loaderImg').css('display','none');
-                    $('#invalidAccount').css('display','inline');
+                    $('#stackInvalidAccount').css('display','inline');
                 } else {
                     $('#display-name').html(response.items[0].display_name);
                     $('#profile_pic').attr('src',response.items[0].profile_image);
@@ -297,7 +301,18 @@ function displayStackInfo(stackUserId) {
 }
 
 
+function displayDetails(employeeId) {
 
+    $('.modal-body').css('display','inline');
+    $('.panel').show();
+    $('#user_pic').attr('src',$('#' + employeeId + '_photo').val());
+    $('#marital_status').html($('#' + employeeId + '_mStatus').val());
+    $('#employment_status').html($('#' + employeeId + '_employment').val());
+    $('#comm_medium').html($('#' + employeeId + '_commMedium').val());
+    $('#residence_address').html($('#' + employeeId + '_residenceAddress').val());
+    $('#office_address').html($('#' + employeeId + '_officeAddress').val());
+    $('#viewDetailsModal').modal('show');
+}
 
 
 

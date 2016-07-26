@@ -154,14 +154,9 @@
                                 Email
                                 <span class="glyphicon glyphicon-triangle-top"></span>
                             </th>
-                            <th>Marital Status</th>
-                            <th>Employment </th>
-                            <th>Comm. Mode</th>
-                            <th title = "Address Residence">Address (R)</th>
-                            <th title = "Address Office">Address (O)</th>
-                            <th>Photo</th>
                             <th>Update</th>
                             <th>Delete</th>
+                            <th>Details</th>
                           </tr>
                         </thead>
                         <tbody id="tablebody">
@@ -190,12 +185,12 @@
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                         <h4 class="modal-title">Stackoverflow Info</h4>
-                        <h4 id="noAccount" style="display: none;">
+                        <h4 id="stackNoAccount" style="display: none;">
                             Please create a
                             <a href="https://stackoverflow.com/users/signup" target="_blank">Stackoverflow</a>
                             accout and update the user id in your details
                         </h4>
-                        <h4 id="invalidAccount" style="display: none;">
+                        <h4 id="stackInvalidAccount" style="display: none;">
                             There is no info for your user id. Please provide a valid user id.
                         </h4>
                     </div>
@@ -272,60 +267,43 @@
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                         <h4 class="modal-title">User Details</h4>
-                        <h4 id="noAccount" style="display: none;">
-                            Please create a
-                            <a href="https://stackoverflow.com/users/signup" target="_blank">Stackoverflow</a>
-                            accout and update the user id in your details
-                        </h4>
-                        <h4 id="invalidAccount" style="display: none;">
-                            There is no info for your user id. Please provide a valid user id.
-                        </h4>
                     </div>
                     <div class="modal-body">
                         <div>
-                            <img id="loaderImg" class="col-md-offset-5" src="/images/ajax-loader.gif">
-                            <div class="panel panel-info" style="padding: 1%">
+                            <div class="panel panel-info" style="padding: 2%">
                                 <div class="panel-heading">
                                     <h3 id="display-name" class="panel-title"></h3>
                                 </div>
                                 <div class="panel-body">
                                     <div class="row">
                                         <div class="col-md-3 col-lg-3 " align="center">
-                                            <img id="profile_pic" alt="User Pic" src="" class="img-circle img-responsive">
+                                            <img id="user_pic" alt="User Pic" src="" class="img-circle img-responsive">
                                         </div>
 
                                         <div class=" col-md-9 col-lg-9 ">
                                             <table class="table table-user-information">
                                                 <tbody>
                                                 <tr>
-                                                    <td>Age</td>
-                                                    <td id="age"></td>
+                                                    <td>Marital Status</td>
+                                                    <td id="marital_status"></td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Reputation</td>
-                                                    <td id="reputation"></td>
+                                                    <td>Employment</td>
+                                                    <td id="employment_status"></td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Bronze Badges</td>
-                                                    <td id="b_badges"></td>
+                                                    <td>Communication Medium</td>
+                                                    <td id="comm_medium"></td>
                                                 </tr>
 
                                                 <tr>
                                                 <tr>
-                                                    <td>Silver Badges</td>
-                                                    <td id="s_badges"></td>
+                                                    <td>Address (R)</td>
+                                                    <td id="residence_address"></td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Gold Badges</td>
-                                                    <td id="g_badges"></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Location</td>
-                                                    <td id="location"></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Link</td>
-                                                    <td><a id="link" href="" target="_blank">Visit Your Stackoverflow profile</a></td>
+                                                    <td>Address (O)</td>
+                                                    <td id="office_address"></td>
                                                 </tr>
                                                 </tbody>
                                             </table>
